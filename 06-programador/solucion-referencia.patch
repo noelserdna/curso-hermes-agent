@@ -1,0 +1,55 @@
+diff --git a/06-programador/demo-app/src/inventario/core.py b/06-programador/demo-app/src/inventario/core.py
+index 2c8ff50..fdfb412 100644
+--- a/06-programador/demo-app/src/inventario/core.py
++++ b/06-programador/demo-app/src/inventario/core.py
+@@ -20,14 +20,16 @@ def total_pedido(lineas: list[tuple[Producto, int]], descuento: float = 0.0) ->
+     `descuento` es un porcentaje entre 0 y 1 que se aplica a la base imponible
+     (antes del IVA). Devuelve el total redondeado a 2 decimales.
+     """
++    if not 0 <= descuento <= 1:
++        raise ValueError("descuento debe estar entre 0 y 1")
+     base = sum(p.precio * cantidad for p, cantidad in lineas)
+-    total = base * (1 + IVA) - descuento  # BUG intencionado: resta el porcentaje como si fueran euros
++    total = base * (1 - descuento) * (1 + IVA)
+     return round(total, 2)
+ 
+ 
+ def productos_bajo_minimo(productos: list[Producto]) -> list[str]:
+     """SKUs cuyo stock está por debajo (estrictamente) de su stock mínimo."""
+-    return [p.sku for p in productos if p.stock <= p.stock_minimo]
++    return [p.sku for p in productos if p.stock < p.stock_minimo]
+ 
+ 
+ def reponer(producto: Producto, unidades: int) -> Producto:
+diff --git a/06-programador/demo-app/tests/test_core.py b/06-programador/demo-app/tests/test_core.py
+index 1e197b2..0475b52 100644
+--- a/06-programador/demo-app/tests/test_core.py
++++ b/06-programador/demo-app/tests/test_core.py
+@@ -14,6 +14,27 @@ def test_total_con_descuento_del_10_por_ciento():
+     assert total_pedido([(teclado, 2)], descuento=0.10) == 108.9
+ 
+ 
++def test_descuento_se_aplica_antes_del_iva_no_como_euros():
++    # descuento de 50 % sobre 100 € = 50 € + 21 % IVA = 60,50 €
++    teclado = Producto("TEC-01", "Teclado", 50.0, 10)
++    assert total_pedido([(teclado, 2)], descuento=0.50) == 60.5
++
++
++def test_descuento_fuera_de_rango_lanza_error():
++    teclado = Producto("TEC-01", "Teclado", 50.0, 10)
++    with pytest.raises(ValueError):
++        total_pedido([(teclado, 1)], descuento=10)
++    with pytest.raises(ValueError):
++        total_pedido([(teclado, 1)], descuento=-0.1)
++
++
++def test_bajo_minimo_es_estricto():
++    en_minimo = Producto("A-1", "En mínimo", 1.0, stock=5, stock_minimo=5)
++    bajo = Producto("A-2", "Bajo", 1.0, stock=4, stock_minimo=5)
++    sobre = Producto("A-3", "Sobre", 1.0, stock=6, stock_minimo=5)
++    assert productos_bajo_minimo([en_minimo, bajo, sobre]) == ["A-2"]
++
++
+ def test_reponer_rechaza_cantidades_no_positivas():
+     raton = Producto("RAT-01", "Ratón", 20.0, 3)
+     with pytest.raises(ValueError):

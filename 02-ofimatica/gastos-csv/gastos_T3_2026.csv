@@ -1,0 +1,44 @@
+fecha,categoria,proveedor,importe_eur,empleado
+2026-07-03,Software,Figma,134.18,Luis
+2026-07-04,Comidas,Cafetería Central,66.39,Ana
+2026-07-04,Formación,CodeCrypto,545.37,Luis
+2026-07-05,Comidas,Glovo,61.38,Ana
+2026-07-07,Formación,CodeCrypto,628.34,Jorge
+2026-07-08,Comidas,Restaurante La Plaza,65.32,Luis
+2026-07-08,Software,GitHub,173.65,Luis
+2026-07-14,Comidas,Restaurante La Plaza,52.34,Marta
+2026-07-15,Comidas,Cafetería Central,83.72,Marta
+2026-07-15,Marketing,Google Ads,498.90,Ana
+2026-07-18,Software,Figma,31.85,Ana
+2026-07-19,Software,OpenRouter,164.68,Marta
+2026-07-21,Viajes,Renfe,363.18,Jorge
+2026-07-27,Formación,O'Reilly,203.62,Luis
+2026-08-02,Material oficina,Amazon,93.35,Luis
+2026-08-05,Viajes,Renfe,138.68,Luis
+2026-08-06,Software,Figma,129.47,Marta
+2026-08-03,Viajes,Iberia,4850.00,Luis
+2026-08-08,Marketing,Google Ads,331.03,Jorge
+2026-08-09,Software,Figma,213.66,Ana
+2026-08-14,Marketing,Google Ads,555.70,Jorge
+2026-08-15,Software,OpenRouter,62.89,Ana
+2026-08-16,Formación,O'Reilly,727.36,Ana
+2026-08-16,Viajes,Cabify,61.96,Ana
+2026-08-17,Software,Figma,62.01,Marta
+2026-08-19,Formación,CodeCrypto,339.10,Marta
+2026-08-23,Comidas,Glovo,80.74,Marta
+2026-08-24,Software,OpenRouter,199.43,Jorge
+2026-08-27,Viajes,Cabify,523.83,Marta
+2026-09-01,Software,AWS,58.11,Ana
+2026-09-06,Marketing,Canva,47.78,Marta
+2026-09-08,Marketing,LinkedIn Ads,403.42,Luis
+2026-09-10,Comidas,Restaurante La Plaza,19.95,Marta
+2026-09-12,Formación,CodeCrypto,154.42,Jorge
+2026-09-13,Formación,Udemy,589.25,Marta
+2026-09-15,Viajes,Iberia,101.56,Ana
+2026-09-16,Material oficina,Office Depot,40.86,Luis
+2026-09-16,Software,Figma,32.74,Ana
+2026-09-19,Formación,CodeCrypto,860.13,Ana
+2026-09-20,Comidas,Restaurante La Plaza,13.77,Luis
+2026-09-23,Viajes,Renfe,464.56,Marta
+2026-09-24,Software,OpenRouter,226.00,Jorge
+2026-09-28,Material oficina,Office Depot,50.78,Jorge

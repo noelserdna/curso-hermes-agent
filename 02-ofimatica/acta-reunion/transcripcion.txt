@@ -1,0 +1,15 @@
+[10:02] Marta: Vale, empezamos. Hoy toca revisar el lanzamiento del curso de agentes y el presupuesto del Q4.
+[10:03] Luis: Del curso, el temario está al 80 %. Me falta el módulo de comparativa y grabar dos vídeos.
+[10:05] Ana: Yo puedo encargarme de la comparativa, pero necesito acceso a las cuentas de prueba de OpenClaw y Claude.
+[10:06] Marta: Hecho, Jorge te las pasa hoy. ¿Fecha de lanzamiento?
+[10:07] Luis: Propongo el 3 de noviembre. Si no, se nos junta con el Black Friday.
+[10:08] Jorge: Me parece bien. Ojo que la landing aún no tiene el formulario de inscripción conectado al CRM.
+[10:10] Marta: Jorge, ¿lo puedes tener para el 24 de octubre?
+[10:10] Jorge: Sí, para el 24.
+[10:12] Marta: Presupuesto Q4: tenemos 12.000 € para marketing. Propongo 7.000 en LinkedIn Ads y 5.000 en contenido.
+[10:14] Ana: Yo bajaría LinkedIn a 5.000 y metería 2.000 en un webinar gratuito de captación.
+[10:16] Luis: Estoy con Ana, el webinar del año pasado convirtió muy bien.
+[10:17] Marta: De acuerdo: 5.000 LinkedIn, 5.000 contenido, 2.000 webinar. Ana organiza el webinar, fecha tentativa 27 de octubre.
+[10:19] Jorge: Una cosa pendiente: no hemos decidido si el curso tendrá certificado con NFT o PDF normal.
+[10:20] Marta: Eso lo dejamos para la próxima reunión, que sea el jueves 16.
+[10:21] Marta: Cerramos. Gracias a todos.
