@@ -152,5 +152,29 @@ ln -s ../../08-entornos/ci/revisar-diff.sh .git/hooks/pre-push   # hook local
 ./ci/revisar-diff.sh main                                          # a mano
 ```
 
-GitHub Actions: [`ci/github-action-review.yml`](ci/github-action-review.yml) 📄 (añade el secreto
-`OPENROUTER_API_KEY` al repo; no lo ejecutamos en el curso).
+### En GitHub Actions ✅ (~2 min y ~0,003 $ por PR)
+
+[`ci/github-action-review.yml`](ci/github-action-review.yml) revisa cada PR y deja el resultado como comentario.
+Cópialo a `.github/workflows/` y añade la clave como secreto del repo (desde tu terminal, sin que pase por ningún chat):
+
+```bash
+gh secret set OPENROUTER_API_KEY --repo <usuario>/<repo>   # pide la clave sin mostrarla
+```
+
+Usa una **clave propia para CI con límite de gasto** (OpenRouter → Keys): si se filtra o alguien abusa del
+workflow, el daño queda acotado y la revocas sin tocar la de tu Hermes.
+
+| Decisión | Por qué |
+|---|---|
+| `--branch v0.21.6` en el instalador, y `hermes --version` en el log | Cada PR se revisa con la misma versión; actualizar es un cambio explícito en el workflow |
+| El diff va a `pr.diff` y el agente lo lee con `-t file` | Meter el diff en el prompt choca con el límite de tamaño de un argumento en PR grandes; además, así puede abrir los ficheros completos para tener contexto |
+| `HERMES_WRITE_SAFE_ROOT` apuntando a una carpeta temporal | `-t file` permite leer **y escribir**: el revisor solo puede tocar esa carpeta |
+| `if:` que excluye PR desde forks | Esas PR no reciben secretos ni permiso de escritura |
+| `cat usage.json` al final | Tokens y coste de cada revisión, visibles en el log del job |
+
+Resultado en una PR de prueba con un fallo a propósito (`stock_bajo` pasa de `<` a `<=`, contra su docstring):
+**VEREDICTO: BLOQUEANTE**, con la línea exacta, el producto que entraría de más (WEB-06, con stock 5), el test que
+rompería (`tests/test_tienda.py:35`) y la contradicción con el docstring. También dio un hallazgo discutible: que el
+arreglo de `buscar` no traía test, cuando el test ya existía (no estaba en el diff). Por eso el revisor **comenta**
+y no bloquea el merge por sí solo: quien decide es una persona. La instalación se lleva ~70 s del total: si revisas muchas PR, cachea `~/.hermes` o usa la
+imagen Docker del equipo (apartado A).

@@ -211,8 +211,8 @@ footer ul { padding-left: 1.1em; }
         <div><dt>Versión estable</dt><dd>v0.21.6</dd></div>
         <div><dt>Publicada</dt><dd>8 oct 2026</dd></div>
         <div><dt>Licencia</dt><dd>MIT</dd></div>
-        <div><dt>Pruebas</dt><dd>21 reales · 1 guía</dd></div>
-        <div><dt>Coste de todas las pruebas</dt><dd>≈ 0,31 $</dd></div>
+        <div><dt>Pruebas</dt><dd>22 reales</dd></div>
+        <div><dt>Coste de todas las pruebas</dt><dd>≈ 0,32 $</dd></div>
       </dl>
       <div class="audience">
         <span class="chip">≈ 6 h de clase</span>
@@ -221,7 +221,7 @@ footer ul { padding-left: 1.1em; }
       </div>
       <div class="note key" style="margin-top:24px">
         <span class="t">Cómo usar este curso</span>
-        <p>Cada módulo tiene la explicación aquí y los ficheros en el <a href="https://github.com/noelserdna/curso-hermes-agent">repositorio de GitHub</a>. Los ejemplos marcados <span class="badge ok">probado</span> se ejecutaron de verdad el 9 de octubre de 2026; los marcados <span class="badge doc">guía</span> siguen la documentación oficial porque necesitan cuentas externas. Marca cada módulo como completado para seguir tu progreso (se guarda solo en tu navegador).</p>
+        <p>Cada módulo tiene la explicación aquí y los ficheros en el <a href="https://github.com/noelserdna/curso-hermes-agent">repositorio de GitHub</a>. Todos los ejemplos marcados <span class="badge ok">probado</span> se ejecutaron de verdad el 9 de octubre de 2026 con Hermes v0.21.6: lo que ves son resultados reales, con su tiempo y su coste. Marca cada módulo como completado para seguir tu progreso (se guarda solo en tu navegador).</p>
       </div>
     </header>
 
@@ -783,7 +783,37 @@ de 10 líneas. Combina sus resultados en un informe."</pre></div>
 RESULTADO="$(hermes -t file -z "Revisa SOLO este diff... VEREDICTO: OK | BLOQUEANTE ... $DIFF" \
              --usage-file .hermes-review-usage.json)"
 grep -q "VEREDICTO: BLOQUEANTE" &lt;&lt;&lt;"$RESULTADO" &amp;&amp; exit 1</pre></div>
-      <p>Con <code>-t file</code> el revisor no tiene terminal ni web. Coste medido: <strong>0,003 $ por revisión</strong>. En el repo hay una plantilla de GitHub Actions que comenta en la PR <span class="badge doc">guía</span>.</p>
+      <p>Con <code>-t file</code> el revisor no tiene terminal ni web. Coste medido: <strong>0,003 $ por revisión</strong>.</p>
+      <h3>Revisión de cada PR en GitHub Actions <span class="badge ok">probado</span></h3>
+      <p class="prose">La plantilla <code>08-entornos/ci/github-action-review.yml</code> revisa cada PR y deja el resultado como comentario. Cópiala a <code>.github/workflows/</code> y añade la clave como secreto del repo desde tu terminal:</p>
+      <div class="code"><pre>gh secret set OPENROUTER_API_KEY --repo &lt;usuario&gt;/&lt;repo&gt;   <span class="c"># pide la clave sin mostrarla</span></pre></div>
+      <div class="code"><span class="lbl">github-action-review.yml (pasos clave)</span><pre>curl -fsSL https://hermes-agent.nousresearch.com/install.sh \
+  | bash -s -- --non-interactive --skip-browser --skip-computer-use --branch v0.21.6
+
+git diff origin/$BASE...HEAD &gt; pr.diff
+HERMES_WRITE_SAFE_ROOT=$RUNNER_TEMP/hermes \
+hermes -t file -z "Revisa el diff de pr.diff… No modifiques ningún fichero. VEREDICTO (OK/BLOQUEANTE)…" \
+  --usage-file usage.json &gt; review.md
+gh pr comment $PR --body-file review.md</pre></div>
+      <div class="tw"><table>
+        <thead><tr><th>Decisión</th><th>Por qué</th></tr></thead>
+        <tbody>
+          <tr><td>Versión fijada en el instalador y <code>hermes --version</code> en el log</td><td>Cada PR se revisa con la misma versión; actualizar es un cambio explícito</td></tr>
+          <tr><td>El diff en un fichero que el agente lee con <code>-t file</code></td><td>En el prompt chocaría con el límite de tamaño de un argumento en PR grandes; así además puede abrir los ficheros completos</td></tr>
+          <tr><td><code>HERMES_WRITE_SAFE_ROOT</code> a una carpeta temporal</td><td><code>-t file</code> permite leer <em>y escribir</em>: el revisor solo puede tocar esa carpeta</td></tr>
+          <tr><td>Sin PR desde forks (<code>if:</code>)</td><td>No reciben secretos ni permiso de escritura</td></tr>
+          <tr><td>Una clave propia para CI, con límite de gasto</td><td>Si se filtra o alguien abusa del workflow, el daño queda acotado</td></tr>
+        </tbody></table></div>
+      <div class="example">
+        <h4>PR de prueba <span class="badge ok">≈ 2 min · ≈ 0,003 $</span></h4>
+        <div class="meta">Fallo a propósito: <code>stock_bajo</code> pasa de <code>&lt;</code> a <code>&lt;=</code>, contra su docstring</div>
+        <ul class="found">
+          <li><strong>VEREDICTO: BLOQUEANTE</strong>, con la línea exacta y el producto que entraría de más (WEB-06, con stock 5).</li>
+          <li>El test que rompería (<code>tests/test_tienda.py:35</code>) y la contradicción con el docstring.</li>
+          <li>Un hallazgo discutible: que el arreglo de <code>buscar</code> llegaba sin test. El test ya existía (y era el que fallaba antes del cambio), pero no estaba en el diff. Por eso el revisor <strong>comenta</strong> y no bloquea el merge por sí solo: quien decide es una persona.</li>
+        </ul>
+        <p>La instalación se lleva ~70 s del total: si revisas muchas PR, cachea <code>~/.hermes</code> o usa la imagen Docker del equipo.</p>
+      </div>
       <button class="mark-done" type="button" data-mod="m9" aria-pressed="false">Marcar como completado</button>
     </section>
 
@@ -937,7 +967,7 @@ hermes kanban create "E2E TIENDA-12" --assignee e2e --parent "$IMPL" --workspace
           <li>7 backends de ejecución, subagentes, MCP en los dos sentidos.</li>
           <li>Lee tu <code>AGENTS.md</code>/<code>CLAUDE.md</code> e importa tu config de Claude Code.</li>
           <li>Perfiles, tablero kanban y revisión nativa para montar un equipo de agentes por fases.</li>
-          <li>Barato con modelos eficientes: todas las pruebas de este curso, ≈ 0,31 $.</li>
+          <li>Barato con modelos eficientes: todas las pruebas de este curso, ≈ 0,32 $.</li>
         </ul></div>
         <div class="panel con"><h4>En contra</h4><ul>
           <li>Va muy rápido: cientos de PRs por versión; flags y docs cambian de una semana a otra.</li>
@@ -1002,8 +1032,8 @@ hermes kanban create "E2E TIENDA-12" --assignee e2e --parent "$IMPL" --workspace
           <tr><td>E2E con grabación en vídeo</td><td>10</td><td class="num">≈ 3 min</td><td>OK, vídeo WebM</td></tr>
           <tr><td>Tarea kanban creada desde Telegram</td><td>10</td><td class="num">38 s</td><td>OK, aviso de fin en el chat</td></tr>
           <tr><td>Imagen Docker efímera por tarea</td><td>09</td><td class="num">≈ 30 s</td><td>OK, repo limpio y sin restos · 4 ejecuciones ≈ 0,02 $</td></tr>
-          <tr><td>GitHub Actions</td><td>09</td><td class="num">—</td><td>No ejecutado: requiere cuenta externa</td></tr>
-          <tr><td><strong>Total (hermes insights + consumo de la clave)</strong></td><td></td><td class="num">35 sesiones</td><td><strong>≈ 0,31 $</strong></td></tr>
+          <tr><td>Revisión de PR en GitHub Actions</td><td>09</td><td class="num">≈ 2 min</td><td>OK, comentario BLOQUEANTE en la PR · 3 ejecuciones ≈ 0,011 $</td></tr>
+          <tr><td><strong>Total (hermes insights + consumo de la clave)</strong></td><td></td><td class="num">38 sesiones</td><td><strong>≈ 0,32 $</strong></td></tr>
         </tbody></table></div>
     </section>
 

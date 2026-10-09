@@ -1,6 +1,6 @@
 # Copia este fichero a .github/workflows/hermes-review.yml
 # Requiere el secreto OPENROUTER_API_KEY en Settings → Secrets and variables → Actions.
-# 📄 Plantilla basada en la documentación oficial: no se ejecutó durante el curso.
+# ✅ Probado en una PR real del repo del curso: ~2 min por ejecución (la instalación es ~70 s) y ~0,005 $ por revisión.
 name: Revisión con Hermes
 
 on:
@@ -12,28 +12,36 @@ permissions:
 
 jobs:
   review:
+    # Las PR desde forks no reciben secretos ni permiso de escritura: no tiene sentido lanzarlas
+    if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
-      - name: Instalar Hermes Agent
+      - name: Instalar Hermes Agent (versión fijada)
         run: |
           curl -fsSL https://hermes-agent.nousresearch.com/install.sh \
-            | bash -s -- --non-interactive --skip-browser --skip-computer-use
+            | bash -s -- --non-interactive --skip-browser --skip-computer-use --branch v0.21.6
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          "$HOME/.local/bin/hermes" --version | head -1   # deja constancia de la versión en el log
 
       - name: Revisar el diff
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          # -t file permite leer y también escribir: el revisor solo puede escribir en una carpeta temporal
+          HERMES_WRITE_SAFE_ROOT: ${{ runner.temp }}/hermes
         run: |
           git diff origin/${{ github.base_ref }}...HEAD > pr.diff
+          # El diff va en un fichero que el agente lee con su herramienta de ficheros (-t file),
+          # no dentro del prompt: así no choca con el límite de tamaño de un argumento en PR grandes.
           hermes -t file --provider openrouter -m anthropic/claude-haiku-5.5 \
-            -z "Revisa este diff como revisor senior. Responde en Markdown: VEREDICTO (OK/BLOQUEANTE) y hasta 5 hallazgos con fichero:línea. $(cat pr.diff)" \
+            -z "Revisa como revisor senior el diff de pr.diff (puedes abrir los ficheros del repo para tener contexto). No modifiques ningún fichero. Responde en Markdown: VEREDICTO (OK/BLOQUEANTE) y hasta 5 hallazgos con fichero:línea." \
             --usage-file usage.json > review.md
           cat review.md
+          cat usage.json   # tokens y coste de la revisión, visibles en el log del job
 
       - name: Comentar en la PR
         env:

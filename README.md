@@ -31,10 +31,10 @@ Hermes publica versiones casi cada semana: si un flag no existe en tu versión, 
 | 5 | [`05-mensajeria`](05-mensajeria) | Gateway: hablar con Hermes por Telegram | ✅ |
 | 6 | [`06-programador`](06-programador) | `AGENTS.md`, arreglar bugs con tests, checkpoints y rollback | ✅ |
 | 7 | [`07-mcp`](07-mcp) | Construir un servidor MCP propio y conectarlo | ✅ |
-| 8 | [`08-entornos`](08-entornos) | Backend Docker, imagen efímera, worktrees, permisos mínimos, despliegue 24/7, subagentes, revisión en CI | ✅ / 📄 |
+| 8 | [`08-entornos`](08-entornos) | Backend Docker, imagen efímera, worktrees, permisos mínimos, despliegue 24/7, subagentes, revisión en CI | ✅ |
 | 9 | [`09-equipo-de-agentes`](09-equipo-de-agentes) | Pipeline por fases con perfiles y kanban: especificar → implementar ↔ revisar → E2E en navegador, lanzable desde Telegram | ✅ |
 
-✅ probado de verdad · 📄 guía basada en la documentación oficial (requiere cuentas externas)
+✅ probado de verdad: todos los ejemplos se ejecutaron el 9 de octubre de 2026 con Hermes v0.21.6
 
 ## Requisitos
 
@@ -43,7 +43,7 @@ Hermes publica versiones casi cada semana: si un flag no existe en tu versión, 
 - Un modelo con **≥ 64K tokens** de contexto.
 - Una API key de un proveedor: recomendamos **[OpenRouter](https://openrouter.ai)** (una clave, todos los modelos).
 - Para los módulos 6 y 9: [`uv`](https://docs.astral.sh/uv/) (y `jq` en el 9). Para el módulo 8: Docker.
-- Coste real medido con `hermes insights`: **las 35 sesiones de prueba de este curso (5 perfiles y 4 contenedores) costaron ~0,31 $ en total** con Claude Haiku 5.5.
+- Coste real medido con `hermes insights`: **las 38 sesiones de prueba de este curso (5 perfiles, 4 contenedores y 3 ejecuciones de GitHub Actions) costaron ~0,32 $ en total** con Claude Haiku 5.5.
 
 ## Cómo usar este repo
 
