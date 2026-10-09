@@ -37,7 +37,9 @@ Hermes publica versiones casi cada semana: si un flag no existe en tu versión, 
 
 ## Requisitos
 
-- macOS, Linux o Windows (nativo o WSL2) con `git` y `curl`.
+- macOS (Apple Silicon), Linux con glibc o Windows 10/11 (nativo o WSL2) con `git` y `curl`.
+- Mínimo 1 GB de RAM (2–4 GB recomendado), ~2,5 GB de disco y sin GPU. Detalle en [`00-instalacion`](00-instalacion#requisitos-mínimos).
+- Un modelo con **≥ 64K tokens** de contexto.
 - Una API key de un proveedor: recomendamos **[OpenRouter](https://openrouter.ai)** (una clave, todos los modelos).
 - Para el módulo 6: [`uv`](https://docs.astral.sh/uv/). Para el módulo 8: Docker.
 - Coste real medido con `hermes insights`: **las 19 sesiones de prueba de este curso costaron ~0,12 $ en total** con Claude Haiku 5.5.

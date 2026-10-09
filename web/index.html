@@ -309,6 +309,21 @@ footer ul { padding-left: 1.1em; }
     <section class="mod" id="m1" data-title="Instalación">
       <div class="mod-head"><span class="mod-num">01</span><h2>Instalación y configuración</h2><span class="badge ok">probado</span></div>
       <p class="mod-goal">Instalar Hermes, conectarlo a un proveedor de modelos y comprobar que responde.</p>
+      <h3>Requisitos mínimos</h3>
+      <div class="tw"><table>
+        <thead><tr><th></th><th>Mínimo</th><th>Recomendado / notas</th></tr></thead>
+        <tbody>
+          <tr><td>Sistema</td><td>macOS (Apple Silicon) · Windows 10/11 (x86_64, ARM64) · Linux con glibc (x86_64, aarch64) · WSL2</td><td>Soporte prioritario (Tier 1). La app de escritorio MSIX exige Windows 11 22H2+. Linux probado sobre Ubuntu reciente. Intel Mac: solo la CLI, sin prioridad de soporte</td></tr>
+          <tr><td>Herramientas previas</td><td><code>git</code>, <code>curl</code>, <code>tar</code> y <code>shasum</code>/<code>sha256sum</code></td><td>Python, Node, <code>uv</code>, ripgrep y FFmpeg los trae el instalador. En Linux mínimo puede pedir <code>sudo</code> para instalar <code>libatomic1</code></td></tr>
+          <tr><td>RAM</td><td>1 GB</td><td>2–4 GB. Las herramientas de navegador (Chromium) son lo que más consume; sin ellas basta 1 GB</td></tr>
+          <tr><td>CPU</td><td>1 núcleo</td><td>2 núcleos. El modelo corre en la nube: no hace falta GPU</td></tr>
+          <tr><td>Disco</td><td>~2,5 GB libres</td><td>Nuestra instalación completa ocupa <strong>2,2 GB</strong> (330 MB son Chromium; <code>--skip-browser</code> lo omite). Los datos (sesiones, skills) crecen con el uso</td></tr>
+          <tr><td>Modelo</td><td>Contexto ≥ <strong>64K tokens</strong></td><td>Hermes rechaza al arrancar los modelos con menos contexto. Con modelos locales (Ollama, llama.cpp) sube <code>ctx-size</code> a 65536</td></tr>
+          <tr><td>Cuenta</td><td>API key de un proveedor</td><td>OpenRouter, Anthropic, OpenAI, Nous Portal… o un servidor local</td></tr>
+          <tr><td>Red</td><td>Conexión a Internet</td><td>Para instalar y para hablar con el modelo (salvo modelo local)</td></tr>
+        </tbody></table></div>
+      <p class="prose" style="margin-top:8px">Fuente: <em>Platform Support</em>, <em>Installation</em> y <em>Docker → Resource limits</em> de la documentación oficial. Las cifras de disco son las medidas en nuestra instalación.</p>
+      <h3>Instalar</h3>
       <div class="tabs" data-tabs>
         <div class="tablist" role="tablist">
           <button role="tab" aria-selected="true" aria-controls="os-unix" id="t-unix">macOS / Linux / WSL2</button>
@@ -322,7 +337,8 @@ iex (irm https://hermes-agent.nousresearch.com/install.ps1)</pre></div>
         <div class="code" role="tabpanel" id="os-docker" aria-labelledby="t-docker" hidden><pre>docker pull nousresearch/hermes-agent:stable
 <span class="c"># monta un volumen en /opt/data para que la memoria y la config persistan</span></pre></div>
         <div class="code" role="tabpanel" id="os-app" aria-labelledby="t-app" hidden><pre><span class="c"># Descarga desde https://hermes-agent.nousresearch.com</span>
-<span class="c"># macOS: solo Apple Silicon · Windows: también en Microsoft Store · Linux disponible</span>
+<span class="c"># macOS: Apple Silicon (Intel tiene bundle aparte) · Windows 11 22H2+ (MSIX)</span>
+<span class="c"># Linux: sin paquete de escritorio oficial; instala la CLI y ejecuta hermes desktop</span>
 <span class="c"># Si ya tienes la CLI:</span>
 hermes desktop</pre></div>
       </div>
