@@ -29,9 +29,9 @@ def listar() -> list[dict]:
 
 def buscar(texto: str) -> list[dict]:
     """Devuelve los productos cuyo nombre contiene `texto`, sin distinguir mayúsculas."""
-    return [asdict(p) for p in CATALOGO if texto in p.nombre]
+    return [asdict(p) for p in CATALOGO if texto.casefold() in p.nombre.casefold()]
 
 
 def stock_bajo() -> list[str]:
     """SKU de los productos con stock estrictamente menor que UMBRAL_STOCK_BAJO."""
-    return [p.sku for p in CATALOGO if p.stock < UMBRAL_STOCK_BAJO]
+    return [p.sku for p in CATALOGO if p.stock <= UMBRAL_STOCK_BAJO]
