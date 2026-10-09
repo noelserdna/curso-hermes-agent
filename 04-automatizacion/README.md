@@ -65,6 +65,21 @@ Hermes crea el job con la herramienta `cronjob`. También: `/cron add "in 30m" "
 /blueprint morning-brief time=07:30 deliver=telegram
 ```
 
+## E. Disparo único tras un despliegue ✅
+
+Un job de una sola vez encadena trabajo a algo que tarda: despliegas una preview y programas la comprobación
+para cuando esté lista. Al ejecutarse, el job se borra solo.
+
+```bash
+cp scripts/smoke_despliegue.sh ~/.hermes/scripts/    # la URL se fija dentro del script
+hermes cron create "in 5m" --no-agent --script smoke_despliegue.sh --name smoke-pr-42 --deliver telegram
+# → ✅ http://127.0.0.1:8765 responde: 6 productos en el catálogo   (llegó al móvil)
+```
+
+El script lo ejecuta el gateway, no tu shell: una variable de entorno puesta al crear el job no le llega.
+Sin `--no-agent`, el job puede lanzar un agente que abra la URL en el navegador y recorra la feature: el E2E
+del módulo 9, disparado por el despliegue.
+
 ## Gestión y parada de emergencia
 
 ```bash

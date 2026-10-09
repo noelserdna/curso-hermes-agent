@@ -1,6 +1,8 @@
-# 5 · Mensajería: Hermes en Telegram 📄
+# 5 · Mensajería: Hermes en Telegram ✅
 
-> Guía basada en la documentación oficial (no ejecutada en nuestra prueba: requiere crear un bot propio).
+> Probado el 9-oct-2026 con un bot propio: conexión en ~15 s (modo *polling*, sin abrir puertos), `/sethome`,
+> entregas de cron y avisos del tablero kanban en el móvil. Las **notas de voz** no funcionan sin un motor de voz
+> a texto (Whisper local o un proveedor con API); el bot lo explica y ofrece alternativas.
 
 El **gateway** conecta Hermes con Telegram, Discord, Slack, WhatsApp, Signal, iMessage, Email, Matrix, Teams,
 Google Chat y más. Es lo que convierte a Hermes en un asistente "siempre encendido": la misma memoria y skills,

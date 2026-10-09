@@ -42,15 +42,70 @@ ls correos/
 Resultado de nuestra prueba en `salida-ejemplo/correos/`: 4 correos, cada tarea en un solo correo, y avisos de
 fechas incoherentes (el 24-oct-2026 cae en sábado).
 
-### Skills de proyecto
+### Scripts dentro de la skill: el punto medio ✅
 
-Coloca skills en `./.hermes/skills/` o `./.agents/skills/` de un repo. Por seguridad, se cargan solo tras
-`hermes skills trust`.
+La skill trae [`scripts/validar_correos.py`](skills/email-seguimiento/scripts/validar_correos.py) y su
+`SKILL.md` obliga a ejecutarlo (`${HERMES_SKILL_DIR}` se sustituye por la ruta de la skill). El script
+comprueba sin LLM lo que se puede comprobar con código: nombres de fichero, cabeceras, huecos de plantilla
+sin rellenar y si el día de la semana de cada fecha cuadra con el calendario.
 
-### El agente crea sus propias skills
+```bash
+python3 skills/email-seguimiento/scripts/validar_correos.py salida-ejemplo/correos 2026
+# OK 2026-10-09_marta.md
+#   ~ aviso (ya marcado para revisar): 'jueves 16 de octubre': el 16/10/2026 es viernes
+```
 
-Tras resolver algo complejo, pídele `/learn` (o simplemente "guarda esto como skill"): Hermes escribe el
-`SKILL.md` por ti. Escribir skills, memoria o `AGENTS.md` **siempre pide aprobación** (desde v0.21).
+Tres formas de pedirle algo a un agente, de más a menos control:
+
+| | Qué es | Cuándo |
+|---|---|---|
+| **Determinista** | Un script. Sin LLM | Lo que tiene una única respuesta correcta: validar, convertir, desplegar |
+| **Pseudodeterminista** | Skill = procedimiento + scripts que el agente **debe** ejecutar | La mayoría de procesos de empresa |
+| **No determinista** | Un prompt suelto | Explorar, redactar, decidir |
+
+Regla práctica: lo que pueda validar un script, que no lo valide el modelo "a ojo".
+
+### Skills de proyecto frente a skills de Hermes
+
+| | Skills de Hermes (`~/.hermes/skills/`) | Skills de proyecto (`<repo>/.hermes/skills/` o `.agents/skills/`) |
+|---|---|---|
+| Qué guardan | **Tu forma de trabajar**: el flujo, cómo redactas, cómo revisas | **Cómo se ejecuta este producto**: levantar el entorno, desplegar, datos de prueba |
+| Quién las mantiene | Tú… y el propio agente (las crea y parchea) | El repo, con revisión de código como el resto |
+| Se activan | Siempre | Solo tras `hermes skills trust` en ese repo, y tienen prioridad |
+| ¿Las toca el agente? | Sí: `skill_manage` y el curator | `skill_manage` y el curator **no**; pero no son de solo lectura (puede editarlas con `write_file`) |
+
+Así un mismo Hermes trabaja en varios productos: el flujo vive en Hermes y la ejecución en cada repo.
+Ejemplo real en el módulo 9: [`app-web/.hermes/skills/levantar-entorno`](../09-equipo-de-agentes/app-web/.hermes/skills/levantar-entorno).
+
+### El agente crea y modifica sus propias skills
+
+Tras resolver algo complejo, pídele `/learn` (o "guarda esto como skill"): Hermes escribe el `SKILL.md`.
+Además, por defecto, una **revisión en segundo plano** tras cada turno puede crear o parchear skills y memoria
+sin preguntarte. Es potente, pero tiene un coste: con semanas de uso, tu entorno ya no se parece al de nadie.
+
+### Higiene: que tu entorno no derive ✅
+
+Con el tiempo cada persona acumula memorias y skills distintas, algunas contradictorias. Síntoma típico:
+**sale un modelo nuevo y "a mí no me funciona"**, porque instrucciones pensadas para el modelo anterior
+lo frenan (por ejemplo, "prioriza siempre lo más simple" hace que elija un *timeout* donde un *watcher*
+era la solución correcta).
+
+| Clave de `config.yaml` | Por defecto | Qué hace |
+|---|---|---|
+| `skills.write_approval` | `false` | `true`: toda escritura de skills queda pendiente (`/skills pending`, `/skills approve`) |
+| `memory.write_approval` | `false` | Igual para la memoria (`/memory pending`) |
+| `auxiliary.background_review.enabled` | `true` | `false`: sin autoaprendizaje en segundo plano |
+| `curator.enabled` | `true` | Poda y archiva skills poco usadas. `hermes curator pin <skill>` evita que borre una |
+
+```bash
+hermes config set skills.write_approval true
+hermes curator status
+hermes profile export default -o mi-entorno.tar.gz   # foto de tu entorno (sin credenciales)
+```
+
+Revisa de vez en cuando `~/.hermes/memories/` y `~/.hermes/skills/`, y cuando cambies de modelo, pregúntate
+qué instrucciones ya no hacen falta. Para equipos, la solución de fondo es otra: un entorno **compartido y
+versionado** (módulo 9).
 
 ### Hub de skills
 

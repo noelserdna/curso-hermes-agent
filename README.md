@@ -26,12 +26,13 @@ Hermes publica versiones casi cada semana: si un flag no existe en tu versión, 
 | 0 | [`00-instalacion`](00-instalacion) | Instalar, configurar proveedor y modelo, actualizar, desinstalar | ✅ |
 | 1 | [`01-primeros-pasos`](01-primeros-pasos) | CLI/TUI, slash commands, sesiones, modo one-shot (`-z`) | ✅ |
 | 2 | [`02-ofimatica`](02-ofimatica) | CSV → Excel con fórmulas y gráfico, transcripción → acta `.docx`, ordenar una carpeta | ✅ |
-| 3 | [`03-memoria-y-skills`](03-memoria-y-skills) | Memoria persistente y crear tu propia skill (`SKILL.md`) | ✅ |
-| 4 | [`04-automatizacion`](04-automatizacion) | Cron con y sin LLM, entrega de resultados, blueprints | ✅ |
-| 5 | [`05-mensajeria`](05-mensajeria) | Gateway: hablar con Hermes por Telegram | 📄 guía |
+| 3 | [`03-memoria-y-skills`](03-memoria-y-skills) | Memoria, skills con scripts de validación, skills de proyecto e higiene del entorno | ✅ |
+| 4 | [`04-automatizacion`](04-automatizacion) | Cron con y sin LLM, disparo único tras un despliegue, blueprints | ✅ |
+| 5 | [`05-mensajeria`](05-mensajeria) | Gateway: hablar con Hermes por Telegram | ✅ |
 | 6 | [`06-programador`](06-programador) | `AGENTS.md`, arreglar bugs con tests, checkpoints y rollback | ✅ |
 | 7 | [`07-mcp`](07-mcp) | Construir un servidor MCP propio y conectarlo | ✅ |
-| 8 | [`08-entornos`](08-entornos) | Backend Docker, subagentes en paralelo, revisión de código en CI | ✅ / 📄 |
+| 8 | [`08-entornos`](08-entornos) | Backend Docker, imagen efímera, worktrees, permisos mínimos, despliegue 24/7, subagentes, revisión en CI | ✅ / 📄 |
+| 9 | [`09-equipo-de-agentes`](09-equipo-de-agentes) | Pipeline por fases con perfiles y kanban: especificar → implementar ↔ revisar → E2E en navegador, lanzable desde Telegram | ✅ |
 
 ✅ probado de verdad · 📄 guía basada en la documentación oficial (requiere cuentas externas)
 
@@ -41,8 +42,8 @@ Hermes publica versiones casi cada semana: si un flag no existe en tu versión, 
 - Mínimo 1 GB de RAM (2–4 GB recomendado), ~2,5 GB de disco y sin GPU. Detalle en [`00-instalacion`](00-instalacion#requisitos-mínimos).
 - Un modelo con **≥ 64K tokens** de contexto.
 - Una API key de un proveedor: recomendamos **[OpenRouter](https://openrouter.ai)** (una clave, todos los modelos).
-- Para el módulo 6: [`uv`](https://docs.astral.sh/uv/). Para el módulo 8: Docker.
-- Coste real medido con `hermes insights`: **las 19 sesiones de prueba de este curso costaron ~0,12 $ en total** con Claude Haiku 5.5.
+- Para los módulos 6 y 9: [`uv`](https://docs.astral.sh/uv/) (y `jq` en el 9). Para el módulo 8: Docker.
+- Coste real medido con `hermes insights`: **las 31 sesiones de prueba de este curso (5 perfiles) costaron ~0,29 $ en total** con Claude Haiku 5.5.
 
 ## Cómo usar este repo
 

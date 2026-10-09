@@ -198,7 +198,7 @@ footer ul { padding-left: 1.1em; }
     </a>
     <div class="ver">Hermes Agent v0.21.6 · oct 2026</div>
     <ol id="toc-list"></ol>
-    <div class="progress"><span id="progress-txt">0 de 11 módulos completados</span><div class="bar"><i id="progress-bar"></i></div></div>
+    <div class="progress"><span id="progress-txt">0 de 12 módulos completados</span><div class="bar"><i id="progress-bar"></i></div></div>
     <a class="repo" href="https://github.com/noelserdna/curso-hermes-agent">Repo con los ejemplos ↗</a>
   </nav>
 
@@ -211,11 +211,11 @@ footer ul { padding-left: 1.1em; }
         <div><dt>Versión estable</dt><dd>v0.21.6</dd></div>
         <div><dt>Publicada</dt><dd>8 oct 2026</dd></div>
         <div><dt>Licencia</dt><dd>MIT</dd></div>
-        <div><dt>Pruebas</dt><dd>14 reales · 2 guías</dd></div>
-        <div><dt>Coste de todas las pruebas</dt><dd>≈ 0,12 $</dd></div>
+        <div><dt>Pruebas</dt><dd>20 reales · 2 guías</dd></div>
+        <div><dt>Coste de todas las pruebas</dt><dd>≈ 0,29 $</dd></div>
       </dl>
       <div class="audience">
-        <span class="chip">≈ 5 h de clase</span>
+        <span class="chip">≈ 6 h de clase</span>
         <span class="chip">macOS · Linux · Windows</span>
         <span class="chip">Modelo usado: Claude Haiku 5.5 vía OpenRouter</span>
       </div>
@@ -498,7 +498,7 @@ hermes -z "¿Cómo formateas 1500 euros?" <span class="c"># sesión nueva → 1.
       <div class="code"><span class="lbl">03-memoria-y-skills/skills/email-seguimiento/SKILL.md</span><pre><span class="k">---</span>
 <span class="k">name:</span> email-seguimiento
 <span class="k">description:</span> "Genera un correo de seguimiento por responsable a partir de un acta."
-<span class="k">version:</span> 1.0.0
+<span class="k">version:</span> 1.1.0
 <span class="k">metadata:</span>
   <span class="k">hermes:</span>
     <span class="k">tags:</span> [Reuniones, Email, Seguimiento]
@@ -510,14 +510,49 @@ hermes -z "¿Cómo formateas 1500 euros?" <span class="c"># sesión nueva → 1.
 2. Agrupa las tareas por responsable.
 3. Rellena templates/email.md. Si una fecha no se fijó, escribe "a definir".
 4. Escribe correos/AAAA-MM-DD_&lt;nombre&gt;.md
+5. Valida: python3 ${HERMES_SKILL_DIR}/scripts/validar_correos.py correos/
 ## Comprobaciones antes de terminar
 - Cada tarea aparece exactamente en un correo.</pre></div>
       <div class="code"><pre>cp -r skills/email-seguimiento ~/.hermes/skills/productivity/
 hermes chat -Q -s email-seguimiento -q "Prepara los correos de seguimiento de transcripcion.txt"</pre></div>
       <div class="note ok"><span class="t">Resultado de la prueba (57 s)</span><p>Cuatro borradores, uno por persona, con la plantilla aplicada. Además detectó que el 24 de octubre de 2026 cae en sábado y pidió confirmarlo.</p></div>
+      <h3>Scripts dentro de la skill: el punto medio</h3>
+      <p class="prose">La versión 1.1 de la skill trae <code>scripts/validar_correos.py</code>, y su <code>SKILL.md</code> obliga a ejecutarlo antes de terminar. <code>${HERMES_SKILL_DIR}</code> se sustituye por la ruta de la skill. El script comprueba sin LLM lo que se puede comprobar con código: nombres de fichero, cabeceras, huecos sin rellenar y si cada día de la semana cuadra con el calendario.</p>
+      <div class="code"><pre>python3 ${HERMES_SKILL_DIR}/scripts/validar_correos.py correos/
+<span class="c"># OK 2026-10-09_marta.md</span>
+<span class="c">#   ~ aviso (ya marcado para revisar): 'jueves 16 de octubre': el 16/10/2026 es viernes</span></pre></div>
+      <div class="tw"><table>
+        <thead><tr><th></th><th>Qué es</th><th>Cuándo</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Determinista</strong></td><td>Un script, sin LLM</td><td>Lo que tiene una única respuesta correcta: validar, convertir, desplegar</td></tr>
+          <tr><td><strong>Pseudodeterminista</strong></td><td>Skill = procedimiento + scripts que el agente debe ejecutar</td><td>La mayoría de procesos de empresa</td></tr>
+          <tr><td><strong>No determinista</strong></td><td>Un prompt suelto</td><td>Explorar, redactar, decidir</td></tr>
+        </tbody></table></div>
+      <h3>Skills de proyecto frente a skills de Hermes</h3>
+      <div class="tw"><table>
+        <thead><tr><th></th><th><code>~/.hermes/skills/</code></th><th><code>&lt;repo&gt;/.hermes/skills/</code></th></tr></thead>
+        <tbody>
+          <tr><td>Qué guardan</td><td><strong>Tu forma de trabajar</strong>: el flujo, cómo redactas, cómo revisas</td><td><strong>Cómo se ejecuta este producto</strong>: levantar el entorno, desplegar, datos de prueba</td></tr>
+          <tr><td>Quién las mantiene</td><td>Tú… y el propio agente, que las crea y parchea</td><td>El repo, con revisión de código</td></tr>
+          <tr><td>Se activan</td><td>Siempre</td><td>Tras <code>hermes skills trust</code>, y tienen prioridad</td></tr>
+          <tr><td>¿Las toca el agente?</td><td>Sí: <code>skill_manage</code> y el curator</td><td>Esos dos no; pero no son de solo lectura</td></tr>
+        </tbody></table></div>
+      <p>Así un mismo Hermes trabaja en varios productos: el flujo vive en Hermes y la ejecución, en cada repo. Lo usamos en el módulo 10.</p>
+      <h3>Higiene: que tu entorno no derive</h3>
+      <p class="prose">Por defecto, una <strong>revisión en segundo plano</strong> tras cada turno puede crear o parchear skills y memoria sin preguntarte. Con semanas de uso, tu entorno ya no se parece al de nadie, y aparece el síntoma típico: <strong>sale un modelo nuevo y "a mí no me funciona"</strong>, porque instrucciones pensadas para el modelo anterior lo frenan.</p>
+      <div class="tw"><table>
+        <thead><tr><th>Clave</th><th>Por defecto</th><th>Qué hace</th></tr></thead>
+        <tbody>
+          <tr><td><code>skills.write_approval</code></td><td><code>false</code></td><td><code>true</code>: toda escritura de skills queda pendiente (<code>/skills pending</code>)</td></tr>
+          <tr><td><code>memory.write_approval</code></td><td><code>false</code></td><td>Igual para la memoria (<code>/memory pending</code>)</td></tr>
+          <tr><td><code>auxiliary.background_review.enabled</code></td><td><code>true</code></td><td><code>false</code>: sin autoaprendizaje en segundo plano</td></tr>
+          <tr><td><code>curator.enabled</code></td><td><code>true</code></td><td>Poda skills sin uso; <code>hermes curator pin &lt;skill&gt;</code> protege una</td></tr>
+        </tbody></table></div>
+      <div class="code"><pre>hermes config set skills.write_approval true
+hermes curator status
+hermes profile export default -o mi-entorno.tar.gz   <span class="c"># foto de tu entorno, sin credenciales</span></pre></div>
       <ul>
-        <li><strong>Skills de proyecto:</strong> en <code>./.hermes/skills/</code> o <code>./.agents/skills/</code>; se activan con <code>hermes skills trust</code>.</li>
-        <li><strong>Que las escriba él:</strong> tras resolver algo, <code>/learn</code> o "guarda esto como skill". Escribir skills, memoria o <code>AGENTS.md</code> siempre pide aprobación.</li>
+        <li><strong>Que las escriba él:</strong> tras resolver algo, <code>/learn</code> o "guarda esto como skill".</li>
         <li><strong>Hub:</strong> <code>hermes skills search pdf</code>, <code>inspect</code> antes de <code>install</code> (una skill puede ejecutar scripts).</li>
       </ul>
       <button class="mark-done" type="button" data-mod="m4" aria-pressed="false">Marcar como completado</button>
@@ -564,12 +599,18 @@ hermes cron create "every 1h" --name watchdog-disco --no-agent --script espacio_
 /blueprint morning-brief time=07:30 deliver=telegram
 
 hermes pause    <span class="c"># parada de emergencia: cron, kanban y gateway</span></pre></div>
+      <h3>Disparo único tras un despliegue</h3>
+      <p class="prose">Un job de una sola vez sirve para encadenar trabajo a algo que tarda: despliegas una preview, sabes que tarda unos minutos y programas la comprobación para cuando esté lista. Al ejecutarse, el job se borra solo.</p>
+      <div class="code"><pre>cp scripts/smoke_despliegue.sh ~/.hermes/scripts/   <span class="c"># la URL se fija dentro del script</span>
+hermes cron create "in 5m" --no-agent --script smoke_despliegue.sh --name smoke-pr-42 --deliver telegram
+<span class="c"># → ✅ http://127.0.0.1:8765 responde: 6 productos en el catálogo   (llegó al móvil)</span></pre></div>
+      <p>Sin <code>--no-agent</code>, el mismo job puede lanzar un agente que abra la URL en el navegador y recorra la feature: el E2E del módulo 10, disparado por el despliegue.</p>
       <button class="mark-done" type="button" data-mod="m5" aria-pressed="false">Marcar como completado</button>
     </section>
 
     <!-- 6 -->
     <section class="mod" id="m6" data-title="Mensajería">
-      <div class="mod-head"><span class="mod-num">06</span><h2>Mensajería: Hermes en Telegram</h2><span class="badge doc">guía</span></div>
+      <div class="mod-head"><span class="mod-num">06</span><h2>Mensajería: Hermes en Telegram</h2><span class="badge ok">probado</span></div>
       <p class="mod-goal">Hablar con tu agente desde el móvil, con la misma memoria y skills.</p>
       <ol class="prose">
         <li>En Telegram, <strong>@BotFather</strong> → <code>/newbot</code> → copia el token.</li>
@@ -589,6 +630,7 @@ hermes gateway run                                     <span class="c"># primer 
           <tr><td><code>/handoff</code></td><td>Continuar la conversación en otra plataforma</td></tr>
           <tr><td><code>/update</code> · <code>/restart</code></td><td>Mantener el agente en remoto</td></tr>
         </tbody></table></div>
+      <div class="note ok"><span class="t">Lo que vimos en la prueba</span><p>El bot conectó en unos 15 s en modo <em>polling</em> (no hace falta abrir puertos). Con <code>/sethome</code>, los avisos del cron y del tablero kanban llegaron al móvil. Una nota de voz <strong>no</strong> funcionó: hace falta un motor de voz a texto (Whisper local o un proveedor con API), y el propio bot lo explicó y ofreció alternativas.</p></div>
       <p>Otras plataformas: Discord, Slack (Socket Mode), WhatsApp, Signal, iMessage (BlueBubbles), Email, Matrix, Teams, Google Chat… Para tenerlo 24/7, un VPS pequeño basta si el modelo está en la nube.</p>
       <button class="mark-done" type="button" data-mod="m6" aria-pressed="false">Marcar como completado</button>
     </section>
@@ -699,6 +741,28 @@ hermes -z "Dime qué productos hay que reponer y registra un pedido de 2 teclado
   <span class="k">docker_mount_cwd_to_workspace:</span> true   <span class="c"># monta el directorio de lanzamiento en /workspace</span>
   <span class="k">cwd:</span> "."                              <span class="c"># NO "/workspace": desactiva el montaje</span></pre></div>
       <div class="note warn"><span class="t">Tropiezo real</span><p>Pusimos <code>cwd: /workspace</code> siguiendo un ejemplo y el contenedor arrancó vacío. Con <code>cwd: "."</code> el proyecto aparece montado y los tests corren en Linux aarch64 dentro del contenedor (21 s). Con backends de contenedor, <code>/rollback</code> no aplica.</p></div>
+      <h3>Imagen efímera por tarea</h3>
+      <p class="prose">Un paso más allá: en vez de un Hermes "vivo" que acumula memoria y skills, cada tarea arranca <strong>un contenedor nuevo de Hermes</strong> a partir de una imagen que controla el equipo. Mejorar el flujo es publicar una imagen nueva, no limpiar la máquina de cada persona. <span class="badge doc">guía</span></p>
+      <div class="code"><pre>docker run --rm \
+  -v "$PWD/hermes-equipo:/opt/data" \      <span class="c"># config.yaml, SOUL.md y skills/ versionados, sin secretos</span>
+  -v "$PWD:/workspace" -w /workspace \
+  -e OPENROUTER_API_KEY \
+  nousresearch/hermes-agent:latest -z "Ejecuta los tests y resume el estado del proyecto"</pre></div>
+      <p>No lo ejecutamos: la imagen, con Chromium y ffmpeg dentro, no cabía en el disco de nuestra máquina de pruebas. Tenlo en cuenta al dimensionar un servidor.</p>
+      <h3>Worktrees y permisos mínimos</h3>
+      <div class="tw"><table>
+        <thead><tr><th>Necesidad</th><th>Cómo</th></tr></thead>
+        <tbody>
+          <tr><td>Varias tareas a la vez sin pisarse</td><td><code>hermes -w</code>, <code>delegation.worktree_isolation: true</code>, <code>kanban create --workspace worktree</code></td></tr>
+          <tr><td>Que cada worktree pruebe de verdad</td><td>Su propia base de datos y su Redis en Docker, su puerto</td></tr>
+          <tr><td>Quitar herramientas</td><td><code>hermes tools disable web browser computer_use</code></td></tr>
+          <tr><td>Solo algunas herramientas MCP</td><td><code>mcp_servers.github.tools.include: [list_issues]</code></td></tr>
+          <tr><td>Prohibir comandos siempre (incluso con <code>--yolo</code>)</td><td><code>approvals.deny: ["git push*"]</code></td></tr>
+          <tr><td>Limitar dónde escribe <code>write_file</code></td><td><code>HERMES_WRITE_SAFE_ROOT=/ruta</code></td></tr>
+        </tbody></table></div>
+      <p>Un agente proactivo que se atasca <strong>se las ingenia</strong>: codifica en base64 lo que no pasa un filtro, levanta un servidor auxiliar… Cuantas menos herramientas tenga, menos rodeos raros.</p>
+      <h3>Dónde vive Hermes 24/7</h3>
+      <p class="prose">Para un equipo, el entorno local no escala. Lo habitual es una máquina que controla el equipo técnico, igual para todos: un VPS de 1–2 vCPU y 2–4 GB, un servidor propio o un mini PC (una Raspberry Pi 4/400 con SO de 64 bits cumple los requisitos), o el contenedor oficial. Se accede por mensajería, por SSH o con una VPN privada como Tailscale para el dashboard. Dimensiona por tareas <em>simultáneas</em>: tres con navegador y base de datos propia no caben en 2 GB.</p>
       <h3>Subagentes en paralelo</h3>
       <div class="code"><pre>hermes -z "Usa delegate_task para lanzar 3 subagentes EN PARALELO (sin modificar ficheros):
 1) revisor de seguridad de src/, 2) revisor de cobertura de tests, 3) redactor de un README
@@ -713,9 +777,131 @@ grep -q "VEREDICTO: BLOQUEANTE" &lt;&lt;&lt;"$RESULTADO" &amp;&amp; exit 1</pre>
       <button class="mark-done" type="button" data-mod="m9" aria-pressed="false">Marcar como completado</button>
     </section>
 
-    <!-- 10 -->
+    <!-- 10 · equipo -->
+    <section class="mod" id="m-equipo" data-title="Equipo de agentes">
+      <div class="mod-head"><span class="mod-num">10</span><h2>Hermes como equipo de desarrollo</h2><span class="badge ok">probado</span></div>
+      <p class="mod-goal">Pasar de "un agente en mi portátil" a un flujo compartido por fases que cualquiera del equipo puede lanzar, con perfiles, tablero kanban, revisión y E2E.</p>
+      <h3>Por qué el entorno local no escala</h3>
+      <p class="prose">Mientras trabajas solo, tu portátil es el mejor sitio para el agente. El problema aparece cuando todo el equipo, incluida gente que no programa, quiere que los agentes implementen features o arreglen bugs:</p>
+      <div class="tw"><table>
+        <thead><tr><th>Problema</th><th>Qué pasa en la práctica</th></tr></thead>
+        <tbody>
+          <tr><td>Cada entorno diverge</td><td>Cada persona acumula memorias y skills distintas. Sale un modelo nuevo y "a mí no me va": el arnés viejo lo frena</td></tr>
+          <tr><td>Las skills no fuerzan el proceso</td><td>Si el modelo no detecta que debe usar la skill, no la usa. "Ya lo tengo hecho"… sobre una rama vieja</td></tr>
+          <tr><td>Mantener a mano no escala</td><td>Repartir skills o plugins y comprobar que todos los tienen al día es un trabajo en sí mismo</td></tr>
+          <tr><td>Recursos</td><td>Base de datos, Redis y navegador no caben en el portátil pequeño de alguien de ventas</td></tr>
+          <tr><td>Cero visibilidad</td><td>Un agente en una terminal remota no te dice qué pasó en cada fase</td></tr>
+        </tbody></table></div>
+      <p class="prose">La salida no es escribir "mejores skills", sino montar <strong>un entorno compartido, controlado por el equipo técnico, igual para todos y observable</strong>. Hermes trae las piezas: perfiles, tablero kanban con dispatcher, <code>/goal</code>, revisión nativa, cron, mensajería y dashboard.</p>
+
+      <h3>La arquitectura</h3>
+      <figure class="diagram" aria-label="Pipeline por fases: ticket, script determinista y cuatro perfiles encadenados">
+        <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg">
+          <defs><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--muted)"/></marker></defs>
+          <g font-size="13" fill="var(--ink)">
+            <rect x="300" y="14" width="300" height="40" rx="6" fill="var(--surface)" stroke="var(--line)"/>
+            <text x="450" y="39" text-anchor="middle">Ticket · Telegram, CLI o dashboard</text>
+            <line x1="450" y1="54" x2="450" y2="78" stroke="var(--muted)" marker-end="url(#ar2)"/>
+            <rect x="270" y="80" width="360" height="46" rx="6" fill="var(--gold-soft)" stroke="var(--gold)"/>
+            <text x="450" y="101" text-anchor="middle" font-weight="700">pipeline.sh · esqueleto fijo</text>
+            <text x="450" y="118" text-anchor="middle" fill="var(--muted)" font-size="12">determinista: crea las tarjetas encadenadas</text>
+            <line x1="450" y1="126" x2="450" y2="150" stroke="var(--muted)" marker-end="url(#ar2)"/>
+            <rect x="20" y="152" width="180" height="78" rx="8" fill="var(--accent-soft)" stroke="var(--accent)"/>
+            <text x="110" y="176" text-anchor="middle" font-weight="700">especificador</text>
+            <text x="110" y="196" text-anchor="middle" fill="var(--muted)" font-size="12">plan + criterios</text>
+            <text x="110" y="214" text-anchor="middle" fill="var(--muted)" font-size="12">sin escribir código</text>
+            <line x1="200" y1="191" x2="244" y2="191" stroke="var(--muted)" marker-end="url(#ar2)"/>
+            <rect x="246" y="152" width="190" height="78" rx="8" fill="var(--accent-soft)" stroke="var(--accent)"/>
+            <text x="341" y="176" text-anchor="middle" font-weight="700">implementador</text>
+            <text x="341" y="196" text-anchor="middle" fill="var(--muted)" font-size="12">TDD + --goal</text>
+            <text x="341" y="214" text-anchor="middle" fill="var(--muted)" font-size="12">tests en verde</text>
+            <path d="M436 176 L482 176" stroke="var(--muted)" marker-end="url(#ar2)" fill="none"/>
+            <path d="M484 206 L438 206" stroke="var(--warn)" marker-end="url(#ar2)" fill="none" stroke-dasharray="4 3"/>
+            <text x="460" y="226" text-anchor="middle" fill="var(--warn)" font-size="11">cambios</text>
+            <rect x="486" y="152" width="180" height="78" rx="8" fill="var(--accent-soft)" stroke="var(--accent)"/>
+            <text x="576" y="176" text-anchor="middle" font-weight="700">revisor</text>
+            <text x="576" y="196" text-anchor="middle" fill="var(--muted)" font-size="12">contexto limpio</text>
+            <text x="576" y="214" text-anchor="middle" fill="var(--muted)" font-size="12">críticos vs deuda</text>
+            <line x1="666" y1="191" x2="710" y2="191" stroke="var(--muted)" marker-end="url(#ar2)"/>
+            <rect x="712" y="152" width="170" height="78" rx="8" fill="var(--accent-soft)" stroke="var(--accent)"/>
+            <text x="797" y="176" text-anchor="middle" font-weight="700">e2e</text>
+            <text x="797" y="196" text-anchor="middle" fill="var(--muted)" font-size="12">navegador real</text>
+            <text x="797" y="214" text-anchor="middle" fill="var(--muted)" font-size="12">+ vídeo WebM</text>
+            <text x="450" y="262" text-anchor="middle" fill="var(--muted)" font-size="12">Cada caja es un perfil de Hermes: su SOUL.md, sus herramientas y un contexto limpio.</text>
+            <text x="450" y="282" text-anchor="middle" fill="var(--muted)" font-size="12">Solo recibe el resumen estructurado de la fase anterior.</text>
+          </g>
+        </svg>
+      </figure>
+      <div class="tw"><table>
+        <thead><tr><th>Pieza</th><th>Cómo se hace en Hermes</th></tr></thead>
+        <tbody>
+          <tr><td>Un rol por fase</td><td><code>hermes profile create &lt;rol&gt; --clone</code>: su <code>SOUL.md</code>, su <code>config.yaml</code> y sus toolsets</td></tr>
+          <tr><td>Encadenar fases</td><td><code>hermes kanban create … --assignee &lt;rol&gt; --parent &lt;id&gt;</code>: no arranca hasta que su padre termina</td></tr>
+          <tr><td>Quién ejecuta</td><td>El dispatcher del <strong>gateway</strong> lanza un worker del perfil asignado (sin gateway, las tarjetas no se mueven)</td></tr>
+          <tr><td>Bucle implementar ↔ revisar</td><td>Nativo: <code>kanban_request_review</code> → <code>kanban_request_changes</code> o <code>kanban_complete</code></td></tr>
+          <tr><td>Iterar hasta terminar</td><td><code>--goal --goal-max-turns 15</code>: un juez revisa cada turno contra el texto de la tarjeta</td></tr>
+          <tr><td>Cómo se arranca <em>este</em> producto</td><td>Skill de proyecto en <code>app-web/.hermes/skills/levantar-entorno</code> (tras <code>hermes skills trust</code>)</td></tr>
+          <tr><td>Visibilidad</td><td><code>hermes dashboard</code> → Kanban, <code>hermes kanban watch</code>, <code>hermes kanban runs &lt;id&gt;</code></td></tr>
+        </tbody></table></div>
+
+      <h3>Práctica: el ticket TIENDA-12</h3>
+      <p class="prose">Una tienda web mínima (solo la biblioteca estándar de Python) con un bug, la búsqueda distingue mayúsculas, y una feature pedida por ventas: resaltar en rojo lo que hay que reponer y mostrar un contador.</p>
+      <div class="code"><span class="lbl">09-equipo-de-agentes</span><pre>./perfiles/crear-perfiles.sh   <span class="c"># 4 perfiles con permisos mínimos, sin memoria ni autoaprendizaje</span>
+hermes gateway run              <span class="c"># en otra terminal: aloja el dispatcher</span>
+./pipeline.sh                   <span class="c"># copia la app a un repo git NUEVO y crea las 3 tarjetas</span>
+hermes kanban watch             <span class="c"># o: hermes dashboard → Kanban</span></pre></div>
+      <div class="code"><span class="lbl">pipeline.sh (núcleo)</span><pre>SPEC=$(hermes kanban create "Especificar TIENDA-12" --assignee especificador \
+  --workspace "dir:$WORK" --body "$TICKET …" --json | jq -r .id)
+IMPL=$(hermes kanban create "Implementar TIENDA-12" --assignee implementador \
+  --parent "$SPEC" --workspace "dir:$WORK" --goal --goal-max-turns 15 \
+  --body "$TICKET  Hecho cuando: criterios cumplidos y pytest en verde." --json | jq -r .id)
+hermes kanban create "E2E TIENDA-12" --assignee e2e --parent "$IMPL" --workspace "dir:$WORK" …</pre></div>
+      <div class="example">
+        <h4>Ejecución real <span class="badge ok">≈ 12 min · ≈ 0,14 $</span></h4>
+        <div class="meta">claude-haiku-5.5 en los 4 perfiles · incluye un primer intento fallido</div>
+        <ul class="found">
+          <li><strong>Especificador (42 s):</strong> encontró la causa del bug y fijó criterios verificables, incluido uno que nadie pidió explícitamente: WEB-06, con stock exactamente 5, <em>no</em> se marca.</li>
+          <li><strong>Implementador:</strong> TDD (8 tests en rojo primero), commit y paso a revisión con evidencia criterio por criterio. Admitió lo que no pudo comprobar: "verificación visual en navegador: NO".</li>
+          <li><strong>Revisor, ronda 1:</strong> rechazó. El resaltado en rojo vivía en JavaScript y ningún test lo ejecutaba; el test añadido solo buscaba el texto de la regla CSS.</li>
+          <li><strong>Implementador, ronda 2:</strong> añadió un test que ejecuta el JS de la página. <strong>Revisor:</strong> aprobado.</li>
+          <li><strong>E2E:</strong> levantó la app con la skill del repo, escribió en el buscador y comprobó colores y posiciones en un Chromium real. Además encontró un bug que nadie buscaba: <strong>una condición de carrera</strong> en el buscador (con escritura muy rápida, la tabla muestra resultados de una búsqueda anterior). Lo dejó como ticket aparte, sin bloquear.</li>
+        </ul>
+        <p>El informe de cada tarjeta, el diff y el vídeo están en <a href="https://github.com/noelserdna/curso-hermes-agent/tree/main/09-equipo-de-agentes/salida-ejemplo"><code>salida-ejemplo/</code></a>.</p>
+      </div>
+      <figure style="margin:18px 0">
+        <img src="e2e-captura.png" alt="Captura del navegador del agente E2E: la tienda filtrada por 'teclado' con el aviso '2 productos con stock bajo' en rojo" style="width:100%;max-width:640px;border:1px solid var(--line);border-radius:var(--radius);display:block">
+        <figcaption class="prose" style="font-size:var(--step--1);color:var(--muted);margin-top:6px">Fotograma del WebM que grabó el perfil E2E.</figcaption>
+      </figure>
+
+      <h3>Tres tropiezos reales (y lo que enseñan)</h3>
+      <div class="note warn"><span class="t">1 · El juez de --goal evalúa el texto de la tarjeta</span><p>En el primer intento escribimos en la tarjeta "cuando estén en verde, pide revisión con <code>kanban_request_review</code>". El juez exigía ver esa llamada como parte del objetivo y rechazó el paso a revisión tres veces; el implementador se bloqueó pidiendo ayuda (bien hecho). <strong>En la tarjeta va el QUÉ y los criterios; el procedimiento va en el <code>SOUL.md</code> del perfil.</strong></p></div>
+      <div class="note warn"><span class="t">2 · El revisor también persigue casos límite</span><p>Pidió un test de JavaScript con Node para un comportamiento visual que la fase E2E iba a comprobar igualmente en el navegador. No es un error, pero cuesta una ronda. Dile a cada fase qué validan las demás: "lo visual lo cubre el E2E".</p></div>
+      <div class="note warn"><span class="t">3 · La grabación de vídeo no sale sola</span><p>Desde la v0.21, el navegador por defecto es <code>browser_exec</code> (Browser Use) y <code>record_sessions</code> solo graba con las herramientas clásicas. Hace falta <code>browser.backend: "off"</code> en el perfil E2E. Aun así, el vídeo fue casi estático: el agente verificó leyendo el DOM, no paseando por la página. Si quieres un vídeo de demo para el equipo, pídelo como <strong>fase aparte</strong> con un recorrido de usuario lento y, si quieres, narración con <code>text_to_speech</code> y ffmpeg.</p></div>
+
+      <h3>El mismo flujo desde Telegram</h3>
+      <p class="prose">Con el gateway conectado a Telegram (módulo 06), cualquiera del equipo puede encargar trabajo desde el móvil. El chat que crea la tarjeta queda suscrito y recibe un aviso cuando termina, se bloquea o falla:</p>
+      <div class="code"><span class="lbl">en el chat del bot</span><pre>/kanban create "Deuda técnica de la tienda" --assignee revisor --workspace dir:/ruta/al/repo \
+  --body "Resume en 5 viñetas la deuda técnica pendiente. No modifiques nada."</pre></div>
+      <div class="note ok"><span class="t">Probado desde el móvil</span><p>La tarjeta la recogió el perfil <code>revisor</code> y en 38 s devolvió cinco puntos de deuda, de más a menos grave: un XSS latente por <code>innerHTML</code> sin escapar, la misma condición de carrera que encontró el E2E, la lógica de stock bajo duplicada entre cliente y servidor, un test que se salta en silencio si no hay Node y ficheros <code>.pyc</code> versionados. El aviso de fin llegó al mismo chat.</p></div>
+
+      <h3>Lecciones para montar el tuyo</h3>
+      <ol class="prose">
+        <li><strong>Céntrate menos en implementar y más en validar.</strong> Si al final tienes que revisar el código a mano, pregúntate qué validación falta: un test, una prueba de rendimiento si toca base de datos, un E2E.</li>
+        <li><strong>Decide qué es determinista.</strong> El orden de las fases lo fija un script; dentro de cada fase decide el modelo. Lo que pueda comprobar código, que no lo juzgue el modelo.</li>
+        <li><strong>Dale al agente el entorno completo de un desarrollador:</strong> base de datos propia por worktree, logs, navegador. Sin eso solo puede hacer tests unitarios y "creer" que funciona.</li>
+        <li><strong>Permisos mínimos por rol.</strong> El revisor no necesita navegador; el especificador no necesita escribir. Un agente proactivo atascado se inventa rodeos. Ojo: un perfil <em>no es un sandbox</em>.</li>
+        <li><strong>Tu arnés puede frenar al modelo.</strong> "Prioriza siempre lo más simple" tenía sentido con modelos que sobre-ingenierizaban; con los actuales puede empujarles a la solución peor (un <em>timeout</em> donde tocaba un <em>watcher</em>). Revisa SOUL, AGENTS.md y skills cada vez que cambies de modelo.</li>
+        <li><strong>No sobre-especifiques el cómo.</strong> Fija el qué y los criterios. Con modelos baratos puedes pedir varias variantes y quedarte con la que mejor pase las validaciones.</li>
+        <li><strong>Código fácil de revisar</strong>, para humanos y agentes: módulos con interfaces claras y la complejidad dentro (<em>deep modules</em>). Se leen interfaces y solo se baja al detalle donde algo huele mal.</li>
+        <li><strong>Construye tu propio flujo.</strong> Este pipeline es un punto de partida: tu producto puede necesitar dos fases o quince. Empieza pequeño y añade la validación que falte.</li>
+      </ol>
+      <p>Para quitarlo todo: <code>./perfiles/borrar-perfiles.sh</code>, <code>hermes kanban archive …</code> y parar el gateway.</p>
+      <button class="mark-done" type="button" data-mod="m-equipo" aria-pressed="false">Marcar como completado</button>
+    </section>
+
+    <!-- 11 · comparativa (id m10 se conserva para no romper el progreso guardado) -->
     <section class="mod" id="m10" data-title="Comparativa">
-      <div class="mod-head"><span class="mod-num">10</span><h2>Comparativa y cuándo usar qué</h2></div>
+      <div class="mod-head"><span class="mod-num">11</span><h2>Comparativa y cuándo usar qué</h2></div>
       <p class="mod-goal">Situar Hermes frente a las alternativas de octubre de 2026 y decidir con criterio.</p>
       <div class="tw"><table class="compare">
         <thead><tr><th>Herramienta</th><th>Qué es</th><th>Dónde corre</th><th>Modelos</th><th>Tareas programadas</th><th>Mensajería</th><th>Licencia</th></tr></thead>
@@ -740,7 +926,8 @@ grep -q "VEREDICTO: BLOQUEANTE" &lt;&lt;&lt;"$RESULTADO" &amp;&amp; exit 1</pre>
           <li>Cron con entrega a donde quieras y watchdogs sin coste de LLM.</li>
           <li>7 backends de ejecución, subagentes, MCP en los dos sentidos.</li>
           <li>Lee tu <code>AGENTS.md</code>/<code>CLAUDE.md</code> e importa tu config de Claude Code.</li>
-          <li>Barato con modelos eficientes: todo este curso, ≈ 0,12 $.</li>
+          <li>Perfiles, tablero kanban y revisión nativa para montar un equipo de agentes por fases.</li>
+          <li>Barato con modelos eficientes: todas las pruebas de este curso, ≈ 0,29 $.</li>
         </ul></div>
         <div class="panel con"><h4>En contra</h4><ul>
           <li>Va muy rápido: cientos de PRs por versión; flags y docs cambian de una semana a otra.</li>
@@ -748,6 +935,8 @@ grep -q "VEREDICTO: BLOQUEANTE" &lt;&lt;&lt;"$RESULTADO" &amp;&amp; exit 1</pre>
           <li>La calidad depende del modelo: con modelos pequeños falla más con herramientas y memoria.</li>
           <li>Más técnico que Claude Desktop: el despliegue y la seguridad son tuyos.</li>
           <li>Las herramientas MCP no pasan por las aprobaciones.</li>
+          <li>Muy proactivo: si se atasca se inventa rodeos. Necesita límites y permisos acotados.</li>
+          <li>Interfaz del dashboard funcional pero básica.</li>
         </ul></div>
       </div>
 
@@ -756,6 +945,11 @@ grep -q "VEREDICTO: BLOQUEANTE" &lt;&lt;&lt;"$RESULTADO" &amp;&amp; exit 1</pre>
         <p>Claude Desktop es más cómodo y no hay nada que mantener, pero sus tareas programadas dependen de que tu ordenador esté encendido con la app abierta y solo usan Claude. Hermes cubre el hueco cuando quieres que el trabajo ocurra <strong>aunque cierres el portátil</strong>, que el resultado te llegue a Telegram o Slack, o que una tarea barata la haga un modelo barato.</p>
         <p>No es una elección exclusiva. Las skills tienen el mismo formato, un servidor MCP sirve a los dos, y <code>hermes mcp serve</code> te deja usar Hermes desde Claude Desktop.</p>
       </div>
+      <h3>Local frente a remoto y compartido</h3>
+      <div class="prose">
+        <p>Para ti solo, el agente en tu portátil (Claude Desktop, Claude Code, Hermes local) es lo más cómodo. Cuando es <strong>un equipo</strong> el que delega trabajo, la pregunta cambia: ¿todos tienen el mismo entorno? ¿quién ve qué hizo el agente en cada fase? ¿qué pasa cuando el agente necesita una decisión y nadie está mirando?</p>
+        <p>Ahí pesa lo que Hermes trae de serie (perfiles por rol, tablero con logs por fase, cron, mensajería y una tendencia a resolver por su cuenta en lugar de quedarse esperando permiso), frente a agentes de código pensados para una persona delante de la terminal. El coste: la infraestructura y la seguridad son tuyas. Lo ves montado en el módulo 10.</p>
+      </div>
       <div class="tw"><table>
         <thead><tr><th>Si necesitas…</th><th>Elige</th></tr></thead>
         <tbody>
@@ -763,6 +957,7 @@ grep -q "VEREDICTO: BLOQUEANTE" &lt;&lt;&lt;"$RESULTADO" &amp;&amp; exit 1</pre>
           <tr><td>Tareas personales en tu Mac con Claude, sin infraestructura</td><td><strong>Claude Desktop / Cowork</strong></td></tr>
           <tr><td>Programar en serio dentro de un repo</td><td><strong>Claude Code</strong> o <strong>Codex</strong>, con Hermes alrededor para CI, cron y revisión</td></tr>
           <tr><td>Agentes de código que corren en la nube con horario</td><td><strong>Rutinas de Claude Code</strong> o <strong>Hermes</strong> en un VPS</td></tr>
+          <tr><td>Que todo el equipo lance features y bugs con un flujo común y visible</td><td><strong>Hermes</strong> en un servidor, con perfiles y kanban (módulo 10)</td></tr>
           <tr><td>Flujos deterministas con cientos de integraciones</td><td><strong>n8n / Zapier</strong>, con Hermes como paso inteligente vía webhook</td></tr>
           <tr><td>Construir tu propio producto de agentes</td><td><strong>LangGraph</strong>, <strong>CrewAI</strong> o el Claude Agent SDK</td></tr>
         </tbody></table></div>
@@ -790,8 +985,14 @@ grep -q "VEREDICTO: BLOQUEANTE" &lt;&lt;&lt;"$RESULTADO" &amp;&amp; exit 1</pre>
           <tr><td>Backend Docker</td><td>09</td><td class="num">21 s</td><td>OK tras corregir <code>cwd</code></td></tr>
           <tr><td>Subagentes en paralelo</td><td>09</td><td class="num">31 s</td><td>OK</td></tr>
           <tr><td>Revisión de diff para CI</td><td>09</td><td class="num">—</td><td>OK · 0,003 $</td></tr>
-          <tr><td>Telegram · GitHub Actions</td><td>06 · 09</td><td class="num">—</td><td>No ejecutado: requiere cuentas externas</td></tr>
-          <tr><td><strong>Total (hermes insights)</strong></td><td></td><td class="num">19 sesiones</td><td><strong>≈ 0,12 $</strong></td></tr>
+          <tr><td>Skill con script de validación</td><td>04</td><td class="num">—</td><td>OK: detectó un día de la semana erróneo ya marcado por el agente</td></tr>
+          <tr><td>Cron de un solo disparo con entrega a Telegram</td><td>05</td><td class="num">1 min</td><td>OK, llegó al móvil y el job se borró solo</td></tr>
+          <tr><td>Gateway de Telegram</td><td>06</td><td class="num">15 s</td><td>OK; las notas de voz necesitan voz a texto</td></tr>
+          <tr><td>Pipeline por fases con 4 perfiles y kanban</td><td>10</td><td class="num">≈ 12 min</td><td>OK tras corregir el texto de la tarjeta <code>--goal</code>; 1 ronda de cambios; bug extra encontrado en E2E</td></tr>
+          <tr><td>E2E con grabación en vídeo</td><td>10</td><td class="num">≈ 3 min</td><td>OK tras <code>browser.backend: off</code></td></tr>
+          <tr><td>Tarea kanban creada desde Telegram</td><td>10</td><td class="num">38 s</td><td>OK, aviso de fin en el chat</td></tr>
+          <tr><td>Imagen Docker efímera · GitHub Actions</td><td>09</td><td class="num">—</td><td>No ejecutado: sin espacio en disco · requiere cuenta externa</td></tr>
+          <tr><td><strong>Total (hermes insights, 5 perfiles)</strong></td><td></td><td class="num">31 sesiones</td><td><strong>≈ 0,29 $</strong></td></tr>
         </tbody></table></div>
     </section>
 

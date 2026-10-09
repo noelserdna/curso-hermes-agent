@@ -1,7 +1,7 @@
 ---
 name: email-seguimiento
 description: "Genera un correo de seguimiento por responsable a partir de un acta o transcripción de reunión."
-version: 1.0.0
+version: 1.1.0
 author: Curso Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -35,7 +35,13 @@ No la uses para enviar correos: solo genera borradores. El envío lo decide la p
    - Fechas en formato "viernes 24 de octubre".
    - Si una fecha límite no se fijó en la reunión, escribe "a definir" y no inventes ninguna.
 4. **Escribe un fichero por persona** en `correos/AAAA-MM-DD_<nombre>.md` (en minúsculas, sin tildes).
-5. **Resume** al final: cuántos correos, para quién y qué datos faltaban en la fuente.
+5. **Valida con el script** (no lo sustituyas por una revisión "a ojo"):
+   ```bash
+   python3 ${HERMES_SKILL_DIR}/scripts/validar_correos.py correos/
+   ```
+   Si sale con errores, corrígelos y vuelve a ejecutarlo hasta que termine con `0 errores`.
+   Una fecha cuyo día de la semana no cuadra en la fuente no se corrige: se marca con `[revisar: …]`.
+6. **Resume** al final: cuántos correos, para quién y qué datos faltaban en la fuente.
 
 ## Comprobaciones antes de terminar
 

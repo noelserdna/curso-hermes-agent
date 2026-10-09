@@ -1,0 +1,232 @@
+diff --git a/src/tienda/app.py b/src/tienda/app.py
+index 6081e5f..82ef2f7 100644
+--- a/src/tienda/app.py
++++ b/src/tienda/app.py
+@@ -20,11 +20,14 @@ PAGINA = """<!doctype html>
+   table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+   th, td { text-align: left; padding: 8px; border-bottom: 1px solid #ddd; }
+   input { padding: 8px; width: 100%; box-sizing: border-box; font-size: 16px; }
++  #stock-bajo { font-weight: bold; color: #b00020; }
++  tr.stock-bajo td { color: #b00020; background: #fdecea; }
+ </style>
+ </head>
+ <body>
+ <h1>Tienda</h1>
+ <input id="buscador" type="search" placeholder="Buscar producto…" aria-label="Buscar producto">
++<p id="stock-bajo">{{CONTADOR_STOCK_BAJO}}</p>
+ <table>
+   <thead><tr><th>SKU</th><th>Producto</th><th>Precio</th><th>Stock</th></tr></thead>
+   <tbody id="productos"></tbody>
+@@ -33,8 +36,10 @@ PAGINA = """<!doctype html>
+ async function cargar(q) {
+   const url = q ? "/api/productos?q=" + encodeURIComponent(q) : "/api/productos";
+   const productos = await (await fetch(url)).json();
++  const bajo = await (await fetch("/api/stock-bajo")).json();
+   document.getElementById("productos").innerHTML = productos.map(p =>
+-    `<tr data-sku="${p.sku}"><td>${p.sku}</td><td>${p.nombre}</td>` +
++    `<tr data-sku="${p.sku}"${bajo.includes(p.sku) ? ' class="stock-bajo"' : ""}>` +
++    `<td>${p.sku}</td><td>${p.nombre}</td>` +
+     `<td>${p.precio.toFixed(2)} €</td><td>${p.stock}</td></tr>`).join("");
+ }
+ document.getElementById("buscador").addEventListener("input", e => cargar(e.target.value));
+@@ -45,6 +50,15 @@ cargar("");
+ """
+ 
+ 
++def texto_contador_stock_bajo(n: int) -> str:
++    return f"{n} producto con stock bajo" if n == 1 else f"{n} productos con stock bajo"
++
++
++def renderizar_pagina() -> str:
++    contador = texto_contador_stock_bajo(len(datos.stock_bajo()))
++    return PAGINA.replace("{{CONTADOR_STOCK_BAJO}}", contador)
++
++
+ class Manejador(BaseHTTPRequestHandler):
+     def _responder(self, codigo: int, cuerpo: str, tipo: str) -> None:
+         datos_bytes = cuerpo.encode("utf-8")
+@@ -57,7 +71,7 @@ class Manejador(BaseHTTPRequestHandler):
+     def do_GET(self) -> None:
+         url = urlparse(self.path)
+         if url.path == "/":
+-            self._responder(200, PAGINA, "text/html")
++            self._responder(200, renderizar_pagina(), "text/html")
+         elif url.path == "/api/productos":
+             q = parse_qs(url.query).get("q", [""])[0]
+             productos = datos.buscar(q) if q else datos.listar()
+diff --git a/src/tienda/datos.py b/src/tienda/datos.py
+index f3cf9aa..aa6f512 100644
+--- a/src/tienda/datos.py
++++ b/src/tienda/datos.py
+@@ -29,7 +29,8 @@ def listar() -> list[dict]:
+ 
+ def buscar(texto: str) -> list[dict]:
+     """Devuelve los productos cuyo nombre contiene `texto`, sin distinguir mayúsculas."""
+-    return [asdict(p) for p in CATALOGO if texto in p.nombre]
++    buscado = texto.casefold()
++    return [asdict(p) for p in CATALOGO if buscado in p.nombre.casefold()]
+ 
+ 
+ def stock_bajo() -> list[str]:
+diff --git a/tests/test_tienda.py b/tests/test_tienda.py
+index 6a107e8..957af48 100644
+--- a/tests/test_tienda.py
++++ b/tests/test_tienda.py
+@@ -1,4 +1,7 @@
+ import json
++import re
++import shutil
++import subprocess
+ import threading
+ from urllib.request import urlopen
+ 
+@@ -22,23 +25,147 @@ def get_json(url):
+         return json.loads(r.read())
+ 
+ 
++def get_texto(url):
++    with urlopen(url) as r:
++        return r.read().decode()
++
++
+ def test_listar_devuelve_todo_el_catalogo():
+     assert len(datos.listar()) == len(datos.CATALOGO)
+ 
+ 
+-def test_buscar_no_distingue_mayusculas():
+-    nombres = [p["nombre"] for p in datos.buscar("teclado")]
++@pytest.mark.parametrize("texto", ["teclado", "Teclado", "TECLADO", "tEcLaDo"])
++def test_buscar_no_distingue_mayusculas(texto):
++    nombres = [p["nombre"] for p in datos.buscar(texto)]
+     assert nombres == ["Teclado mecánico"]
+ 
+ 
++def test_buscar_sin_coincidencias_devuelve_lista_vacia():
++    assert datos.buscar("xyz") == []
++
++
+ def test_stock_bajo():
+     assert datos.stock_bajo() == ["RAT-02", "AUR-05"]
+ 
+ 
++def test_stock_bajo_usa_el_catalogo_actual(monkeypatch, base_url):
++    catalogo = [
++        datos.Producto("A-1", "Uno", 1.0, 4),
++        datos.Producto("A-2", "Dos", 1.0, 5),
++    ]
++    monkeypatch.setattr(datos, "CATALOGO", catalogo)
++    assert get_json(f"{base_url}/api/stock-bajo") == ["A-1"]
++
++
+ def test_api_productos(base_url):
+     assert len(get_json(f"{base_url}/api/productos")) == len(datos.CATALOGO)
+ 
+ 
++def test_api_productos_q_vacio_devuelve_catalogo(base_url):
++    assert len(get_json(f"{base_url}/api/productos?q=")) == len(datos.CATALOGO)
++
++
++def test_api_productos_busqueda_sin_distinguir_mayusculas(base_url):
++    for q in ["teclado", "TECLADO"]:
++        productos = get_json(f"{base_url}/api/productos?q={q}")
++        assert [p["sku"] for p in productos] == ["TEC-01"]
++
++
++def test_api_productos_sin_coincidencias(base_url):
++    assert get_json(f"{base_url}/api/productos?q=xyz") == []
++
++
+ def test_pagina_principal(base_url):
+     with urlopen(f"{base_url}/") as r:
+         assert "<h1>Tienda</h1>" in r.read().decode()
++
++
++def test_pagina_contador_stock_bajo_encima_de_la_tabla(base_url):
++    html = get_texto(f"{base_url}/")
++    assert 'id="stock-bajo"' in html
++    assert "2 productos con stock bajo" in html
++    assert html.index('id="stock-bajo"') < html.index("<table")
++
++
++def test_pagina_contador_singular(monkeypatch, base_url):
++    monkeypatch.setattr(datos, "CATALOGO", [datos.Producto("A-1", "Uno", 1.0, 1)])
++    html = get_texto(f"{base_url}/")
++    assert "1 producto con stock bajo" in html
++    assert "1 productos" not in html
++
++
++def test_pagina_contador_cero(monkeypatch, base_url):
++    monkeypatch.setattr(datos, "CATALOGO", [datos.Producto("A-1", "Uno", 1.0, 9)])
++    html = get_texto(f"{base_url}/")
++    assert "0 productos con stock bajo" in html
++
++
++def test_pagina_tiene_regla_css_de_stock_bajo(base_url):
++    html = get_texto(f"{base_url}/")
++    assert "tr.stock-bajo" in html
++
++
++PRUEBA_JS_PAGINA = """
++const elementos = {};
++const escrituras = [];
++function elemento(id) {
++  if (!elementos[id]) {
++    const el = { listeners: {}, addEventListener(ev, fn) { this.listeners[ev] = fn; } };
++    let html = "";
++    Object.defineProperty(el, "innerHTML", {
++      get() { return html; },
++      set(v) { html = v; escrituras.push({ id, html: v }); },
++    });
++    elementos[id] = el;
++  }
++  return elementos[id];
++}
++globalThis.document = { getElementById: elemento };
++const fetchReal = globalThis.fetch;
++globalThis.fetch = (url, opts) => fetchReal(BASE + url, opts);
++
++const esperar = (cond) => new Promise((resolver, rechazar) => {
++  const inicio = Date.now();
++  const iv = setInterval(() => {
++    if (cond()) { clearInterval(iv); resolver(); }
++    else if (Date.now() - inicio > 5000) { clearInterval(iv); rechazar(new Error("tiempo agotado")); }
++  }, 10);
++});
++const filas = (html) => [...html.matchAll(/<tr data-sku="([^"]+)"( class="stock-bajo")?>/g)]
++  .map(m => ({ sku: m[1], bajo: Boolean(m[2]) }));
++const tablas = () => escrituras.filter(e => e.id === "productos").map(e => e.html);
++
++(0, eval)(SCRIPT);
++(async () => {
++  await esperar(() => tablas().length >= 1);
++  const sinFiltro = filas(tablas()[0]);
++  elemento("buscador").value = FILTRO;
++  elemento("buscador").listeners.input({ target: { value: FILTRO } });
++  await esperar(() => tablas().length >= 2);
++  const conFiltro = filas(tablas()[1]);
++  console.log(JSON.stringify({ sinFiltro, conFiltro }));
++})().catch(e => { console.error(e.message); process.exit(1); });
++"""
++
++
++@pytest.mark.skipif(shutil.which("node") is None, reason="hace falta node para ejecutar el JS de la página")
++def test_pagina_resalta_solo_las_filas_con_stock_bajo(base_url):
++    html = get_texto(f"{base_url}/")
++    coincidencia = re.search(r"<script>(.*?)</script>", html, re.DOTALL)
++    assert coincidencia is not None
++    script = coincidencia.group(1)
++    programa = (
++        f"const SCRIPT = {json.dumps(script)};\n"
++        f"const BASE = {json.dumps(base_url)};\n"
++        f"const FILTRO = {json.dumps('teclado')};\n"
++        + PRUEBA_JS_PAGINA
++    )
++    salida = subprocess.run(
++        ["node", "-e", programa], capture_output=True, text=True, timeout=60, check=True
++    ).stdout
++    resultado = json.loads(salida)
++
++    bajos = {f["sku"] for f in resultado["sinFiltro"] if f["bajo"]}
++    assert len(resultado["sinFiltro"]) == len(datos.CATALOGO)
++    assert bajos == {"RAT-02", "AUR-05"}
++    assert {f["sku"]: f["bajo"] for f in resultado["conFiltro"]} == {"TEC-01": False}
