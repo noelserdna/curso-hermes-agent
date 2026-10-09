@@ -14,7 +14,7 @@ Hermes carga automáticamente **un** fichero de contexto, por este orden de prio
 `.hermes.md` / `HERMES.md` → `AGENTS.md` (se encadenan desde la raíz git) → `CLAUDE.md` → `.cursorrules`.
 Si ya usas Claude Code o Cursor, **tus ficheros funcionan tal cual**. `/init` genera un `AGENTS.md`.
 
-## Ejercicio: arreglar con red de seguridad ✅ (~45 s, ~0,02 $)
+## Ejercicio: arreglar con red de seguridad ✅ (~45 s)
 
 ```bash
 hermes chat -Q --checkpoints -q "Ejecuta los tests, encuentra la causa del fallo y corrígelo. Revisa además \

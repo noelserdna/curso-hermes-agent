@@ -40,7 +40,7 @@ Hermes publica versiones casi cada semana: si un flag no existe en tu versión, 
 - macOS, Linux o Windows (nativo o WSL2) con `git` y `curl`.
 - Una API key de un proveedor: recomendamos **[OpenRouter](https://openrouter.ai)** (una clave, todos los modelos).
 - Para el módulo 6: [`uv`](https://docs.astral.sh/uv/). Para el módulo 8: Docker.
-- Presupuesto orientativo: **todos los ejemplos del curso juntos cuestan menos de 0,50 $** con Claude Haiku 5.5.
+- Coste real medido con `hermes insights`: **las 19 sesiones de prueba de este curso costaron ~0,12 $ en total** con Claude Haiku 5.5.
 
 ## Cómo usar este repo
 
