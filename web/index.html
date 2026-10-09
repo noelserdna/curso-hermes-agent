@@ -1,0 +1,893 @@
+<title>Curso Hermes Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: manual técnico de curso — índice lateral fijo + columna de lectura de ~70ch; el código y las tablas pueden ensancharse con scroll propio. */
+:root {
+  --bg: #F2F4F6;
+  --surface: #FFFFFF;
+  --ink: #15202C;
+  --muted: #586675;
+  --line: #D6DDE4;
+  --accent: #0A6973;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #DCEEF0;
+  --gold: #9A5F0C;
+  --gold-soft: #F6EBD8;
+  --ok: #2C7A4B;
+  --ok-soft: #DFF1E6;
+  --warn: #9C5300;
+  --warn-soft: #FBEBD6;
+  --code-bg: #101B26;
+  --code-fg: #DCE6EE;
+  --code-dim: #8EA0B1;
+  --code-key: #7FD3DB;
+  --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --step--1: 0.875rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.25rem;
+  --step-2: 1.6rem;
+  --step-3: 2.2rem;
+  --step-4: clamp(2.4rem, 5vw, 3.6rem);
+  --radius: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0C131A; --surface: #131E28; --ink: #E3E9EF; --muted: #93A2B0; --line: #253442;
+    --accent: #5BC3CD; --accent-ink: #062A2E; --accent-soft: #123239;
+    --gold: #E2AA52; --gold-soft: #33260F; --ok: #73C493; --ok-soft: #14301F;
+    --warn: #EBA552; --warn-soft: #36240E;
+    --code-bg: #081018; --code-fg: #DCE6EE; --code-dim: #7F92A4; --code-key: #7FD3DB;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0C131A; --surface: #131E28; --ink: #E3E9EF; --muted: #93A2B0; --line: #253442;
+  --accent: #5BC3CD; --accent-ink: #062A2E; --accent-soft: #123239;
+  --gold: #E2AA52; --gold-soft: #33260F; --ok: #73C493; --ok-soft: #14301F;
+  --warn: #EBA552; --warn-soft: #36240E;
+  --code-bg: #081018; --code-fg: #DCE6EE; --code-dim: #7F92A4; --code-key: #7FD3DB;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: var(--step-0); line-height: 1.6;
+  padding-inline: 16px;
+}
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+h1, h2, h3, h4 { font-family: var(--font-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: var(--step-3); font-weight: 800; font-stretch: 112%; letter-spacing: -0.01em; }
+h3 { font-size: var(--step-1); font-weight: 700; margin-top: 1.6em; }
+h4 { font-size: var(--step-0); font-weight: 700; margin-top: 1.2em; }
+p, ul, ol { margin: 0.7em 0; }
+li { margin: 0.25em 0; }
+code { font-family: var(--font-mono); font-size: 0.86em; background: var(--accent-soft); padding: 0.1em 0.35em; border-radius: 4px; overflow-wrap: anywhere; }
+strong { font-weight: 700; }
+
+.shell { max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 48px; padding-block: 32px 80px; }
+
+/* Índice lateral */
+.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; max-height: calc(100vh - 48px); overflow-y: auto; }
+.toc .brand { font-family: var(--font-display); font-weight: 800; font-stretch: 118%; font-size: 1.15rem; letter-spacing: 0.01em; display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; }
+.toc .brand svg { flex: none; }
+.toc .ver { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); margin: 6px 0 18px; }
+.toc ol { list-style: none; padding: 0; margin: 0; display: grid; gap: 2px; }
+.toc a.item { display: grid; grid-template-columns: 28px 1fr 16px; align-items: baseline; gap: 4px; padding: 6px 8px; border-radius: 6px; color: var(--muted); text-decoration: none; font-size: 0.95rem; line-height: 1.3; }
+.toc a.item:hover { background: var(--surface); color: var(--ink); }
+.toc a.item.active { background: var(--accent-soft); color: var(--ink); }
+.toc .n { font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent); }
+.toc .done-mark { font-size: 0.8rem; color: var(--ok); visibility: hidden; }
+.toc a.item.done .done-mark { visibility: visible; }
+.toc .progress { margin-top: 18px; font-size: var(--step--1); color: var(--muted); }
+.toc .bar { height: 4px; background: var(--line); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+.toc .bar i { display: block; height: 100%; width: 0; background: var(--ok); transition: width .3s; }
+.toc .repo { margin-top: 16px; display: inline-flex; gap: 6px; align-items: center; font-size: var(--step--1); font-weight: 600; }
+
+main { min-width: 0; }
+.prose { max-width: 72ch; }
+
+/* Portada */
+.hero { padding-bottom: 40px; border-bottom: 1px solid var(--line); }
+.eyebrow { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); }
+.hero h1 { font-size: var(--step-4); font-weight: 800; font-stretch: 122%; letter-spacing: -0.02em; margin: 10px 0 14px; }
+.hero h1 span { color: var(--accent); }
+.hero .lede { font-size: var(--step-1); color: var(--muted); max-width: 60ch; line-height: 1.5; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; margin-top: 28px; }
+.facts div { background: var(--surface); padding: 14px 16px; }
+.facts dt { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.facts dd { margin: 4px 0 0; font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+.audience { margin-top: 24px; display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font-size: var(--step--1); padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); }
+
+/* Módulos */
+section.mod { padding-block: 56px 8px; border-bottom: 1px solid var(--line); }
+.mod-head { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+.mod-num { font-family: var(--font-mono); font-size: 0.85rem; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; padding: 1px 7px; }
+.mod-goal { color: var(--muted); font-size: var(--step-1); margin-top: 10px; max-width: 64ch; line-height: 1.45; }
+.mark-done { margin-left: auto; font: inherit; font-size: var(--step--1); padding: 5px 12px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); cursor: pointer; }
+.mark-done[aria-pressed="true"] { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+
+/* Código */
+.code { position: relative; margin: 14px 0; background: var(--code-bg); border-radius: var(--radius); max-width: 100%; }
+.code pre { margin: 0; padding: 16px 18px; overflow-x: auto; font-family: var(--font-mono); font-size: 0.84rem; line-height: 1.6; color: var(--code-fg); }
+.code .lbl { position: absolute; top: 0; left: 14px; transform: translateY(-50%); font-family: var(--font-mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; background: var(--code-bg); color: var(--code-dim); padding: 1px 6px; border-radius: 3px; }
+.code .c { color: var(--code-dim); }
+.code .k { color: var(--code-key); }
+.copy { position: absolute; top: 8px; right: 8px; font: 600 0.72rem var(--font-body); padding: 4px 9px; border-radius: 5px; border: 1px solid #ffffff2e; background: #ffffff12; color: var(--code-fg); cursor: pointer; }
+.copy:hover { background: #ffffff24; }
+
+/* Avisos */
+.note { border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius); padding: 14px 16px; margin: 16px 0; max-width: 72ch; }
+.note > :first-child { margin-top: 0; } .note > :last-child { margin-bottom: 0; }
+.note .t { font-family: var(--font-display); font-weight: 700; font-size: 0.95rem; display: block; margin-bottom: 4px; }
+.note.ok { background: var(--ok-soft); border-color: transparent; } .note.ok .t { color: var(--ok); }
+.note.warn { background: var(--warn-soft); border-color: transparent; } .note.warn .t { color: var(--warn); }
+.note.key { background: var(--gold-soft); border-color: transparent; } .note.key .t { color: var(--gold); }
+
+.badge { display: inline-block; font: 600 0.72rem var(--font-body); padding: 1px 8px; border-radius: 999px; vertical-align: middle; letter-spacing: 0.02em; }
+.badge.ok { background: var(--ok-soft); color: var(--ok); }
+.badge.doc { background: var(--accent-soft); color: var(--accent); }
+
+/* Tablas */
+.tw { overflow-x: auto; margin: 16px 0; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+tr:last-child td { border-bottom: 0; }
+th { font-family: var(--font-display); font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); background: var(--bg); white-space: nowrap; }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+table.compare td:first-child { font-weight: 700; white-space: nowrap; }
+table.compare tr.me td { background: var(--accent-soft); }
+
+/* Pestañas */
+.tabs { margin: 16px 0; }
+.tablist { display: flex; flex-wrap: wrap; gap: 4px; }
+.tablist button { font: 600 0.88rem var(--font-body); padding: 6px 12px; border: 1px solid var(--line); border-bottom: 0; border-radius: 6px 6px 0 0; background: var(--bg); color: var(--muted); cursor: pointer; }
+.tablist button[aria-selected="true"] { background: var(--code-bg); color: var(--code-fg); border-color: var(--code-bg); }
+.tabs .code { margin-top: 0; border-top-left-radius: 0; }
+
+/* Ejemplos */
+.example { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); padding: 18px 20px; margin: 22px 0; }
+.example h4 { margin: 0; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.example .meta { font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+.example .found { margin: 10px 0 0; padding-left: 1.1em; }
+
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 16px 0; }
+.cols > * { min-width: 0; }
+.panel { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); padding: 14px 16px; }
+.panel h4 { margin-top: 0; }
+.panel ul { padding-left: 1.1em; margin-bottom: 0; }
+.pro h4 { color: var(--ok); } .con h4 { color: var(--warn); }
+
+details.ex { border: 1px dashed var(--line); border-radius: var(--radius); padding: 10px 14px; margin: 18px 0; max-width: 72ch; }
+details.ex summary { cursor: pointer; font-family: var(--font-display); font-weight: 700; }
+
+/* Diagrama */
+.diagram { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; overflow-x: auto; margin: 18px 0; }
+.diagram svg { display: block; min-width: 640px; width: 100%; height: auto; }
+.diagram svg text { font-family: var(--font-body); }
+
+footer { padding-block: 40px; color: var(--muted); font-size: var(--step--1); }
+footer ul { padding-left: 1.1em; }
+
+@media (max-width: 900px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 0; padding-top: 0; }
+  .toc { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; max-height: none; overflow: visible; background: var(--bg); margin-inline: -16px; padding: 10px 16px; border-bottom: 1px solid var(--line); }
+  .toc .ver, .toc .progress, .toc .repo { display: none; }
+  .toc .brand { font-size: 1rem; }
+  .toc ol { display: flex; overflow-x: auto; gap: 4px; margin-top: 8px; scrollbar-width: none; }
+  .toc a.item { display: flex; white-space: nowrap; padding: 4px 10px; border: 1px solid var(--line); background: var(--surface); }
+  .toc .done-mark { display: none; }
+  .hero { padding-top: 28px; }
+  .mark-done { margin-left: 0; }
+}
+</style>
+
+<div class="shell">
+  <nav class="toc" aria-label="Módulos del curso">
+    <a class="brand" href="#inicio">
+      <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><path d="M3 15c4-1 7-4 9-9l2 3c1-2 3-4 6-5-1 3-2 5-4 7l3 1c-3 3-7 4-11 4l-2 4-1-4-2-1z" fill="var(--accent)"/></svg>
+      Curso Hermes
+    </a>
+    <div class="ver">Hermes Agent v0.21.6 · oct 2026</div>
+    <ol id="toc-list"></ol>
+    <div class="progress"><span id="progress-txt">0 de 11 módulos completados</span><div class="bar"><i id="progress-bar"></i></div></div>
+    <a class="repo" href="https://github.com/noelserdna/curso-hermes-agent">Repo con los ejemplos ↗</a>
+  </nav>
+
+  <main>
+    <header class="hero" id="inicio">
+      <div class="eyebrow">Curso práctico · para programadores con experiencia</div>
+      <h1>Hermes Agent, <span>de cero a producción</span></h1>
+      <p class="lede">Qué es el agente open source de Nous Research, cómo instalarlo y qué puedes hacer con él en la oficina y en tu código. Al final, cómo se compara con Claude, OpenClaw, Codex y el resto del mercado.</p>
+      <dl class="facts">
+        <div><dt>Versión estable</dt><dd>v0.21.6</dd></div>
+        <div><dt>Publicada</dt><dd>8 oct 2026</dd></div>
+        <div><dt>Licencia</dt><dd>MIT</dd></div>
+        <div><dt>Pruebas</dt><dd>14 reales · 2 guías</dd></div>
+        <div><dt>Coste de todas las pruebas</dt><dd>≈ 0,12 $</dd></div>
+      </dl>
+      <div class="audience">
+        <span class="chip">≈ 5 h de clase</span>
+        <span class="chip">macOS · Linux · Windows</span>
+        <span class="chip">Modelo usado: Claude Haiku 5.5 vía OpenRouter</span>
+      </div>
+      <div class="note key" style="margin-top:24px">
+        <span class="t">Cómo usar este curso</span>
+        <p>Cada módulo tiene la explicación aquí y los ficheros en el <a href="https://github.com/noelserdna/curso-hermes-agent">repositorio de GitHub</a>. Los ejemplos marcados <span class="badge ok">probado</span> se ejecutaron de verdad el 9 de octubre de 2026; los marcados <span class="badge doc">guía</span> siguen la documentación oficial porque necesitan cuentas externas. Marca cada módulo como completado para seguir tu progreso (se guarda solo en tu navegador).</p>
+      </div>
+    </header>
+
+    <!-- 0 -->
+    <section class="mod" id="m0" data-title="Qué es Hermes">
+      <div class="mod-head"><span class="mod-num">00</span><h2>Qué es Hermes y para qué sirve</h2></div>
+      <p class="mod-goal">Entender las piezas de un agente y qué hace distinto a Hermes antes de instalar nada.</p>
+      <div class="prose">
+        <p><strong>Hermes Agent</strong> es un agente de IA autónomo y open source publicado por <a href="https://github.com/NousResearch/hermes-agent">Nous Research</a> el 25 de febrero de 2026. No es un modelo: es el programa que rodea a un modelo (Claude, GPT, Gemini, Hermes 4, uno local…) y le da manos, memoria y presencia.</p>
+        <p>Un chatbot responde; un agente <strong>actúa en bucle</strong>: piensa, llama a una herramienta (terminal, ficheros, web, navegador, MCP…), lee el resultado y decide el siguiente paso hasta terminar. Hermes añade a ese bucle tres cosas que lo diferencian:</p>
+        <ul>
+          <li><strong>Vive fuera de tu sesión.</strong> Un proceso llamado <em>gateway</em> lo mantiene encendido en tu Mac o en un VPS, y puedes hablarle desde Telegram, Slack, Discord, WhatsApp, iMessage, email…</li>
+          <li><strong>Aprende.</strong> Guarda memoria sobre ti y tu entorno, y convierte lo que resuelve en <em>skills</em> reutilizables que él mismo escribe y mejora.</li>
+          <li><strong>Trabaja solo.</strong> Programa tareas con cron, recibe webhooks y entrega resultados donde le digas.</li>
+        </ul>
+      </div>
+
+      <div class="diagram" role="img" aria-label="Arquitectura de Hermes: canales de entrada, núcleo del agente, modelo, herramientas y estado persistente en ~/.hermes">
+        <svg viewBox="0 0 900 360" xmlns="http://www.w3.org/2000/svg">
+          <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--muted)"/></marker></defs>
+          <g font-size="13" fill="var(--ink)">
+            <text x="20" y="28" font-weight="700" fill="var(--muted)" font-size="11" letter-spacing="1">ENTRADAS</text>
+            <rect x="20" y="40" width="180" height="40" rx="6" fill="var(--surface)" stroke="var(--line)"/><text x="34" y="65">CLI · TUI · Desktop</text>
+            <rect x="20" y="92" width="180" height="40" rx="6" fill="var(--surface)" stroke="var(--line)"/><text x="34" y="117">Telegram · Slack · Discord…</text>
+            <rect x="20" y="144" width="180" height="40" rx="6" fill="var(--surface)" stroke="var(--line)"/><text x="34" y="169">Cron · blueprints</text>
+            <rect x="20" y="196" width="180" height="40" rx="6" fill="var(--surface)" stroke="var(--line)"/><text x="34" y="221">Webhooks · CI (hermes -z)</text>
+            <rect x="20" y="248" width="180" height="40" rx="6" fill="var(--surface)" stroke="var(--line)"/><text x="34" y="273">Editor (ACP) · MCP serve</text>
+
+            <rect x="290" y="80" width="250" height="170" rx="10" fill="var(--accent-soft)" stroke="var(--accent)"/>
+            <text x="310" y="108" font-weight="700" font-size="15">Núcleo del agente</text>
+            <text x="310" y="134" fill="var(--muted)">1 · lee contexto (AGENTS.md,</text>
+            <text x="322" y="152" fill="var(--muted)">memoria, skills relevantes)</text>
+            <text x="310" y="176" fill="var(--muted)">2 · pide al modelo el siguiente paso</text>
+            <text x="310" y="200" fill="var(--muted)">3 · ejecuta la herramienta</text>
+            <text x="310" y="224" fill="var(--muted)">4 · repite hasta terminar</text>
+
+            <rect x="300" y="290" width="230" height="44" rx="6" fill="var(--gold-soft)" stroke="var(--gold)"/>
+            <text x="314" y="317">Modelo: OpenRouter, Anthropic, Nous…</text>
+
+            <text x="630" y="28" font-weight="700" fill="var(--muted)" font-size="11" letter-spacing="1">HERRAMIENTAS</text>
+            <rect x="630" y="40" width="250" height="40" rx="6" fill="var(--surface)" stroke="var(--line)"/><text x="644" y="65">Terminal: local · Docker · SSH · nube</text>
+            <rect x="630" y="92" width="250" height="40" rx="6" fill="var(--surface)" stroke="var(--line)"/><text x="644" y="117">Ficheros · web · navegador · visión</text>
+            <rect x="630" y="144" width="250" height="40" rx="6" fill="var(--surface)" stroke="var(--line)"/><text x="644" y="169">Servidores MCP</text>
+            <rect x="630" y="196" width="250" height="40" rx="6" fill="var(--surface)" stroke="var(--line)"/><text x="644" y="221">Subagentes (delegate_task)</text>
+
+            <text x="630" y="268" font-weight="700" fill="var(--muted)" font-size="11" letter-spacing="1">ESTADO EN ~/.hermes</text>
+            <rect x="630" y="280" width="250" height="54" rx="6" fill="var(--surface)" stroke="var(--line)"/>
+            <text x="644" y="302">memories/ · skills/ · sessions/</text><text x="644" y="322">cron/ · config.yaml · .env</text>
+          </g>
+          <g stroke="var(--muted)" stroke-width="1.5" fill="none" marker-end="url(#ar)">
+            <path d="M200 60 L288 130"/><path d="M200 112 L288 145"/><path d="M200 164 L288 165"/><path d="M200 216 L288 185"/><path d="M200 268 L288 205"/>
+            <path d="M415 250 L415 288"/>
+            <path d="M540 120 L628 60"/><path d="M540 140 L628 112"/><path d="M540 165 L628 164"/><path d="M540 190 L628 214"/>
+            <path d="M540 230 L628 300"/>
+          </g>
+        </svg>
+      </div>
+
+      <div class="cols">
+        <div class="panel"><h4>Para qué sirve bien</h4><ul>
+          <li>Un asistente personal o de equipo 24/7, accesible desde el móvil.</li>
+          <li>Automatizar trabajo recurrente: informes, vigilancia, resúmenes, triage.</li>
+          <li>Tareas de ofimática "describe el resultado": Excel, Word, PDF, carpetas.</li>
+          <li>Rodear tu trabajo de programación: CI, revisión de código, subagentes, entornos aislados.</li>
+        </ul></div>
+        <div class="panel"><h4>Para qué no es la mejor opción</h4><ul>
+          <li>Programar dentro del IDE con el mejor agente de código posible (ahí ganan Claude Code o Codex; Hermes los puede orquestar).</li>
+          <li>Flujos 100 % deterministas con cientos de integraciones (n8n, Zapier).</li>
+          <li>Usuarios no técnicos que no quieren tocar una terminal.</li>
+        </ul></div>
+      </div>
+      <details class="ex"><summary>Glosario rápido</summary>
+        <ul>
+          <li><strong>Toolset</strong>: grupo de herramientas que el agente puede usar (<code>file</code>, <code>terminal</code>, <code>web</code>, <code>browser</code>…).</li>
+          <li><strong>Skill</strong>: carpeta con un <code>SKILL.md</code> que explica un procedimiento. Estándar abierto compartido con Claude.</li>
+          <li><strong>Gateway</strong>: proceso en segundo plano que conecta Hermes con mensajería y ejecuta el cron.</li>
+          <li><strong>Backend de terminal</strong>: dónde se ejecutan los comandos (tu máquina, Docker, SSH, sandbox en la nube).</li>
+          <li><strong>Perfil</strong>: un Hermes independiente con su propia config, memoria y skills (<code>hermes -p trabajo</code>).</li>
+        </ul>
+      </details>
+      <button class="mark-done" type="button" data-mod="m0" aria-pressed="false">Marcar como completado</button>
+    </section>
+
+    <!-- 1 -->
+    <section class="mod" id="m1" data-title="Instalación">
+      <div class="mod-head"><span class="mod-num">01</span><h2>Instalación y configuración</h2><span class="badge ok">probado</span></div>
+      <p class="mod-goal">Instalar Hermes, conectarlo a un proveedor de modelos y comprobar que responde.</p>
+      <div class="tabs" data-tabs>
+        <div class="tablist" role="tablist">
+          <button role="tab" aria-selected="true" aria-controls="os-unix" id="t-unix">macOS / Linux / WSL2</button>
+          <button role="tab" aria-selected="false" aria-controls="os-win" id="t-win" tabindex="-1">Windows</button>
+          <button role="tab" aria-selected="false" aria-controls="os-docker" id="t-docker" tabindex="-1">Docker</button>
+          <button role="tab" aria-selected="false" aria-controls="os-app" id="t-app" tabindex="-1">App de escritorio</button>
+        </div>
+        <div class="code" role="tabpanel" id="os-unix" aria-labelledby="t-unix"><pre>curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash</pre></div>
+        <div class="code" role="tabpanel" id="os-win" aria-labelledby="t-win" hidden><pre><span class="c"># PowerShell</span>
+iex (irm https://hermes-agent.nousresearch.com/install.ps1)</pre></div>
+        <div class="code" role="tabpanel" id="os-docker" aria-labelledby="t-docker" hidden><pre>docker pull nousresearch/hermes-agent:stable
+<span class="c"># monta un volumen en /opt/data para que la memoria y la config persistan</span></pre></div>
+        <div class="code" role="tabpanel" id="os-app" aria-labelledby="t-app" hidden><pre><span class="c"># Descarga desde https://hermes-agent.nousresearch.com</span>
+<span class="c"># macOS: solo Apple Silicon · Windows: también en Microsoft Store · Linux disponible</span>
+<span class="c"># Si ya tienes la CLI:</span>
+hermes desktop</pre></div>
+      </div>
+      <div class="prose">
+        <p>El instalador trae su propio Python 3.14, Node, ripgrep, FFmpeg, <code>uv</code> y un Chromium para el navegador. No toca el Python de tu sistema. En nuestra prueba (Mac mini M-series) tardó unos 3 minutos y dejó instaladas <strong>58 skills de serie</strong>.</p>
+        <p>Opciones útiles: <code>--non-interactive</code>, <code>--skip-browser</code>, <code>--skip-computer-use</code>. Ojo: el instalador sigue la rama <code>main</code> (nuestra prueba quedó en <code>v0.21.6+301</code>); para fijar una versión exacta usa <code>--commit &lt;sha&gt;</code>.</p>
+      </div>
+      <h3>Dónde queda cada cosa</h3>
+      <div class="code"><span class="lbl">árbol</span><pre>~/.local/bin/hermes        <span class="c">← lanzador (se añade al PATH en ~/.zprofile)</span>
+~/.hermes/
+├── hermes-agent/          <span class="c">← código fuente (git)</span>
+├── config.yaml            <span class="c">← configuración sin secretos</span>
+├── .env                   <span class="c">← API keys y tokens</span>
+├── SOUL.md                <span class="c">← identidad y tono del agente</span>
+├── memories/              <span class="c">← MEMORY.md y USER.md</span>
+├── skills/                <span class="c">← skills incluidas, instaladas y creadas por el agente</span>
+├── cron/                  <span class="c">← jobs y sus salidas</span>
+└── sessions/ logs/ checkpoints/</pre></div>
+      <h3>Conectar un modelo (OpenRouter)</h3>
+      <div class="code"><pre>hermes model     <span class="c"># asistente: elige OpenRouter, pega la clave, elige modelo</span>
+hermes setup     <span class="c"># asistente completo: modelo, terminal, gateway, herramientas</span></pre></div>
+      <div class="note warn"><span class="t">Dos tropiezos que tuvimos</span>
+        <p><code>hermes model</code> y <code>hermes setup</code> exigen una <strong>terminal interactiva real</strong>: fallan si los lanzas desde otro agente o un pipe. Y tras instalar, abre una terminal nueva: el PATH se actualiza en <code>~/.zprofile</code>.</p></div>
+      <p>Alternativa sin asistente. <code>hermes config set</code> decide el fichero según la clave: MAYÚSCULAS van a <code>.env</code>, rutas con puntos a <code>config.yaml</code>.</p>
+      <div class="code"><pre>hermes config set OPENROUTER_API_KEY sk-or-...
+hermes config set model.provider openrouter
+hermes config set model.default anthropic/claude-haiku-5.5</pre></div>
+      <h3>Comprobar</h3>
+      <div class="code"><pre>hermes --version
+hermes doctor
+hermes -z "Responde solo: OK y tu modelo" --usage-file uso.json
+<span class="c"># → OK. Soy Hermes Agent con anthropic/claude-haiku-5.5 vía OpenRouter.   (8 s, 0,0025 $)</span></pre></div>
+      <p>Requisito del modelo: <strong>al menos 64K tokens de contexto</strong>. Actualizar: <code>hermes update</code>. Copia de seguridad: <code>hermes backup</code> (incluye credenciales). Desinstalar: <code>hermes uninstall --dry-run</code> y luego <code>--full</code>.</p>
+      <button class="mark-done" type="button" data-mod="m1" aria-pressed="false">Marcar como completado</button>
+    </section>
+
+    <!-- 2 -->
+    <section class="mod" id="m2" data-title="Primeros pasos">
+      <div class="mod-head"><span class="mod-num">02</span><h2>Primeros pasos: modos y comandos</h2><span class="badge ok">probado</span></div>
+      <p class="mod-goal">Saber cuándo usar el chat interactivo y cuándo el modo one-shot para scripts.</p>
+      <div class="tw"><table>
+        <thead><tr><th>Modo</th><th>Comando</th><th>Cuándo</th></tr></thead>
+        <tbody>
+          <tr><td>Interactivo</td><td><code>hermes</code> · <code>hermes --tui</code></td><td>Trabajo del día a día</td></tr>
+          <tr><td>One-shot</td><td><code>hermes -z "…"</code></td><td>Scripts, CI, pipes. Imprime solo la respuesta final</td></tr>
+          <tr><td>One-shot con sesión</td><td><code>hermes chat -Q -q "…"</code></td><td>Igual, y muestra el <code>session_id</code> para retomarla</td></tr>
+          <tr><td>Desde stdin</td><td><code>… | hermes chat -Q --query-file -</code></td><td>Pasarle datos generados por otro comando</td></tr>
+        </tbody></table></div>
+      <div class="note warn"><span class="t">Cambio en v0.21</span><p><code>hermes chat -q "…"</code> en una terminal real <strong>abre</strong> una sesión interactiva con ese primer mensaje. Para que responda y salga añade <code>-Q</code>, <code>--oneshot</code> o usa <code>-z</code>.</p></div>
+      <div class="code"><span class="lbl">ejercicios</span><pre><span class="c"># 1. Pregunta con coste medido</span>
+hermes -z "Explica en 3 líneas qué es un agente de IA" --usage-file uso.json
+
+<span class="c"># 2. Prompt + datos por stdin</span>
+(echo "¿Qué ficheros ocultos son de configuración?"; ls -a ~) | hermes chat -Q --query-file -
+
+<span class="c"># 3. Otro modelo solo para esta consulta</span>
+hermes -z "¿Quién eres?" -m openai/gpt-6.1-sol --provider openrouter
+
+<span class="c"># 4. Superficie mínima: solo ficheros y web</span>
+hermes -t file,web -z "Resume https://hermes-agent.nousresearch.com en 3 viñetas"
+
+<span class="c"># 5. Retomar</span>
+hermes -c                 <span class="c"># continúa la última sesión</span>
+hermes --resume &lt;id&gt;</pre></div>
+      <h3>Slash commands que vas a usar a diario</h3>
+      <div class="tw"><table>
+        <thead><tr><th>Comando</th><th>Para qué</th></tr></thead>
+        <tbody>
+          <tr><td><code>Ctrl+P</code> · <code>/help</code></td><td>Paleta de comandos y ayuda</td></tr>
+          <tr><td><code>/model</code> · <code>/reasoning high</code></td><td>Cambiar de modelo y de nivel de razonamiento</td></tr>
+          <tr><td><code>/new</code> · <code>/resume</code> · <code>/sessions</code></td><td>Gestionar conversaciones</td></tr>
+          <tr><td><code>/usage</code> · <code>/context</code> · <code>/compress</code></td><td>Coste, contexto ocupado y compactarlo</td></tr>
+          <tr><td><code>/plan</code></td><td>Que piense un plan antes de tocar nada</td></tr>
+          <tr><td><code>/goal &lt;objetivo&gt;</code></td><td>Bucle hasta cumplirlo, con un modelo juez</td></tr>
+          <tr><td><code>/bg &lt;tarea&gt;</code> · <code>/agents</code> · <code>/steer</code></td><td>Trabajo en segundo plano y subagentes en vivo</td></tr>
+          <tr><td><code>/rollback</code> · <code>/diff</code></td><td>Deshacer cambios en ficheros</td></tr>
+          <tr><td><code>/memory</code> · <code>/skills</code> · <code>/tools</code></td><td>Ver lo que sabe y lo que puede usar</td></tr>
+          <tr><td><code>/yolo</code></td><td>Quitar aprobaciones. Solo en un entorno aislado</td></tr>
+        </tbody></table></div>
+      <button class="mark-done" type="button" data-mod="m2" aria-pressed="false">Marcar como completado</button>
+    </section>
+
+    <!-- 3 -->
+    <section class="mod" id="m3" data-title="Ofimática">
+      <div class="mod-head"><span class="mod-num">03</span><h2>Hermes en la oficina</h2><span class="badge ok">probado</span></div>
+      <p class="mod-goal">Describir el resultado que quieres y dejar que Hermes elija las herramientas: Excel, Word, carpetas.</p>
+      <div class="prose"><p>Hermes trae skills para <strong>docx, xlsx, pptx, pdf, Google Workspace, Notion, Airtable, Obsidian, Apple Notes/Reminders y correo</strong>. No hay que programar: el truco está en escribir el prompt como un encargo a un becario muy rápido: formato de salida, restricciones y qué hacer ante la duda. Ficheros en <a href="https://github.com/noelserdna/curso-hermes-agent/tree/main/02-ofimatica"><code>02-ofimatica/</code></a>.</p></div>
+
+      <div class="example">
+        <h4>A · CSV de gastos → Excel con fórmulas e informe <span class="badge ok">72 s</span></h4>
+        <div class="meta">02-ofimatica/gastos-csv · 43 gastos del tercer trimestre</div>
+        <div class="code"><pre>hermes chat -Q -q "Analiza gastos_T3_2026.csv. Crea informe_gastos_T3.xlsx con: hoja 'Datos'
+(los datos como tabla), hoja 'Resumen' con total por categoría y por mes (con fórmulas de
+Excel, no valores fijos) y un gráfico de barras por categoría. Después escribe resumen.md
+con 5 conclusiones para dirección, incluyendo cualquier gasto anómalo que detectes."</pre></div>
+        <p><strong>Qué hizo:</strong></p>
+        <ul class="found">
+          <li>Usó <code>SUMIFS</code>/<code>COUNTIF</code> reales y añadió celdas de control que deben dar 0.</li>
+          <li>Encontró el gasto trampa que escondimos: un vuelo de 4.850 €, el 33 % del trimestre.</li>
+          <li>Señaló dos partidas más a revisar, con su razonamiento.</li>
+          <li>Total 14.505,46 €: lo verificamos con Python y cuadra al céntimo.</li>
+        </ul>
+      </div>
+
+      <div class="example">
+        <h4>B · Transcripción de reunión → acta en Word <span class="badge ok">67 s</span></h4>
+        <div class="meta">02-ofimatica/acta-reunion</div>
+        <div class="code"><pre>hermes chat -Q -q "A partir de transcripcion.txt genera acta_reunion.docx: título, fecha de hoy,
+asistentes, resumen en 3 líneas, decisiones tomadas, tabla de tareas (responsable, tarea,
+fecha límite) y temas pendientes. Formato profesional."</pre></div>
+        <ul class="found">
+          <li>Revisó el documento renderizado antes de entregarlo.</li>
+          <li>Avisó de que "el jueves 16" no existe en octubre de 2026 (el 16 es viernes) y lo marcó en rojo.</li>
+          <li>Las fechas límite que nadie dijo quedaron como "No fijada", sin inventarlas.</li>
+        </ul>
+      </div>
+
+      <div class="example">
+        <h4>C · Ordenar una carpeta caótica <span class="badge ok">47 s</span></h4>
+        <div class="meta">02-ofimatica/ordenar-carpeta · 9 ficheros con nombres sin criterio</div>
+        <div class="code"><pre>hermes chat -Q -q "La carpeta entrada/ está desordenada. Lee el contenido de cada fichero y
+organízalos en ordenado/ (facturas/, contratos/, notas/, otros/). Renombra con el formato
+AAAA-MM-DD_tipo_descripcion.txt usando la fecha del contenido (si no hay: 'sin-fecha').
+No borres nada: copia, no muevas. Crea ordenado/INDICE.md con nombre original, nuevo y carpeta."</pre></div>
+        <ul class="found">
+          <li>Clasificó por contenido, no por nombre: <code>IMG_2041.txt</code> era una foto de la pizarra y acabó en notas.</li>
+          <li>Con "09/12" sin año prefirió preguntar antes que adivinar.</li>
+        </ul>
+      </div>
+      <div class="note key"><span class="t">Patrón de prompt que funciona</span>
+        <p><strong>Entrada</strong> (qué fichero) + <strong>salida exacta</strong> (nombre, formato, secciones) + <strong>restricciones</strong> (copiar, no mover; fórmulas, no valores) + <strong>algo auditable</strong> (índice, resumen). Para tus carpetas reales añade <code>--checkpoints</code>.</p></div>
+      <details class="ex"><summary>Ejercicios propuestos</summary><ul>
+        <li>"Convierte los PDF de <code>facturas/</code> en una hoja con proveedor, fecha, base, IVA y total."</li>
+        <li>"Hazme una presentación de 6 diapositivas a partir de <code>resumen.md</code>."</li>
+        <li>Con la skill <code>email-inbox-triage</code>: "¿Qué correos de hoy requieren respuesta?"</li>
+      </ul></details>
+      <button class="mark-done" type="button" data-mod="m3" aria-pressed="false">Marcar como completado</button>
+    </section>
+
+    <!-- 4 -->
+    <section class="mod" id="m4" data-title="Memoria y skills">
+      <div class="mod-head"><span class="mod-num">04</span><h2>Memoria y skills</h2><span class="badge ok">probado</span></div>
+      <p class="mod-goal">Hacer que Hermes recuerde quién eres y enseñarle procedimientos propios.</p>
+      <h3>Memoria persistente</h3>
+      <div class="tw"><table>
+        <thead><tr><th>Fichero</th><th>Qué guarda</th><th>Límite</th></tr></thead>
+        <tbody>
+          <tr><td><code>memories/USER.md</code></td><td>Quién eres y tus preferencias</td><td class="num">≈ 1.375 caracteres</td></tr>
+          <tr><td><code>memories/MEMORY.md</code></td><td>Lo que ha aprendido de tu entorno</td><td class="num">≈ 2.200 caracteres</td></tr>
+        </tbody></table></div>
+      <div class="code"><pre>hermes -z "Recuerda para siempre: prefiero importes con formato 1.234,56 € y fechas tipo 'viernes 9 de octubre'."
+cat ~/.hermes/memories/USER.md          <span class="c"># entradas separadas por §</span>
+hermes -z "¿Cómo formateas 1500 euros?" <span class="c"># sesión nueva → 1.500,00 €</span></pre></div>
+      <p>Se inyecta al inicio de cada sesión, también en cron: nuestro job programado del módulo 5 formateó los importes así sin pedírselo. Para el historial completo el agente usa <code>session_search</code> sobre las sesiones pasadas.</p>
+      <h3>Skills: procedimientos reutilizables</h3>
+      <p>Una skill es una carpeta con <code>SKILL.md</code> (estándar <a href="https://agentskills.io">agentskills.io</a>, el mismo que usan Claude Code y Claude Desktop) y, si hace falta, <code>templates/</code>, <code>scripts/</code> o <code>references/</code>. Hermes solo carga el nombre y la descripción de cada una; el cuerpo lo lee cuando la necesita.</p>
+      <div class="code"><span class="lbl">03-memoria-y-skills/skills/email-seguimiento/SKILL.md</span><pre><span class="k">---</span>
+<span class="k">name:</span> email-seguimiento
+<span class="k">description:</span> "Genera un correo de seguimiento por responsable a partir de un acta."
+<span class="k">version:</span> 1.0.0
+<span class="k">metadata:</span>
+  <span class="k">hermes:</span>
+    <span class="k">tags:</span> [Reuniones, Email, Seguimiento]
+    <span class="k">related_skills:</span> [meeting-action-items, docx]
+<span class="k">---</span>
+# Email de seguimiento tras una reunión
+## Procedimiento
+1. Lee la fuente. Identifica decisiones y tareas con responsable y fecha.
+2. Agrupa las tareas por responsable.
+3. Rellena templates/email.md. Si una fecha no se fijó, escribe "a definir".
+4. Escribe correos/AAAA-MM-DD_&lt;nombre&gt;.md
+## Comprobaciones antes de terminar
+- Cada tarea aparece exactamente en un correo.</pre></div>
+      <div class="code"><pre>cp -r skills/email-seguimiento ~/.hermes/skills/productivity/
+hermes chat -Q -s email-seguimiento -q "Prepara los correos de seguimiento de transcripcion.txt"</pre></div>
+      <div class="note ok"><span class="t">Resultado de la prueba (57 s)</span><p>Cuatro borradores, uno por persona, con la plantilla aplicada. Además detectó que el 24 de octubre de 2026 cae en sábado y pidió confirmarlo.</p></div>
+      <ul>
+        <li><strong>Skills de proyecto:</strong> en <code>./.hermes/skills/</code> o <code>./.agents/skills/</code>; se activan con <code>hermes skills trust</code>.</li>
+        <li><strong>Que las escriba él:</strong> tras resolver algo, <code>/learn</code> o "guarda esto como skill". Escribir skills, memoria o <code>AGENTS.md</code> siempre pide aprobación.</li>
+        <li><strong>Hub:</strong> <code>hermes skills search pdf</code>, <code>inspect</code> antes de <code>install</code> (una skill puede ejecutar scripts).</li>
+      </ul>
+      <button class="mark-done" type="button" data-mod="m4" aria-pressed="false">Marcar como completado</button>
+    </section>
+
+    <!-- 5 -->
+    <section class="mod" id="m5" data-title="Automatización">
+      <div class="mod-head"><span class="mod-num">05</span><h2>Automatización: cron y blueprints</h2><span class="badge ok">probado</span></div>
+      <p class="mod-goal">Programar trabajo recurrente, con o sin LLM, y elegir dónde llega el resultado.</p>
+      <p class="prose">Las tareas las dispara el <strong>gateway</strong>, que revisa el calendario cada 60 s. Sin gateway los jobs se crean pero no se ejecutan solos (Hermes te lo avisa al crearlos).</p>
+      <div class="code"><pre>hermes gateway install &amp;&amp; hermes gateway start    <span class="c"># launchd en macOS, systemd en Linux</span>
+
+hermes cron create "every monday 9am" \
+  "Lee /ruta/gastos_T3_2026.csv y dame en 3 viñetas el total y la categoría con más gasto." \
+  --name resumen-gastos-semanal --deliver telegram
+
+hermes cron list
+hermes cron run &lt;id&gt;        <span class="c"># dispararlo ya, para probar</span></pre></div>
+      <div class="cols">
+        <div class="panel"><h4>Horarios</h4><ul>
+          <li>Una vez: <code>in 30m</code>, <code>2026-11-03T09:00:00</code></li>
+          <li>Intervalo: <code>30m</code>, <code>every 2h</code></li>
+          <li>Natural: <code>weekdays at 9am</code>, <code>daily at 7am</code></li>
+          <li>Cron: <code>0 9 * * 1-5</code></li>
+        </ul></div>
+        <div class="panel"><h4>Destinos (--deliver)</h4><ul>
+          <li><code>local</code> → <code>~/.hermes/cron/output/</code></li>
+          <li><code>telegram</code>, <code>discord:#canal</code>, <code>slack</code>, <code>email</code></li>
+          <li><code>origin</code>: el chat donde lo pediste</li>
+          <li>Si no hay nada nuevo responde <code>[SILENT]</code> y no envía nada</li>
+        </ul></div>
+      </div>
+      <h3>Watchdog sin LLM: coste cero</h3>
+      <div class="code"><pre>cp scripts/espacio_disco.sh ~/.hermes/scripts/
+hermes cron create "every 1h" --name watchdog-disco --no-agent --script espacio_disco.sh --deliver telegram
+<span class="c"># el script solo imprime si el disco supera el 85 %: salida vacía = no se notifica</span></pre></div>
+      <p>Sin <code>--no-agent</code>, la salida del script se inyecta en el prompt: el script recoge datos y el modelo los interpreta.</p>
+      <div class="note ok"><span class="t">Lo que vimos en la prueba</span><p>El job con LLM devolvió cifras exactas y aplicó la memoria (formato 1.234,56 €). También vimos la seguridad desatendida: en cron los comandos de terminal que necesitan aprobación se deniegan, así que el agente calculó sin ejecutar su script y lo avisó.</p></div>
+      <h3>Desde el chat o con blueprints</h3>
+      <div class="code"><pre>&gt; Todos los días laborables a las 8:30 mándame por Telegram los titulares de IA de Hacker News
+
+/blueprint                                   <span class="c"># morning-brief, important-mail, weekly-review,</span>
+                                             <span class="c"># price-watch, competitor-watch, news-digest…</span>
+/blueprint morning-brief time=07:30 deliver=telegram
+
+hermes pause    <span class="c"># parada de emergencia: cron, kanban y gateway</span></pre></div>
+      <button class="mark-done" type="button" data-mod="m5" aria-pressed="false">Marcar como completado</button>
+    </section>
+
+    <!-- 6 -->
+    <section class="mod" id="m6" data-title="Mensajería">
+      <div class="mod-head"><span class="mod-num">06</span><h2>Mensajería: Hermes en Telegram</h2><span class="badge doc">guía</span></div>
+      <p class="mod-goal">Hablar con tu agente desde el móvil, con la misma memoria y skills.</p>
+      <ol class="prose">
+        <li>En Telegram, <strong>@BotFather</strong> → <code>/newbot</code> → copia el token.</li>
+        <li>Tu ID de usuario te lo da <strong>@userinfobot</strong>.</li>
+        <li>Configura y arranca:</li>
+      </ol>
+      <div class="code"><pre>hermes gateway setup                                   <span class="c"># asistente, o bien:</span>
+hermes config set TELEGRAM_BOT_TOKEN 123456:ABC...
+hermes config set TELEGRAM_ALLOWED_USERS 111222333     <span class="c"># imprescindible</span>
+hermes gateway run                                     <span class="c"># primer plano, para probar</span></pre></div>
+      <div class="note warn"><span class="t">No te saltes la lista blanca</span><p>Sin <code>TELEGRAM_ALLOWED_USERS</code> (o el emparejamiento con <code>hermes pairing approve</code>), cualquiera que encuentre tu bot tendría una terminal en tu máquina.</p></div>
+      <div class="tw"><table>
+        <thead><tr><th>En el chat</th><th>Para qué</th></tr></thead>
+        <tbody>
+          <tr><td><code>/approve</code> · <code>/deny</code></td><td>Autorizar comandos peligrosos desde el móvil</td></tr>
+          <tr><td><code>/sethome</code></td><td>Este chat recibe las entregas del cron</td></tr>
+          <tr><td><code>/handoff</code></td><td>Continuar la conversación en otra plataforma</td></tr>
+          <tr><td><code>/update</code> · <code>/restart</code></td><td>Mantener el agente en remoto</td></tr>
+        </tbody></table></div>
+      <p>Otras plataformas: Discord, Slack (Socket Mode), WhatsApp, Signal, iMessage (BlueBubbles), Email, Matrix, Teams, Google Chat… Para tenerlo 24/7, un VPS pequeño basta si el modelo está en la nube.</p>
+      <button class="mark-done" type="button" data-mod="m6" aria-pressed="false">Marcar como completado</button>
+    </section>
+
+    <!-- 7 -->
+    <section class="mod" id="m7" data-title="Para programadores">
+      <div class="mod-head"><span class="mod-num">07</span><h2>Hermes para programadores</h2><span class="badge ok">probado</span></div>
+      <p class="mod-goal">Darle contexto de proyecto, dejarle arreglar bugs con red de seguridad y deshacer si hace falta.</p>
+      <h3>Contexto de proyecto</h3>
+      <p class="prose">Hermes carga <strong>un</strong> fichero de contexto, por este orden: <code>.hermes.md</code>/<code>HERMES.md</code> → <code>AGENTS.md</code> (encadenados desde la raíz git) → <code>CLAUDE.md</code> → <code>.cursorrules</code>. Si ya usas Claude Code o Cursor, tus ficheros funcionan sin cambios. <code>/init</code> genera uno, y <code>hermes import-agent</code> importa tu configuración de <code>~/.claude</code> o <code>~/.codex</code>.</p>
+      <div class="code"><span class="lbl">06-programador/demo-app/AGENTS.md</span><pre># Inventario — instrucciones para agentes
+## Comandos
+- Tests: `uv run pytest -q`
+## Convenciones
+- Precios en euros como float, redondeados a 2 decimales al devolverlos.
+- Cualquier cambio de comportamiento lleva su test en tests/.
+- No añadas dependencias sin preguntar.</pre></div>
+      <div class="example">
+        <h4>Ejercicio: arreglar bugs con checkpoints <span class="badge ok">43 s</span></h4>
+        <div class="meta">06-programador/demo-app · 1 test en rojo y un segundo bug sin test</div>
+        <div class="code"><pre>uv run pytest -q          <span class="c"># 1 failed, 2 passed</span>
+hermes chat -Q --checkpoints -q "Ejecuta los tests, encuentra la causa del fallo y corrígelo.
+Revisa además si hay otros bugs en src/ que los tests no cubran; si los hay, corrígelos
+y añade su test. Termina con un resumen breve de los cambios."
+uv run pytest -q          <span class="c"># 6 passed</span></pre></div>
+        <ul class="found">
+          <li>Corrigió el descuento, que se restaba en euros después del IVA.</li>
+          <li>Encontró el bug oculto: <code>&lt;=</code> donde el docstring decía "estrictamente".</li>
+          <li>Añadió validación del rango del descuento y 3 tests que fallaban antes del cambio.</li>
+          <li>No hizo commit y explicó un cambio de comportamiento que conviene confirmar.</li>
+        </ul>
+        <p>El diff completo está en <a href="https://github.com/noelserdna/curso-hermes-agent/blob/main/06-programador/solucion-referencia.patch"><code>solucion-referencia.patch</code></a>.</p>
+      </div>
+      <h3>Checkpoints y rollback</h3>
+      <p class="prose">Con <code>--checkpoints</code>, Hermes guarda un repo git <em>sombra</em> en <code>~/.hermes/checkpoints/</code> antes de cada escritura o comando destructivo. No toca tu <code>.git</code>.</p>
+      <div class="code"><pre>/rollback            <span class="c"># lista de puntos de restauración</span>
+/rollback diff 2     <span class="c"># qué cambió desde el 2</span>
+/rollback 2          <span class="c"># volver</span>
+hermes checkpoints status</pre></div>
+      <div class="tw"><table>
+        <thead><tr><th>Necesidad</th><th>Cómo</th></tr></thead>
+        <tbody>
+          <tr><td>Varias tareas en paralelo sin pisarse</td><td><code>hermes -w</code> crea un git worktree por sesión</td></tr>
+          <tr><td>Iterar hasta que todo pase</td><td><code>/goal "tests en verde y ruff sin errores"</code></td></tr>
+          <tr><td>Usarlo desde VS Code, Zed o JetBrains</td><td><code>hermes acp</code> (Agent Client Protocol)</td></tr>
+          <tr><td>Delegar en otro agente de código</td><td>skills incluidas <code>claude-code</code>, <code>codex</code>, <code>opencode</code></td></tr>
+          <tr><td>Metodología</td><td>skills <code>test-driven-development</code>, <code>systematic-debugging</code>, <code>requesting-code-review</code></td></tr>
+        </tbody></table></div>
+      <button class="mark-done" type="button" data-mod="m7" aria-pressed="false">Marcar como completado</button>
+    </section>
+
+    <!-- 8 -->
+    <section class="mod" id="m8" data-title="MCP">
+      <div class="mod-head"><span class="mod-num">08</span><h2>MCP: tus propias herramientas</h2><span class="badge ok">probado</span></div>
+      <p class="mod-goal">Construir un servidor MCP en 60 líneas y conectarlo a Hermes (y a cualquier otro agente).</p>
+      <p class="prose"><a href="https://modelcontextprotocol.io">MCP</a> es el estándar para dar herramientas a un agente. El mismo servidor sirve para Hermes, Claude Desktop, Claude Code o Cursor. El nuestro expone el inventario de una tienda en SQLite.</p>
+      <div class="code"><span class="lbl">07-mcp/servidor_tienda.py (extracto)</span><pre><span class="c"># /// script
+# dependencies = ["mcp>=2.3"]
+# ///</span>
+<span class="k">from</span> mcp.server.mcpserver <span class="k">import</span> MCPServer   <span class="c"># mcp 2.x (en 1.x: FastMCP)</span>
+
+mcp = MCPServer(<span class="k">"tienda"</span>)
+
+@mcp.tool()
+<span class="k">def</span> stock_bajo() -&gt; str:
+    <span class="k">"""Productos con stock estrictamente por debajo de su mínimo."""</span>
+    ...
+
+@mcp.tool()
+<span class="k">def</span> registrar_pedido(sku: str, unidades: int) -&gt; str:
+    <span class="k">"""Registra una venta y descuenta el stock."""</span>
+    ...
+
+<span class="k">if</span> __name__ == <span class="k">"__main__"</span>:
+    mcp.run()</pre></div>
+      <div class="note warn"><span class="t">Tropiezo real</span><p>El SDK oficial de MCP ya va por la 2.x y <code>FastMCP</code> pasó a llamarse <code>MCPServer</code>. Muchos tutoriales de 2025 fallan con <code>ModuleNotFoundError</code>.</p></div>
+      <div class="code"><pre>hermes mcp add tienda --command uv --args run "$PWD/servidor_tienda.py"
+hermes -z "Dime qué productos hay que reponer y registra un pedido de 2 teclados TEC-01."
+<span class="c"># → AUR-BT y RAT-01 bajo mínimo. Pedido registrado; stock de TEC-01: 10.   (12 s)</span></pre></div>
+      <div class="code"><span class="lbl">~/.hermes/config.yaml</span><pre><span class="k">mcp_servers:</span>
+  <span class="k">tienda:</span>
+    <span class="k">command:</span> uv
+    <span class="k">args:</span> [run, /ruta/absoluta/servidor_tienda.py]
+    <span class="c"># tools: { exclude: [registrar_pedido] }</span>
+    <span class="c"># trust: untrusted</span></pre></div>
+      <div class="note warn"><span class="t">Lección de seguridad</span><p>El pedido se registró <strong>sin pedir aprobación</strong>. Las aprobaciones de Hermes protegen la terminal, no las herramientas MCP. Diseña servidores de solo lectura por defecto, filtra con <code>tools.exclude</code> o pon la confirmación dentro de la propia herramienta.</p></div>
+      <p>Al revés también funciona: <code>hermes mcp serve</code> expone Hermes como servidor MCP para Claude Desktop o Cursor.</p>
+      <button class="mark-done" type="button" data-mod="m8" aria-pressed="false">Marcar como completado</button>
+    </section>
+
+    <!-- 9 -->
+    <section class="mod" id="m9" data-title="Entornos y CI">
+      <div class="mod-head"><span class="mod-num">09</span><h2>Entornos: dónde trabaja el agente</h2><span class="badge ok">probado</span></div>
+      <p class="mod-goal">Separar el cerebro (modelo) de las manos (entorno) y preparar el entorno para que el agente rinda.</p>
+      <p class="prose">Un agente programador rinde tanto como el entorno que le das: dónde ejecuta, qué ve, qué herramientas tiene y cómo comprueba su trabajo. Invertir en eso suele dar más que acumular skills.</p>
+      <div class="tw"><table>
+        <thead><tr><th>Backend</th><th>Uso típico</th></tr></thead>
+        <tbody>
+          <tr><td><code>local</code></td><td>Por defecto, tu máquina</td></tr>
+          <tr><td><code>docker</code> <span class="badge ok">probado</span></td><td>Aislamiento reproducible; tu sistema queda intacto</td></tr>
+          <tr><td><code>ssh</code></td><td>Que trabaje en un servidor remoto</td></tr>
+          <tr><td><code>modal</code> · <code>daytona</code> · <code>vercel_sandbox</code></td><td>Sandboxes efímeros en la nube</td></tr>
+          <tr><td><code>singularity</code></td><td>Clústeres HPC</td></tr>
+        </tbody></table></div>
+      <div class="code"><span class="lbl">~/.hermes/config.yaml</span><pre><span class="k">terminal:</span>
+  <span class="k">backend:</span> docker
+  <span class="k">docker_image:</span> python:3.13-slim
+  <span class="k">docker_mount_cwd_to_workspace:</span> true   <span class="c"># monta el directorio de lanzamiento en /workspace</span>
+  <span class="k">cwd:</span> "."                              <span class="c"># NO "/workspace": desactiva el montaje</span></pre></div>
+      <div class="note warn"><span class="t">Tropiezo real</span><p>Pusimos <code>cwd: /workspace</code> siguiendo un ejemplo y el contenedor arrancó vacío. Con <code>cwd: "."</code> el proyecto aparece montado y los tests corren en Linux aarch64 dentro del contenedor (21 s). Con backends de contenedor, <code>/rollback</code> no aplica.</p></div>
+      <h3>Subagentes en paralelo</h3>
+      <div class="code"><pre>hermes -z "Usa delegate_task para lanzar 3 subagentes EN PARALELO (sin modificar ficheros):
+1) revisor de seguridad de src/, 2) revisor de cobertura de tests, 3) redactor de un README
+de 10 líneas. Combina sus resultados en un informe."</pre></div>
+      <p>Tardó 31 s y cada subagente tuvo su propio contexto. Hasta 10 subagentes en paralelo; usa un modelo más barato para ellos con <code>delegation.model</code>.</p>
+      <h3>Revisión de código en pre-push o CI</h3>
+      <div class="code"><span class="lbl">08-entornos/ci/revisar-diff.sh (núcleo)</span><pre>DIFF="$(git diff "$BASE" -- .)"
+RESULTADO="$(hermes -t file -z "Revisa SOLO este diff... VEREDICTO: OK | BLOQUEANTE ... $DIFF" \
+             --usage-file .hermes-review-usage.json)"
+grep -q "VEREDICTO: BLOQUEANTE" &lt;&lt;&lt;"$RESULTADO" &amp;&amp; exit 1</pre></div>
+      <p>Con <code>-t file</code> el revisor no tiene terminal ni web. Coste medido: <strong>0,003 $ por revisión</strong>. En el repo hay una plantilla de GitHub Actions que comenta en la PR <span class="badge doc">guía</span>.</p>
+      <button class="mark-done" type="button" data-mod="m9" aria-pressed="false">Marcar como completado</button>
+    </section>
+
+    <!-- 10 -->
+    <section class="mod" id="m10" data-title="Comparativa">
+      <div class="mod-head"><span class="mod-num">10</span><h2>Comparativa y cuándo usar qué</h2></div>
+      <p class="mod-goal">Situar Hermes frente a las alternativas de octubre de 2026 y decidir con criterio.</p>
+      <div class="tw"><table class="compare">
+        <thead><tr><th>Herramienta</th><th>Qué es</th><th>Dónde corre</th><th>Modelos</th><th>Tareas programadas</th><th>Mensajería</th><th>Licencia</th></tr></thead>
+        <tbody>
+          <tr class="me"><td>Hermes Agent</td><td>Agente personal autónomo que aprende</td><td>Tu máquina, VPS, Docker</td><td>Cualquiera (OpenRouter, locales…)</td><td>Sí, 24/7 con el gateway</td><td>20+ plataformas</td><td>MIT</td></tr>
+          <tr><td>OpenClaw</td><td>Asistente personal siempre encendido</td><td>Tu máquina, VPS</td><td>Varios proveedores</td><td>Sí</td><td>Sí, y apps móviles</td><td>Open source</td></tr>
+          <tr><td>Claude Desktop / Cowork</td><td>App de escritorio de Anthropic con conectores</td><td>Tu ordenador</td><td>Solo Claude</td><td>Sí, con el equipo encendido y la app abierta</td><td>No</td><td>Propietaria, suscripción</td></tr>
+          <tr><td>Claude Code + rutinas</td><td>Agente de programación</td><td>Terminal, IDE; rutinas en la nube de Anthropic</td><td>Solo Claude</td><td>Sí, rutinas en la nube</td><td>Integración con Slack</td><td>Propietaria, suscripción o API</td></tr>
+          <tr><td>Codex CLI</td><td>Agente de programación de OpenAI</td><td>Terminal, CI</td><td>OpenAI principalmente</td><td>Vía CI</td><td>No</td><td>Apache-2.0</td></tr>
+          <tr><td>Gemini CLI</td><td>Agente de programación de Google</td><td>Terminal</td><td>Gemini</td><td>Vía CI</td><td>No</td><td>Apache-2.0</td></tr>
+          <tr><td>Cursor</td><td>IDE con agente integrado</td><td>Editor; agentes en segundo plano</td><td>Varios</td><td>No es su foco</td><td>No</td><td>Propietaria</td></tr>
+          <tr><td>n8n</td><td>Flujos visuales con nodos de IA</td><td>Autoalojado o nube</td><td>Varios</td><td>Sí, deterministas</td><td>Por integraciones</td><td>Fair-code</td></tr>
+          <tr><td>Zapier (Agents)</td><td>Automatización sin código</td><td>SaaS</td><td>Los que ofrezca</td><td>Sí</td><td>Por integraciones</td><td>Propietaria</td></tr>
+          <tr><td>LangGraph · CrewAI</td><td>Frameworks para construir agentes</td><td>Tu código</td><td>Cualquiera</td><td>Lo programas tú</td><td>Lo programas tú</td><td>MIT</td></tr>
+        </tbody></table></div>
+
+      <div class="cols">
+        <div class="panel pro"><h4>A favor de Hermes</h4><ul>
+          <li>Open source MIT y sin atarte a un proveedor: cambias de modelo con un flag.</li>
+          <li>Siempre encendido en un VPS y accesible desde el móvil.</li>
+          <li>Memoria y skills que mejoran con el uso, en formato estándar.</li>
+          <li>Cron con entrega a donde quieras y watchdogs sin coste de LLM.</li>
+          <li>7 backends de ejecución, subagentes, MCP en los dos sentidos.</li>
+          <li>Lee tu <code>AGENTS.md</code>/<code>CLAUDE.md</code> e importa tu config de Claude Code.</li>
+          <li>Barato con modelos eficientes: todo este curso, ≈ 0,12 $.</li>
+        </ul></div>
+        <div class="panel con"><h4>En contra</h4><ul>
+          <li>Va muy rápido: cientos de PRs por versión; flags y docs cambian de una semana a otra.</li>
+          <li>Mucha superficie de ataque. La v0.21.6 corrigió fallos en el dashboard, en filtros git de repos no confiables y en el gateway de email.</li>
+          <li>La calidad depende del modelo: con modelos pequeños falla más con herramientas y memoria.</li>
+          <li>Más técnico que Claude Desktop: el despliegue y la seguridad son tuyos.</li>
+          <li>Las herramientas MCP no pasan por las aprobaciones.</li>
+        </ul></div>
+      </div>
+
+      <h3>Si ya usas Claude Desktop y sus tareas programadas</h3>
+      <div class="prose">
+        <p>Claude Desktop es más cómodo y no hay nada que mantener, pero sus tareas programadas dependen de que tu ordenador esté encendido con la app abierta y solo usan Claude. Hermes cubre el hueco cuando quieres que el trabajo ocurra <strong>aunque cierres el portátil</strong>, que el resultado te llegue a Telegram o Slack, o que una tarea barata la haga un modelo barato.</p>
+        <p>No es una elección exclusiva. Las skills tienen el mismo formato, un servidor MCP sirve a los dos, y <code>hermes mcp serve</code> te deja usar Hermes desde Claude Desktop.</p>
+      </div>
+      <div class="tw"><table>
+        <thead><tr><th>Si necesitas…</th><th>Elige</th></tr></thead>
+        <tbody>
+          <tr><td>Un asistente 24/7 en el móvil, multimodelo, en tu servidor</td><td><strong>Hermes</strong> (u OpenClaw)</td></tr>
+          <tr><td>Tareas personales en tu Mac con Claude, sin infraestructura</td><td><strong>Claude Desktop / Cowork</strong></td></tr>
+          <tr><td>Programar en serio dentro de un repo</td><td><strong>Claude Code</strong> o <strong>Codex</strong>, con Hermes alrededor para CI, cron y revisión</td></tr>
+          <tr><td>Agentes de código que corren en la nube con horario</td><td><strong>Rutinas de Claude Code</strong> o <strong>Hermes</strong> en un VPS</td></tr>
+          <tr><td>Flujos deterministas con cientos de integraciones</td><td><strong>n8n / Zapier</strong>, con Hermes como paso inteligente vía webhook</td></tr>
+          <tr><td>Construir tu propio producto de agentes</td><td><strong>LangGraph</strong>, <strong>CrewAI</strong> o el Claude Agent SDK</td></tr>
+        </tbody></table></div>
+      <button class="mark-done" type="button" data-mod="m10" aria-pressed="false">Marcar como completado</button>
+    </section>
+
+    <section class="mod" id="pruebas" data-title="Pruebas reales" style="border-bottom:0">
+      <div class="mod-head"><span class="mod-num">✓</span><h2>Registro de pruebas</h2></div>
+      <p class="mod-goal">Todo lo que ejecutamos para preparar el curso, el 9 de octubre de 2026.</p>
+      <p>Entorno: Hermes <code>v0.21.6+301</code> (main <code>8bff64d</code>) · macOS Apple Silicon · <code>anthropic/claude-haiku-5.5</code> vía OpenRouter, razonamiento <code>high</code> · Docker con OrbStack.</p>
+      <div class="tw"><table>
+        <thead><tr><th>Prueba</th><th>Módulo</th><th>Tiempo</th><th>Resultado</th></tr></thead>
+        <tbody>
+          <tr><td>Instalación oficial</td><td>01</td><td class="num">≈ 3 min</td><td>OK, 58 skills incluidas</td></tr>
+          <tr><td>Primera consulta one-shot</td><td>01</td><td class="num">8 s</td><td>OK · 0,0025 $</td></tr>
+          <tr><td>Prompt por stdin, cambio de modelo, toolset web</td><td>02</td><td class="num">—</td><td>OK (corregido un slug de modelo inexistente)</td></tr>
+          <tr><td>CSV → Excel + informe</td><td>03</td><td class="num">72 s</td><td>OK, anomalía detectada, cifras verificadas</td></tr>
+          <tr><td>Transcripción → acta .docx</td><td>03</td><td class="num">67 s</td><td>OK, detectó fecha incoherente</td></tr>
+          <tr><td>Ordenar carpeta</td><td>03</td><td class="num">47 s</td><td>OK, 9 ficheros clasificados con índice</td></tr>
+          <tr><td>Memoria entre sesiones</td><td>04</td><td class="num">—</td><td>OK</td></tr>
+          <tr><td>Skill propia email-seguimiento</td><td>04</td><td class="num">57 s</td><td>OK, 4 correos</td></tr>
+          <tr><td>Cron con LLM y watchdog sin LLM</td><td>05</td><td class="num">—</td><td>OK, cifras exactas</td></tr>
+          <tr><td>Arreglar bugs con checkpoints</td><td>07</td><td class="num">43 s</td><td>OK, 2 de 2 bugs, 6 tests en verde</td></tr>
+          <tr><td>Servidor MCP propio</td><td>08</td><td class="num">12 s</td><td>OK tras migrar a mcp 2.x</td></tr>
+          <tr><td>Backend Docker</td><td>09</td><td class="num">21 s</td><td>OK tras corregir <code>cwd</code></td></tr>
+          <tr><td>Subagentes en paralelo</td><td>09</td><td class="num">31 s</td><td>OK</td></tr>
+          <tr><td>Revisión de diff para CI</td><td>09</td><td class="num">—</td><td>OK · 0,003 $</td></tr>
+          <tr><td>Telegram · GitHub Actions</td><td>06 · 09</td><td class="num">—</td><td>No ejecutado: requiere cuentas externas</td></tr>
+          <tr><td><strong>Total (hermes insights)</strong></td><td></td><td class="num">19 sesiones</td><td><strong>≈ 0,12 $</strong></td></tr>
+        </tbody></table></div>
+    </section>
+
+    <footer>
+      <p><strong>Fuentes</strong></p>
+      <ul>
+        <li><a href="https://github.com/NousResearch/hermes-agent">NousResearch/hermes-agent</a> y sus <a href="https://github.com/NousResearch/hermes-agent/releases">releases</a></li>
+        <li><a href="https://hermes-agent.nousresearch.com/docs/">Documentación oficial de Hermes Agent</a></li>
+        <li><a href="https://modelcontextprotocol.io">Model Context Protocol</a> · <a href="https://agentskills.io">agentskills.io</a></li>
+        <li>Versiones de las alternativas consultadas en sus repos de GitHub el 9 de octubre de 2026</li>
+      </ul>
+      <p>Ejemplos: <a href="https://github.com/noelserdna/curso-hermes-agent">github.com/noelserdna/curso-hermes-agent</a> · Hermes Agent es © Nous Research (MIT).</p>
+    </footer>
+  </main>
+</div>
+
+<script>
+(function () {
+  var KEY = "curso-hermes-progreso";
+  var mods = Array.prototype.slice.call(document.querySelectorAll("section.mod[id^='m']"));
+  var list = document.getElementById("toc-list");
+  var done = {};
+  try { done = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { done = {}; }
+
+  mods.forEach(function (s) {
+    var li = document.createElement("li");
+    var a = document.createElement("a");
+    a.className = "item"; a.href = "#" + s.id; a.dataset.mod = s.id;
+    var n = s.querySelector(".mod-num").textContent;
+    a.innerHTML = '<span class="n">' + n + '</span><span></span><span class="done-mark" aria-hidden="true">✓</span>';
+    a.children[1].textContent = s.dataset.title;
+    li.appendChild(a); list.appendChild(li);
+  });
+  var extra = document.createElement("li");
+  extra.innerHTML = '<a class="item" href="#pruebas"><span class="n">✓</span><span>Pruebas reales</span><span class="done-mark"></span></a>';
+  list.appendChild(extra);
+
+  function render() {
+    var count = 0;
+    mods.forEach(function (s) {
+      var on = !!done[s.id]; if (on) count++;
+      var btn = s.querySelector(".mark-done");
+      if (btn) { btn.setAttribute("aria-pressed", on ? "true" : "false"); btn.textContent = on ? "✓ Completado" : "Marcar como completado"; }
+      var link = list.querySelector('a[data-mod="' + s.id + '"]');
+      if (link) link.classList.toggle("done", on);
+    });
+    document.getElementById("progress-txt").textContent = count + " de " + mods.length + " módulos completados";
+    document.getElementById("progress-bar").style.width = (count / mods.length * 100) + "%";
+  }
+  document.querySelectorAll(".mark-done").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var id = b.dataset.mod; done[id] = !done[id];
+      try { localStorage.setItem(KEY, JSON.stringify(done)); } catch (e) {}
+      render();
+    });
+  });
+  render();
+
+  // Índice activo según el scroll
+  var links = list.querySelectorAll("a.item");
+  var targets = Array.prototype.slice.call(document.querySelectorAll("section.mod"));
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          links.forEach(function (l) { l.classList.toggle("active", l.getAttribute("href") === "#" + en.target.id); });
+          var act = list.querySelector("a.active");
+          if (act && window.matchMedia("(max-width: 900px)").matches) {
+            list.scrollTo({ left: act.offsetLeft - 16, behavior: "smooth" });
+          }
+        }
+      });
+    }, { rootMargin: "-30% 0px -60% 0px" });
+    targets.forEach(function (t) { io.observe(t); });
+  }
+
+  // Botones de copiar
+  document.querySelectorAll(".code").forEach(function (box) {
+    var pre = box.querySelector("pre"); if (!pre) return;
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "copy"; b.textContent = "Copiar";
+    b.addEventListener("click", function () {
+      var text = pre.innerText;
+      function ok() { b.textContent = "Copiado"; setTimeout(function () { b.textContent = "Copiar"; }, 1400); }
+      function fallback() {
+        var r = document.createRange(); r.selectNodeContents(pre);
+        var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+        b.textContent = "Seleccionado: pulsa Ctrl/Cmd+C";
+      }
+      try { navigator.clipboard.writeText(text).then(ok, fallback); } catch (e) { fallback(); }
+    });
+    box.appendChild(b);
+  });
+
+  // Pestañas
+  document.querySelectorAll("[data-tabs]").forEach(function (wrap) {
+    var tabs = wrap.querySelectorAll('[role="tab"]');
+    function select(t) {
+      tabs.forEach(function (x) {
+        var on = x === t;
+        x.setAttribute("aria-selected", on ? "true" : "false");
+        x.tabIndex = on ? 0 : -1;
+        document.getElementById(x.getAttribute("aria-controls")).hidden = !on;
+      });
+    }
+    tabs.forEach(function (t, i) {
+      t.addEventListener("click", function () { select(t); });
+      t.addEventListener("keydown", function (e) {
+        var j = e.key === "ArrowRight" ? (i + 1) % tabs.length : e.key === "ArrowLeft" ? (i - 1 + tabs.length) % tabs.length : -1;
+        if (j >= 0) { tabs[j].focus(); select(tabs[j]); }
+      });
+    });
+  });
+})();
+</script>
