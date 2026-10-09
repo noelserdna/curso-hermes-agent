@@ -1,0 +1,12 @@
+# Config del equipo. Sin secretos: la clave entra en tiempo de ejecución (--env-file).
+model:
+  default: "anthropic/claude-haiku-5.5"
+  provider: "openrouter"
+
+agent:
+  max_turns: 20
+
+# Nada de memoria ni autoaprendizaje: cada tarea parte del mismo estado
+memory:
+  memory_enabled: false
+  user_profile_enabled: false

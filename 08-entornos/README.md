@@ -43,26 +43,46 @@ hermes config set TERMINAL_SSH_HOST mi-servidor.com
 hermes config set TERMINAL_SSH_USER deploy
 ```
 
-### Imagen efímera por tarea: el arnés como artefacto versionado 📄
+### Imagen efímera por tarea: el arnés como artefacto versionado ✅ (~30 s y ~0,005 $ por tarea)
 
 Un paso más allá: en vez de un Hermes "vivo" que acumula memoria y skills con el uso, cada tarea arranca
 **un contenedor nuevo de Hermes** a partir de una imagen que controla el equipo. Mejorar el flujo es publicar
 una imagen nueva, no entrar en la máquina de cada persona a limpiar skills.
 
+En [`imagen-equipo/`](imagen-equipo) está la versión que probamos:
+
+| Fichero | Qué es |
+|---|---|
+| [`Dockerfile`](imagen-equipo/Dockerfile) | `FROM nousresearch/hermes-agent:v0.21.6` (versión fijada) + `uv` + la config del equipo copiada en `/opt/data` |
+| [`config.yaml`](imagen-equipo/config.yaml) | Modelo y proveedor, límite de turnos, memoria desactivada. **Sin secretos** |
+| [`SOUL.md`](imagen-equipo/SOUL.md) | Cómo trabaja el agente del equipo |
+| [`tarea.sh`](imagen-equipo/tarea.sh) | `docker build` + `docker run --rm` con el repo montado en `/workspace` y solo la clave del proveedor |
+
 ```bash
-# config del equipo (config.yaml, SOUL.md, skills/) versionada en git, sin secretos
-docker run --rm \
-  -v "$PWD/hermes-equipo:/opt/data" \
-  -v "$PWD:/workspace" -w /workspace \
-  -e OPENROUTER_API_KEY \
-  nousresearch/hermes-agent:latest -z "Ejecuta los tests y resume el estado del proyecto"
+./imagen-equipo/tarea.sh ../09-equipo-de-agentes/app-web \
+  "Ejecuta los tests de este proyecto y resume el estado. No modifiques ningún fichero."
 ```
 
-`/opt/data` es el `HERMES_HOME` dentro de la imagen; si no trae `config.yaml`, se crea uno de ejemplo.
-Con `--rm`, todo lo que el agente aprenda en esa tarea desaparece al terminar: **reproducible por diseño**.
+Resultado real: "4 de 5 tests pasan y 1 falla", con la causa exacta (`datos.py:32`), `git status` limpio
+al terminar, ningún contenedor ni volumen sobrante. La imagen ocupa **4,5 GB** (trae Chromium, Node y ffmpeg):
+tenlo en cuenta al dimensionar el servidor.
 
-No lo ejecutamos: la imagen (con Chromium y ffmpeg dentro) no cabía en el disco de nuestra máquina de pruebas.
-Tenlo en cuenta al dimensionar un servidor.
+Lo que aprendimos al probarlo:
+
+1. **No montes la carpeta de config del equipo como `/opt/data`.** Fue nuestro primer intento (`-v ./hermes-equipo:/opt/data`):
+   el contenedor la llenó con 39 MB de estado (las 58 skills incluidas, cachés, `state.db`, el venv que se
+   montó el agente…). Ni efímero ni limpio para git. `/opt/data` es un `VOLUME` de la imagen: si copias la
+   config **dentro** de la imagen y no lo montas, cada `docker run --rm` parte de cero y lo tira todo al acabar.
+2. **Mete en la imagen las herramientas de tus repos.** Sin `uv`, el agente no podía ejecutar el comando que
+   dice `AGENTS.md` y se fabricaba un venv con pip en cada tarea (y lo decía). Con `uv` en la imagen ejecuta
+   lo que el repo indica.
+3. **La clave nunca va en la imagen.** `tarea.sh` pasa solo `OPENROUTER_API_KEY` (no el `.env` entero, que puede
+   llevar el token de Telegram). Comprobamos que Hermes no la escribe en disco: en `auth.json` guarda solo su huella.
+4. **Pierdes la visibilidad de serie.** Con `--rm` desaparecen también las sesiones y `hermes insights`: medimos el
+   coste con el consumo de la clave en OpenRouter. En producción, monta solo `logs/` y `sessions/` en un volumen,
+   o envía la salida a tu sistema de logs.
+5. Cada arranque repite la inicialización (migración de config, copia de skills) y la imprime antes de la
+   respuesta: filtra la salida si la vas a procesar.
 
 ## B. Worktrees: varias tareas a la vez sin pisarse
 

@@ -211,8 +211,8 @@ footer ul { padding-left: 1.1em; }
         <div><dt>Versión estable</dt><dd>v0.21.6</dd></div>
         <div><dt>Publicada</dt><dd>8 oct 2026</dd></div>
         <div><dt>Licencia</dt><dd>MIT</dd></div>
-        <div><dt>Pruebas</dt><dd>20 reales · 2 guías</dd></div>
-        <div><dt>Coste de todas las pruebas</dt><dd>≈ 0,29 $</dd></div>
+        <div><dt>Pruebas</dt><dd>21 reales · 1 guía</dd></div>
+        <div><dt>Coste de todas las pruebas</dt><dd>≈ 0,31 $</dd></div>
       </dl>
       <div class="audience">
         <span class="chip">≈ 6 h de clase</span>
@@ -742,13 +742,22 @@ hermes -z "Dime qué productos hay que reponer y registra un pedido de 2 teclado
   <span class="k">cwd:</span> "."                              <span class="c"># NO "/workspace": desactiva el montaje</span></pre></div>
       <div class="note warn"><span class="t">Tropiezo real</span><p>Pusimos <code>cwd: /workspace</code> siguiendo un ejemplo y el contenedor arrancó vacío. Con <code>cwd: "."</code> el proyecto aparece montado y los tests corren en Linux aarch64 dentro del contenedor (21 s). Con backends de contenedor, <code>/rollback</code> no aplica.</p></div>
       <h3>Imagen efímera por tarea</h3>
-      <p class="prose">Un paso más allá: en vez de un Hermes "vivo" que acumula memoria y skills, cada tarea arranca <strong>un contenedor nuevo de Hermes</strong> a partir de una imagen que controla el equipo. Mejorar el flujo es publicar una imagen nueva, no limpiar la máquina de cada persona. <span class="badge doc">guía</span></p>
-      <div class="code"><pre>docker run --rm \
-  -v "$PWD/hermes-equipo:/opt/data" \      <span class="c"># config.yaml, SOUL.md y skills/ versionados, sin secretos</span>
-  -v "$PWD:/workspace" -w /workspace \
-  -e OPENROUTER_API_KEY \
-  nousresearch/hermes-agent:latest -z "Ejecuta los tests y resume el estado del proyecto"</pre></div>
-      <p>No lo ejecutamos: la imagen, con Chromium y ffmpeg dentro, no cabía en el disco de nuestra máquina de pruebas. Tenlo en cuenta al dimensionar un servidor.</p>
+      <p class="prose">Un paso más allá: en vez de un Hermes "vivo" que acumula memoria y skills, cada tarea arranca <strong>un contenedor nuevo de Hermes</strong> a partir de una imagen que controla el equipo. Mejorar el flujo es publicar una imagen nueva, no limpiar la máquina de cada persona. <span class="badge ok">probado</span></p>
+      <div class="code"><span class="lbl">imagen-equipo/Dockerfile</span><pre><span class="k">FROM</span> nousresearch/hermes-agent:v0.21.6          <span class="c"># versión fijada</span>
+<span class="k">COPY</span> --from=ghcr.io/astral-sh/uv:0.11.20 /uv /uvx /usr/local/bin/   <span class="c"># lo que necesitan tus repos</span>
+<span class="k">COPY</span> config.yaml SOUL.md /opt/data/          <span class="c"># config del equipo, sin secretos</span></pre></div>
+      <div class="code"><span class="lbl">imagen-equipo/tarea.sh (resumen)</span><pre>docker build -q -t hermes-equipo:local imagen-equipo
+docker run --rm \
+  --env-file &lt;(grep '^OPENROUTER_API_KEY=' ~/.hermes/.env) \   <span class="c"># solo la clave, no todo el .env</span>
+  -v "$REPO:/workspace" -w /workspace \
+  hermes-equipo:local -z "Ejecuta los tests y resume el estado. No modifiques ningún fichero."</pre></div>
+      <p class="prose">Resultado real sobre la tienda del módulo 10: <strong>"4 de 5 tests pasan y 1 falla"</strong>, con la causa exacta, <code>git status</code> limpio al terminar y ningún contenedor ni volumen sobrante. Unos <strong>30 s y 0,005 $</strong> por tarea. La imagen ocupa <strong>4,5 GB</strong> (trae Chromium, Node y ffmpeg): tenlo en cuenta al dimensionar el servidor.</p>
+      <div class="note warn"><span class="t">Lo que aprendimos al probarlo</span><ul class="prose">
+        <li><strong>No montes la config del equipo como <code>/opt/data</code>.</strong> Fue nuestro primer intento: el contenedor la llenó con 39 MB de estado (58 skills, cachés, <code>state.db</code>, el venv que se montó el agente). <code>/opt/data</code> es un <code>VOLUME</code> de la imagen: copia la config <em>dentro</em> de la imagen y cada <code>--rm</code> partirá de cero.</li>
+        <li><strong>Mete en la imagen las herramientas de tus repos.</strong> Sin <code>uv</code>, el agente no podía ejecutar el comando de <code>AGENTS.md</code> y se fabricaba un venv con pip en cada tarea. Con <code>uv</code> en la imagen ejecuta lo que el repo indica.</li>
+        <li><strong>La clave nunca va en la imagen.</strong> Comprobamos que Hermes no la escribe en disco: en <code>auth.json</code> guarda solo su huella.</li>
+        <li><strong>Pierdes la visibilidad de serie:</strong> con <code>--rm</code> se van también las sesiones y <code>hermes insights</code>. Monta solo <code>logs/</code> y <code>sessions/</code> en un volumen o envía la salida a tu sistema de logs.</li>
+      </ul></div>
       <h3>Worktrees y permisos mínimos</h3>
       <div class="tw"><table>
         <thead><tr><th>Necesidad</th><th>Cómo</th></tr></thead>
@@ -927,7 +936,7 @@ hermes kanban create "E2E TIENDA-12" --assignee e2e --parent "$IMPL" --workspace
           <li>7 backends de ejecución, subagentes, MCP en los dos sentidos.</li>
           <li>Lee tu <code>AGENTS.md</code>/<code>CLAUDE.md</code> e importa tu config de Claude Code.</li>
           <li>Perfiles, tablero kanban y revisión nativa para montar un equipo de agentes por fases.</li>
-          <li>Barato con modelos eficientes: todas las pruebas de este curso, ≈ 0,29 $.</li>
+          <li>Barato con modelos eficientes: todas las pruebas de este curso, ≈ 0,31 $.</li>
         </ul></div>
         <div class="panel con"><h4>En contra</h4><ul>
           <li>Va muy rápido: cientos de PRs por versión; flags y docs cambian de una semana a otra.</li>
@@ -991,8 +1000,9 @@ hermes kanban create "E2E TIENDA-12" --assignee e2e --parent "$IMPL" --workspace
           <tr><td>Pipeline por fases con 4 perfiles y kanban</td><td>10</td><td class="num">≈ 12 min</td><td>OK tras corregir el texto de la tarjeta <code>--goal</code>; 1 ronda de cambios; bug extra encontrado en E2E</td></tr>
           <tr><td>E2E con grabación en vídeo</td><td>10</td><td class="num">≈ 3 min</td><td>OK tras <code>browser.backend: off</code></td></tr>
           <tr><td>Tarea kanban creada desde Telegram</td><td>10</td><td class="num">38 s</td><td>OK, aviso de fin en el chat</td></tr>
-          <tr><td>Imagen Docker efímera · GitHub Actions</td><td>09</td><td class="num">—</td><td>No ejecutado: sin espacio en disco · requiere cuenta externa</td></tr>
-          <tr><td><strong>Total (hermes insights, 5 perfiles)</strong></td><td></td><td class="num">31 sesiones</td><td><strong>≈ 0,29 $</strong></td></tr>
+          <tr><td>Imagen Docker efímera por tarea</td><td>09</td><td class="num">≈ 30 s</td><td>OK tras no montar <code>/opt/data</code> y añadir <code>uv</code> a la imagen · 4 ejecuciones ≈ 0,02 $</td></tr>
+          <tr><td>GitHub Actions</td><td>09</td><td class="num">—</td><td>No ejecutado: requiere cuenta externa</td></tr>
+          <tr><td><strong>Total (hermes insights + consumo de la clave)</strong></td><td></td><td class="num">35 sesiones</td><td><strong>≈ 0,31 $</strong></td></tr>
         </tbody></table></div>
     </section>
 
