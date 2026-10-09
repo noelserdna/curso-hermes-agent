@@ -1,0 +1,2 @@
+- llamar al gestor
+- renovar dominio
