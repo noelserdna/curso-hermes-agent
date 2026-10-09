@@ -1,0 +1,41 @@
+# Copia este fichero a .github/workflows/hermes-review.yml
+# Requiere el secreto OPENROUTER_API_KEY en Settings → Secrets and variables → Actions.
+# 📄 Plantilla basada en la documentación oficial: no se ejecutó durante el curso.
+name: Revisión con Hermes
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Instalar Hermes Agent
+        run: |
+          curl -fsSL https://hermes-agent.nousresearch.com/install.sh \
+            | bash -s -- --non-interactive --skip-browser --skip-computer-use
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Revisar el diff
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          git diff origin/${{ github.base_ref }}...HEAD > pr.diff
+          hermes -t file --provider openrouter -m anthropic/claude-haiku-5.5 \
+            -z "Revisa este diff como revisor senior. Responde en Markdown: VEREDICTO (OK/BLOQUEANTE) y hasta 5 hallazgos con fichero:línea. $(cat pr.diff)" \
+            --usage-file usage.json > review.md
+          cat review.md
+
+      - name: Comentar en la PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh pr comment ${{ github.event.pull_request.number }} --body-file review.md
