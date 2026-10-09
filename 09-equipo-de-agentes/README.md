@@ -43,6 +43,23 @@ cron, gateway de mensajería y dashboard.
 - **El flujo vive en Hermes; la ejecución del producto vive en el repo**: la skill de proyecto
   `app-web/.hermes/skills/levantar-entorno` dice cómo se arranca **esta** app.
 
+## Claves de diseño
+
+1. **La tarjeta dice QUÉ; el `SOUL.md` dice CÓMO.** Con `--goal`, un juez revisa cada turno del worker contra
+   el título y el cuerpo de la tarjeta y no le deja terminar hasta que se cumplan. Todo lo que escribas en la
+   tarjeta se convierte en objetivo: si pones "cuando esté en verde, pide revisión con `kanban_request_review`",
+   el juez exigirá esa llamada como parte del resultado y rechazará el paso a revisión. Por eso la tarjeta lleva
+   solo el objetivo y los criterios ("Hecho cuando: criterios cumplidos y pytest en verde") y el procedimiento
+   (TDD, commit, pedir revisión) vive en el `SOUL.md` del implementador.
+2. **Cada fase sabe qué validan las demás.** Un revisor riguroso pedirá tests para todo lo que vea sin cubrir,
+   también para lo visual que el E2E va a comprobar en el navegador. Una línea en su `SOUL.md` ("lo visual lo
+   valida el E2E") ahorra rondas. En la ejecución de ejemplo la dejamos fuera para que se vea el bucle de cambios.
+3. **Grabar el E2E exige el navegador clásico.** Desde la v0.21 el navegador por defecto es `browser_exec`
+   (Browser Use), y `browser.record_sessions` solo graba con las herramientas clásicas (`browser_navigate`…):
+   `crear-perfiles.sh` pone `browser.backend: off` en el perfil `e2e`. La grabación es **evidencia**, no una
+   demo: el agente verifica leyendo el DOM y el vídeo sale casi estático. Para un vídeo que enseñar al equipo,
+   añade una fase aparte con un recorrido lento y, si quieres, narración con `text_to_speech` + ffmpeg.
+
 | Fichero | Qué es |
 |---|---|
 | [`app-web/`](app-web) | App web mínima (biblioteca estándar de Python) con un bug y una feature pendiente |
@@ -62,33 +79,19 @@ hermes kanban watch             # o: hermes dashboard → Kanban (http://127.0.0
 
 Requisitos: `uv`, `jq` y `git`. Los perfiles se clonan de tu perfil activo (heredan proveedor, modelo y clave).
 
-### Qué pasó en nuestra ejecución ([`salida-ejemplo/tarjetas.md`](salida-ejemplo/tarjetas.md))
+### Ejecución de ejemplo ([`salida-ejemplo/tarjetas.md`](salida-ejemplo/tarjetas.md))
 
 | Fase | Perfil | Resultado |
 |---|---|---|
 | Especificar | `especificador` | 42 s. Causa del bug y criterios verificables, incluido uno implícito: WEB-06, con stock exactamente 5, **no** se marca |
 | Implementar | `implementador` | TDD (8 tests en rojo primero), commit y petición de revisión con evidencia criterio por criterio. Admitió lo que no pudo comprobar |
-| Revisar (ronda 1) | `revisor` | **Cambios**: el resaltado vivía en JavaScript y ningún test lo ejecutaba |
+| Revisar (ronda 1) | `revisor` | **Cambios**: el resaltado vivía en JavaScript y ningún test lo ejecutaba (clave de diseño 2) |
 | Implementar (ronda 2) | `implementador` | Test que ejecuta el JS de la página |
 | Revisar (ronda 2) | `revisor` | Aprobado |
 | E2E | `e2e` | Chromium real: búsqueda, colores y posiciones OK. **Encontró una condición de carrera** en el buscador que nadie buscaba y la dejó como ticket aparte |
 
 Diff final en [`salida-ejemplo/cambios.diff`](salida-ejemplo/cambios.diff); vídeo del E2E en
 [`salida-ejemplo/e2e-tienda.webm`](salida-ejemplo/e2e-tienda.webm).
-
-### Tres tropiezos reales
-
-1. **El juez de `--goal` evalúa el texto de la tarjeta.** En el primer intento la tarjeta decía "cuando estén en
-   verde, pide revisión con `kanban_request_review`". El juez exigía ver esa llamada como parte del objetivo y
-   rechazó el paso a revisión tres veces; el implementador se bloqueó pidiendo ayuda. **En la tarjeta va el QUÉ y
-   los criterios; el procedimiento va en el `SOUL.md` del perfil.**
-2. **El revisor también persigue casos límite.** Pidió un test de JavaScript con Node para algo visual que el E2E
-   iba a comprobar en el navegador. Dile a cada fase qué validan las demás.
-3. **La grabación no sale sola.** Desde la v0.21 el navegador por defecto es `browser_exec` (Browser Use) y
-   `record_sessions` solo graba con las herramientas clásicas: hace falta `browser.backend: off` en el perfil E2E
-   (ya lo hace `crear-perfiles.sh`). Aun así el vídeo es casi estático: el agente verificó leyendo el DOM. Si
-   quieres un vídeo de demo para el equipo, pídelo como fase aparte con un recorrido lento, y si quieres,
-   narración con `text_to_speech` + ffmpeg.
 
 ### El mismo flujo desde Telegram ✅
 

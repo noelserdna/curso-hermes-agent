@@ -9,7 +9,7 @@
 | One-shot | `hermes -z "prompt"` | Scripts, CI, cron, pipes: imprime **solo** la respuesta final |
 | One-shot "verboso" | `hermes chat -Q -q "prompt"` | Como `-z` pero muestra el `session_id` para retomar |
 
-> Ojo (cambio en v0.21): `hermes chat -q "..."` en una terminal real **abre** una sesión interactiva con ese
+> Desde la v0.21, `hermes chat -q "..."` en una terminal real **abre** una sesión interactiva con ese
 > primer mensaje. Para que responda y salga usa `-Q`, `--oneshot` o `-z`.
 
 ## Ejercicios

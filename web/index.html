@@ -360,8 +360,8 @@ hermes desktop</pre></div>
       <h3>Conectar un modelo (OpenRouter)</h3>
       <div class="code"><pre>hermes model     <span class="c"># asistente: elige OpenRouter, pega la clave, elige modelo</span>
 hermes setup     <span class="c"># asistente completo: modelo, terminal, gateway, herramientas</span></pre></div>
-      <div class="note warn"><span class="t">Dos tropiezos que tuvimos</span>
-        <p><code>hermes model</code> y <code>hermes setup</code> exigen una <strong>terminal interactiva real</strong>: fallan si los lanzas desde otro agente o un pipe. Y tras instalar, abre una terminal nueva: el PATH se actualiza en <code>~/.zprofile</code>.</p></div>
+      <div class="note key"><span class="t">Antes de lanzar los asistentes</span>
+        <p>Abre una <strong>terminal nueva</strong> tras instalar: el instalador añade Hermes al PATH en <code>~/.zprofile</code>. <code>hermes model</code> y <code>hermes setup</code> son asistentes interactivos, así que necesitan una terminal real; desde un script, un pipe u otro agente usa la alternativa de abajo.</p></div>
       <p>Alternativa sin asistente. <code>hermes config set</code> decide el fichero según la clave: MAYÚSCULAS van a <code>.env</code>, rutas con puntos a <code>config.yaml</code>.</p>
       <div class="code"><pre>hermes config set OPENROUTER_API_KEY sk-or-...
 hermes config set model.provider openrouter
@@ -706,7 +706,7 @@ mcp = MCPServer(<span class="k">"tienda"</span>)
 
 <span class="k">if</span> __name__ == <span class="k">"__main__"</span>:
     mcp.run()</pre></div>
-      <div class="note warn"><span class="t">Tropiezo real</span><p>El SDK oficial de MCP ya va por la 2.x y <code>FastMCP</code> pasó a llamarse <code>MCPServer</code>. Muchos tutoriales de 2025 fallan con <code>ModuleNotFoundError</code>.</p></div>
+      <div class="note key"><span class="t">SDK de MCP 2.x</span><p>Este servidor usa la versión actual del SDK oficial, la 2.x, donde la clase se llama <code>MCPServer</code>. En la 1.x se llamaba <code>FastMCP</code>: si sigues un tutorial de 2025 y ves <code>ModuleNotFoundError</code>, es por eso. Fija la versión en las dependencias del script.</p></div>
       <div class="code"><pre>hermes mcp add tienda --command uv --args run "$PWD/servidor_tienda.py"
 hermes -z "Dime qué productos hay que reponer y registra un pedido de 2 teclados TEC-01."
 <span class="c"># → AUR-BT y RAT-01 bajo mínimo. Pedido registrado; stock de TEC-01: 10.   (12 s)</span></pre></div>
@@ -740,7 +740,7 @@ hermes -z "Dime qué productos hay que reponer y registra un pedido de 2 teclado
   <span class="k">docker_image:</span> python:3.13-slim
   <span class="k">docker_mount_cwd_to_workspace:</span> true   <span class="c"># monta el directorio de lanzamiento en /workspace</span>
   <span class="k">cwd:</span> "."                              <span class="c"># NO "/workspace": desactiva el montaje</span></pre></div>
-      <div class="note warn"><span class="t">Tropiezo real</span><p>Pusimos <code>cwd: /workspace</code> siguiendo un ejemplo y el contenedor arrancó vacío. Con <code>cwd: "."</code> el proyecto aparece montado y los tests corren en Linux aarch64 dentro del contenedor (21 s). Con backends de contenedor, <code>/rollback</code> no aplica.</p></div>
+      <div class="note key"><span class="t">Cómo se monta tu proyecto</span><p><code>docker_mount_cwd_to_workspace</code> monta el directorio desde el que lanzas <code>hermes</code> en <code>/workspace</code>, y <code>cwd: "."</code> le dice que trabaje ahí. Si fijas <code>cwd: /workspace</code> explícitamente, el montaje se desactiva y el contenedor arranca vacío. Con esta configuración los tests de la demo corren en Linux aarch64 dentro del contenedor en 21 s. Con backends de contenedor, <code>/rollback</code> no aplica.</p></div>
       <h3>Imagen efímera por tarea</h3>
       <p class="prose">Un paso más allá: en vez de un Hermes "vivo" que acumula memoria y skills, cada tarea arranca <strong>un contenedor nuevo de Hermes</strong> a partir de una imagen que controla el equipo. Mejorar el flujo es publicar una imagen nueva, no limpiar la máquina de cada persona. <span class="badge ok">probado</span></p>
       <div class="code"><span class="lbl">imagen-equipo/Dockerfile</span><pre><span class="k">FROM</span> nousresearch/hermes-agent:v0.21.6          <span class="c"># versión fijada</span>
@@ -752,12 +752,13 @@ docker run --rm \
   -v "$REPO:/workspace" -w /workspace \
   hermes-equipo:local -z "Ejecuta los tests y resume el estado. No modifiques ningún fichero."</pre></div>
       <p class="prose">Resultado real sobre la tienda del módulo 10: <strong>"4 de 5 tests pasan y 1 falla"</strong>, con la causa exacta, <code>git status</code> limpio al terminar y ningún contenedor ni volumen sobrante. Unos <strong>30 s y 0,005 $</strong> por tarea. La imagen ocupa <strong>4,5 GB</strong> (trae Chromium, Node y ffmpeg): tenlo en cuenta al dimensionar el servidor.</p>
-      <div class="note warn"><span class="t">Lo que aprendimos al probarlo</span><ul class="prose">
-        <li><strong>No montes la config del equipo como <code>/opt/data</code>.</strong> Fue nuestro primer intento: el contenedor la llenó con 39 MB de estado (58 skills, cachés, <code>state.db</code>, el venv que se montó el agente). <code>/opt/data</code> es un <code>VOLUME</code> de la imagen: copia la config <em>dentro</em> de la imagen y cada <code>--rm</code> partirá de cero.</li>
-        <li><strong>Mete en la imagen las herramientas de tus repos.</strong> Sin <code>uv</code>, el agente no podía ejecutar el comando de <code>AGENTS.md</code> y se fabricaba un venv con pip en cada tarea. Con <code>uv</code> en la imagen ejecuta lo que el repo indica.</li>
-        <li><strong>La clave nunca va en la imagen.</strong> Comprobamos que Hermes no la escribe en disco: en <code>auth.json</code> guarda solo su huella.</li>
-        <li><strong>Pierdes la visibilidad de serie:</strong> con <code>--rm</code> se van también las sesiones y <code>hermes insights</code>. Monta solo <code>logs/</code> y <code>sessions/</code> en un volumen o envía la salida a tu sistema de logs.</li>
-      </ul></div>
+      <h4>Cuatro decisiones de diseño</h4>
+      <ul class="prose">
+        <li><strong>La config va dentro de la imagen, no montada.</strong> <code>/opt/data</code> (el <code>HERMES_HOME</code>) es un <code>VOLUME</code> de la imagen y Hermes escribe en él su estado: skills incluidas, cachés, <code>state.db</code>, los entornos que monte el agente… Si montas ahí la carpeta del equipo, la ensucias con decenas de MB en cada tarea. Copiada en la imagen, cada <code>docker run --rm</code> parte de cero y lo tira todo al acabar.</li>
+        <li><strong>La imagen lleva las herramientas de tus repos.</strong> Si <code>AGENTS.md</code> dice <code>uv run pytest</code>, <code>uv</code> tiene que estar en la imagen; si no, el agente improvisa (un venv con pip en cada tarea) y deja de ejecutar lo que el repo indica.</li>
+        <li><strong>La clave nunca va en la imagen.</strong> Entra al ejecutar, y solo la del proveedor, no el <code>.env</code> entero. Hermes no la escribe en disco: en <code>auth.json</code> guarda solo su huella.</li>
+        <li><strong>Decide dónde va la visibilidad.</strong> Con <code>--rm</code> se van también las sesiones y <code>hermes insights</code>. Monta solo <code>logs/</code> y <code>sessions/</code> en un volumen, envía la salida a tu sistema de logs o mide el coste con el consumo de la clave en el proveedor, como hicimos aquí.</li>
+      </ul>
       <h3>Worktrees y permisos mínimos</h3>
       <div class="tw"><table>
         <thead><tr><th>Necesidad</th><th>Cómo</th></tr></thead>
@@ -853,6 +854,11 @@ grep -q "VEREDICTO: BLOQUEANTE" &lt;&lt;&lt;"$RESULTADO" &amp;&amp; exit 1</pre>
           <tr><td>Visibilidad</td><td><code>hermes dashboard</code> → Kanban, <code>hermes kanban watch</code>, <code>hermes kanban runs &lt;id&gt;</code></td></tr>
         </tbody></table></div>
 
+      <h3>Claves de diseño del pipeline</h3>
+      <div class="note key"><span class="t">La tarjeta dice QUÉ; el SOUL.md dice CÓMO</span><p>Con <code>--goal</code>, un juez revisa cada turno del worker contra el título y el cuerpo de la tarjeta, y no deja terminar hasta que se cumpla. Todo lo que escribas en la tarjeta se convierte en objetivo: si pones "cuando esté en verde, pide revisión con <code>kanban_request_review</code>", el juez exigirá esa llamada como parte del resultado y rechazará el paso a revisión. Por eso la tarjeta lleva solo el objetivo y los criterios ("Hecho cuando: criterios cumplidos y pytest en verde") y el procedimiento (TDD, commit, pedir revisión) vive en el <code>SOUL.md</code> del perfil.</p></div>
+      <div class="note key"><span class="t">Cada fase sabe qué validan las demás</span><p>Un revisor riguroso pedirá tests para todo lo que vea sin cubrir, también para lo visual que la fase E2E va a comprobar en el navegador. Si el <code>SOUL.md</code> del revisor dice "lo visual lo valida el E2E", te ahorras rondas. En la ejecución de abajo lo dejamos sin esa línea para que veas el bucle de cambios en acción.</p></div>
+      <div class="note key"><span class="t">Grabar el E2E: navegador clásico</span><p>Desde la v0.21 el navegador por defecto es <code>browser_exec</code> (Browser Use), y <code>browser.record_sessions</code> solo graba con las herramientas clásicas (<code>browser_navigate</code>, <code>browser_click</code>…). Por eso <code>crear-perfiles.sh</code> pone <code>browser.backend: off</code> en el perfil <code>e2e</code>. La grabación es <em>evidencia</em>, no una demo: el agente verifica leyendo el DOM y el vídeo sale casi estático. Si quieres un vídeo para enseñar al equipo, añade una <strong>fase aparte</strong> con un recorrido de usuario lento y, si quieres, narración con <code>text_to_speech</code> y ffmpeg.</p></div>
+
       <h3>Práctica: el ticket TIENDA-12</h3>
       <p class="prose">Una tienda web mínima (solo la biblioteca estándar de Python) con un bug, la búsqueda distingue mayúsculas, y una feature pedida por ventas: resaltar en rojo lo que hay que reponer y mostrar un contador.</p>
       <div class="code"><span class="lbl">09-equipo-de-agentes</span><pre>./perfiles/crear-perfiles.sh   <span class="c"># 4 perfiles con permisos mínimos, sin memoria ni autoaprendizaje</span>
@@ -867,11 +873,11 @@ IMPL=$(hermes kanban create "Implementar TIENDA-12" --assignee implementador \
 hermes kanban create "E2E TIENDA-12" --assignee e2e --parent "$IMPL" --workspace "dir:$WORK" …</pre></div>
       <div class="example">
         <h4>Ejecución real <span class="badge ok">≈ 12 min · ≈ 0,14 $</span></h4>
-        <div class="meta">claude-haiku-5.5 en los 4 perfiles · incluye un primer intento fallido</div>
+        <div class="meta">claude-haiku-5.5 en los 4 perfiles · coste total de la práctica</div>
         <ul class="found">
           <li><strong>Especificador (42 s):</strong> encontró la causa del bug y fijó criterios verificables, incluido uno que nadie pidió explícitamente: WEB-06, con stock exactamente 5, <em>no</em> se marca.</li>
           <li><strong>Implementador:</strong> TDD (8 tests en rojo primero), commit y paso a revisión con evidencia criterio por criterio. Admitió lo que no pudo comprobar: "verificación visual en navegador: NO".</li>
-          <li><strong>Revisor, ronda 1:</strong> rechazó. El resaltado en rojo vivía en JavaScript y ningún test lo ejecutaba; el test añadido solo buscaba el texto de la regla CSS.</li>
+          <li><strong>Revisor, ronda 1:</strong> devolvió cambios. El resaltado en rojo vivía en JavaScript y ningún test lo ejecutaba; el test añadido solo buscaba el texto de la regla CSS. Es el bucle de revisión haciendo su trabajo (y una ronda que puedes ahorrarte: ver "Cada fase sabe qué validan las demás").</li>
           <li><strong>Implementador, ronda 2:</strong> añadió un test que ejecuta el JS de la página. <strong>Revisor:</strong> aprobado.</li>
           <li><strong>E2E:</strong> levantó la app con la skill del repo, escribió en el buscador y comprobó colores y posiciones en un Chromium real. Además encontró un bug que nadie buscaba: <strong>una condición de carrera</strong> en el buscador (con escritura muy rápida, la tabla muestra resultados de una búsqueda anterior). Lo dejó como ticket aparte, sin bloquear.</li>
         </ul>
@@ -881,11 +887,6 @@ hermes kanban create "E2E TIENDA-12" --assignee e2e --parent "$IMPL" --workspace
         <img src="e2e-captura.png" alt="Captura del navegador del agente E2E: la tienda filtrada por 'teclado' con el aviso '2 productos con stock bajo' en rojo" style="width:100%;max-width:640px;border:1px solid var(--line);border-radius:var(--radius);display:block">
         <figcaption class="prose" style="font-size:var(--step--1);color:var(--muted);margin-top:6px">Fotograma del WebM que grabó el perfil E2E.</figcaption>
       </figure>
-
-      <h3>Tres tropiezos reales (y lo que enseñan)</h3>
-      <div class="note warn"><span class="t">1 · El juez de --goal evalúa el texto de la tarjeta</span><p>En el primer intento escribimos en la tarjeta "cuando estén en verde, pide revisión con <code>kanban_request_review</code>". El juez exigía ver esa llamada como parte del objetivo y rechazó el paso a revisión tres veces; el implementador se bloqueó pidiendo ayuda (bien hecho). <strong>En la tarjeta va el QUÉ y los criterios; el procedimiento va en el <code>SOUL.md</code> del perfil.</strong></p></div>
-      <div class="note warn"><span class="t">2 · El revisor también persigue casos límite</span><p>Pidió un test de JavaScript con Node para un comportamiento visual que la fase E2E iba a comprobar igualmente en el navegador. No es un error, pero cuesta una ronda. Dile a cada fase qué validan las demás: "lo visual lo cubre el E2E".</p></div>
-      <div class="note warn"><span class="t">3 · La grabación de vídeo no sale sola</span><p>Desde la v0.21, el navegador por defecto es <code>browser_exec</code> (Browser Use) y <code>record_sessions</code> solo graba con las herramientas clásicas. Hace falta <code>browser.backend: "off"</code> en el perfil E2E. Aun así, el vídeo fue casi estático: el agente verificó leyendo el DOM, no paseando por la página. Si quieres un vídeo de demo para el equipo, pídelo como <strong>fase aparte</strong> con un recorrido de usuario lento y, si quieres, narración con <code>text_to_speech</code> y ffmpeg.</p></div>
 
       <h3>El mismo flujo desde Telegram</h3>
       <p class="prose">Con el gateway conectado a Telegram (módulo 06), cualquiera del equipo puede encargar trabajo desde el móvil. El chat que crea la tarjeta queda suscrito y recibe un aviso cuando termina, se bloquea o falla:</p>
@@ -990,17 +991,17 @@ hermes kanban create "E2E TIENDA-12" --assignee e2e --parent "$IMPL" --workspace
           <tr><td>Skill propia email-seguimiento</td><td>04</td><td class="num">57 s</td><td>OK, 4 correos</td></tr>
           <tr><td>Cron con LLM y watchdog sin LLM</td><td>05</td><td class="num">—</td><td>OK, cifras exactas</td></tr>
           <tr><td>Arreglar bugs con checkpoints</td><td>07</td><td class="num">43 s</td><td>OK, 2 de 2 bugs, 6 tests en verde</td></tr>
-          <tr><td>Servidor MCP propio</td><td>08</td><td class="num">12 s</td><td>OK tras migrar a mcp 2.x</td></tr>
-          <tr><td>Backend Docker</td><td>09</td><td class="num">21 s</td><td>OK tras corregir <code>cwd</code></td></tr>
+          <tr><td>Servidor MCP propio</td><td>08</td><td class="num">12 s</td><td>OK con mcp 2.x</td></tr>
+          <tr><td>Backend Docker</td><td>09</td><td class="num">21 s</td><td>OK, tests en Linux dentro del contenedor</td></tr>
           <tr><td>Subagentes en paralelo</td><td>09</td><td class="num">31 s</td><td>OK</td></tr>
           <tr><td>Revisión de diff para CI</td><td>09</td><td class="num">—</td><td>OK · 0,003 $</td></tr>
           <tr><td>Skill con script de validación</td><td>04</td><td class="num">—</td><td>OK: detectó un día de la semana erróneo ya marcado por el agente</td></tr>
           <tr><td>Cron de un solo disparo con entrega a Telegram</td><td>05</td><td class="num">1 min</td><td>OK, llegó al móvil y el job se borró solo</td></tr>
           <tr><td>Gateway de Telegram</td><td>06</td><td class="num">15 s</td><td>OK; las notas de voz necesitan voz a texto</td></tr>
-          <tr><td>Pipeline por fases con 4 perfiles y kanban</td><td>10</td><td class="num">≈ 12 min</td><td>OK tras corregir el texto de la tarjeta <code>--goal</code>; 1 ronda de cambios; bug extra encontrado en E2E</td></tr>
-          <tr><td>E2E con grabación en vídeo</td><td>10</td><td class="num">≈ 3 min</td><td>OK tras <code>browser.backend: off</code></td></tr>
+          <tr><td>Pipeline por fases con 4 perfiles y kanban</td><td>10</td><td class="num">≈ 12 min</td><td>OK; 1 ronda de cambios; el E2E encontró un bug extra</td></tr>
+          <tr><td>E2E con grabación en vídeo</td><td>10</td><td class="num">≈ 3 min</td><td>OK, vídeo WebM</td></tr>
           <tr><td>Tarea kanban creada desde Telegram</td><td>10</td><td class="num">38 s</td><td>OK, aviso de fin en el chat</td></tr>
-          <tr><td>Imagen Docker efímera por tarea</td><td>09</td><td class="num">≈ 30 s</td><td>OK tras no montar <code>/opt/data</code> y añadir <code>uv</code> a la imagen · 4 ejecuciones ≈ 0,02 $</td></tr>
+          <tr><td>Imagen Docker efímera por tarea</td><td>09</td><td class="num">≈ 30 s</td><td>OK, repo limpio y sin restos · 4 ejecuciones ≈ 0,02 $</td></tr>
           <tr><td>GitHub Actions</td><td>09</td><td class="num">—</td><td>No ejecutado: requiere cuenta externa</td></tr>
           <tr><td><strong>Total (hermes insights + consumo de la clave)</strong></td><td></td><td class="num">35 sesiones</td><td><strong>≈ 0,31 $</strong></td></tr>
         </tbody></table></div>

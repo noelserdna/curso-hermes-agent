@@ -22,7 +22,7 @@ terminal:
   backend: docker
   docker_image: python:3.13-slim          # o nousresearch/hermes-sandbox:desktop
   docker_mount_cwd_to_workspace: true     # monta el directorio desde el que lanzas hermes en /workspace
-  cwd: "."                                # ⚠️ NO pongas "/workspace": desactiva el montaje
+  cwd: "."                                # trabaja en el directorio montado ("/workspace" explícito desactiva el montaje)
   # container_persistent: false           # un contenedor nuevo por sesión
 ```
 
@@ -49,7 +49,7 @@ Un paso más allá: en vez de un Hermes "vivo" que acumula memoria y skills con 
 **un contenedor nuevo de Hermes** a partir de una imagen que controla el equipo. Mejorar el flujo es publicar
 una imagen nueva, no entrar en la máquina de cada persona a limpiar skills.
 
-En [`imagen-equipo/`](imagen-equipo) está la versión que probamos:
+En [`imagen-equipo/`](imagen-equipo) está lista para usar:
 
 | Fichero | Qué es |
 |---|---|
@@ -67,22 +67,22 @@ Resultado real: "4 de 5 tests pasan y 1 falla", con la causa exacta (`datos.py:3
 al terminar, ningún contenedor ni volumen sobrante. La imagen ocupa **4,5 GB** (trae Chromium, Node y ffmpeg):
 tenlo en cuenta al dimensionar el servidor.
 
-Lo que aprendimos al probarlo:
+Cuatro decisiones de diseño:
 
-1. **No montes la carpeta de config del equipo como `/opt/data`.** Fue nuestro primer intento (`-v ./hermes-equipo:/opt/data`):
-   el contenedor la llenó con 39 MB de estado (las 58 skills incluidas, cachés, `state.db`, el venv que se
-   montó el agente…). Ni efímero ni limpio para git. `/opt/data` es un `VOLUME` de la imagen: si copias la
-   config **dentro** de la imagen y no lo montas, cada `docker run --rm` parte de cero y lo tira todo al acabar.
-2. **Mete en la imagen las herramientas de tus repos.** Sin `uv`, el agente no podía ejecutar el comando que
-   dice `AGENTS.md` y se fabricaba un venv con pip en cada tarea (y lo decía). Con `uv` en la imagen ejecuta
-   lo que el repo indica.
-3. **La clave nunca va en la imagen.** `tarea.sh` pasa solo `OPENROUTER_API_KEY` (no el `.env` entero, que puede
-   llevar el token de Telegram). Comprobamos que Hermes no la escribe en disco: en `auth.json` guarda solo su huella.
-4. **Pierdes la visibilidad de serie.** Con `--rm` desaparecen también las sesiones y `hermes insights`: medimos el
-   coste con el consumo de la clave en OpenRouter. En producción, monta solo `logs/` y `sessions/` en un volumen,
-   o envía la salida a tu sistema de logs.
-5. Cada arranque repite la inicialización (migración de config, copia de skills) y la imprime antes de la
-   respuesta: filtra la salida si la vas a procesar.
+1. **La config va dentro de la imagen, no montada.** `/opt/data` (el `HERMES_HOME`) es un `VOLUME` de la imagen
+   y Hermes escribe en él su estado: las skills incluidas, cachés, `state.db`, los entornos que monte el agente…
+   Si montas ahí la carpeta del equipo (`-v ./hermes-equipo:/opt/data`), la ensucias con decenas de MB en cada
+   tarea. Copiada en la imagen, cada `docker run --rm` parte de cero y lo tira todo al acabar.
+2. **La imagen lleva las herramientas de tus repos.** Si `AGENTS.md` dice `uv run pytest`, `uv` tiene que estar
+   en la imagen; si no, el agente improvisa (un venv con pip en cada tarea) y deja de ejecutar lo que el repo indica.
+3. **La clave nunca va en la imagen.** `tarea.sh` pasa solo `OPENROUTER_API_KEY`, no el `.env` entero (que puede
+   llevar el token de Telegram). Hermes no la escribe en disco: en `auth.json` guarda solo su huella.
+4. **Decide dónde va la visibilidad.** Con `--rm` desaparecen también las sesiones y `hermes insights`. Monta solo
+   `logs/` y `sessions/` en un volumen, envía la salida a tu sistema de logs o mide el coste con el consumo de la
+   clave en el proveedor, como hicimos aquí.
+
+Cada arranque repite la inicialización (migración de config, copia de skills) y la imprime antes de la
+respuesta: fíltrala si vas a procesar la salida.
 
 ## B. Worktrees: varias tareas a la vez sin pisarse
 

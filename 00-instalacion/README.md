@@ -53,7 +53,7 @@ hermes model          # asistente interactivo: elige OpenRouter, pega la clave, 
 hermes setup          # asistente completo (modelo, terminal, gateway, herramientas...)
 ```
 
-⚠️ Ambos necesitan una **terminal interactiva real** (no funcionan dentro de un pipe ni del `!` de otros agentes).
+Ambos son asistentes interactivos: necesitan una terminal real. Desde un script, un pipe u otro agente, usa la alternativa no interactiva.
 
 Alternativa no interactiva:
 
