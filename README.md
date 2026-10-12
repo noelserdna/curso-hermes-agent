@@ -33,8 +33,9 @@ Hermes publica versiones casi cada semana: si un flag no existe en tu versión, 
 | 7 | [`07-mcp`](07-mcp) | Construir un servidor MCP propio y conectarlo | ✅ |
 | 8 | [`08-entornos`](08-entornos) | Backend Docker, imagen efímera, worktrees, permisos mínimos, despliegue 24/7, subagentes, revisión en CI | ✅ |
 | 9 | [`09-equipo-de-agentes`](09-equipo-de-agentes) | Pipeline por fases con perfiles y kanban: especificar → implementar ↔ revisar → E2E en navegador, lanzable desde Telegram | ✅ |
+| 10 | [`10-sdd-con-puertas`](10-sdd-con-puertas) | El método SDD como arnés: el ejecutor propone, decides con botones en Telegram y un notario sin LLM firma; práctica gratis con una ejecución grabada | ✅ |
 
-✅ probado de verdad: todos los ejemplos se ejecutaron el 9 de octubre de 2026 con Hermes v0.21.6
+✅ probado de verdad: todos los ejemplos se ejecutaron del 9 al 12 de octubre de 2026 con Hermes v0.21.6
 
 ## Requisitos
 
@@ -43,7 +44,7 @@ Hermes publica versiones casi cada semana: si un flag no existe en tu versión, 
 - Un modelo con **≥ 64K tokens** de contexto.
 - Una API key de un proveedor: recomendamos **[OpenRouter](https://openrouter.ai)** (una clave, todos los modelos).
 - Para los módulos 6 y 9: [`uv`](https://docs.astral.sh/uv/) (y `jq` en el 9). Para el módulo 8: Docker.
-- Coste real medido con `hermes insights`: **las 38 sesiones de prueba de este curso (5 perfiles, 4 contenedores y 3 ejecuciones de GitHub Actions) costaron ~0,32 $ en total** con Claude Haiku 5.5.
+- Coste real medido con `hermes insights`: **las ~60 sesiones de prueba de este curso con Hermes (perfiles, contenedores, GitHub Actions y el arnés SDD) costaron ~0,48 $ en total** con Claude Haiku 5.5. La práctica opcional del módulo 10 con Claude Code como ejecutor costó además ~25 $ de la suscripción de Claude; su versión reproducida, 0 $.
 
 ## Cómo usar este repo
 

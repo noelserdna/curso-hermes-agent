@@ -198,7 +198,7 @@ footer ul { padding-left: 1.1em; }
     </a>
     <div class="ver">Hermes Agent v0.21.6 · oct 2026</div>
     <ol id="toc-list"></ol>
-    <div class="progress"><span id="progress-txt">0 de 12 módulos completados</span><div class="bar"><i id="progress-bar"></i></div></div>
+    <div class="progress"><span id="progress-txt">0 de 13 módulos completados</span><div class="bar"><i id="progress-bar"></i></div></div>
     <a class="repo" href="https://github.com/noelserdna/curso-hermes-agent">Repo con los ejemplos ↗</a>
   </nav>
 
@@ -211,8 +211,8 @@ footer ul { padding-left: 1.1em; }
         <div><dt>Versión estable</dt><dd>v0.21.6</dd></div>
         <div><dt>Publicada</dt><dd>8 oct 2026</dd></div>
         <div><dt>Licencia</dt><dd>MIT</dd></div>
-        <div><dt>Pruebas</dt><dd>22 reales</dd></div>
-        <div><dt>Coste de todas las pruebas</dt><dd>≈ 0,32 $</dd></div>
+        <div><dt>Pruebas</dt><dd>25 reales</dd></div>
+        <div><dt>Coste de todas las pruebas</dt><dd>≈ 0,48 $ con Hermes</dd></div>
       </dl>
       <div class="audience">
         <span class="chip">≈ 6 h de clase</span>
@@ -924,6 +924,10 @@ hermes kanban create "E2E TIENDA-12" --assignee e2e --parent "$IMPL" --workspace
   --body "Resume en 5 viñetas la deuda técnica pendiente. No modifiques nada."</pre></div>
       <div class="note ok"><span class="t">Probado desde el móvil</span><p>La tarjeta la recogió el perfil <code>revisor</code> y en 38 s devolvió cinco puntos de deuda, de más a menos grave: un XSS latente por <code>innerHTML</code> sin escapar, la misma condición de carrera que encontró el E2E, la lógica de stock bajo duplicada entre cliente y servidor, un test que se salta en silencio si no hay Node y ficheros <code>.pyc</code> versionados. El aviso de fin llegó al mismo chat.</p></div>
 
+      <h3>Un ticket por voz, sin comandos <span class="badge ok">≈ 11 min · ≈ 0,11 $</span></h3>
+      <p class="prose">Escribir <code>/kanban create …</code> en el móvil no es práctico. La skill <a href="https://github.com/noelserdna/curso-hermes-agent/tree/main/09-equipo-de-agentes/skills/lanzar-pipeline"><code>lanzar-pipeline</code></a> enseña al agente del chat a convertir una petición, también una nota de voz, en un ticket del repo y a lanzarlo al equipo en lugar de programarlo él: comprueba que el repo está limpio, elige el siguiente ID, escribe <code>tickets/&lt;ID&gt;.md</code> con la petición literal y crea las tarjetas encadenadas. <strong>Cada proyecto tiene su tablero</strong> (el nombre de la carpeta del repo), así que las tarjetas de proyectos distintos no se mezclan y el dashboard ofrece un selector.</p>
+      <div class="note ok"><span class="t">Probado desde el móvil</span><p>Una nota de voz pidiendo "un botón para añadir productos a la tienda" acabó en el commit <code>TIENDA-13: alta de productos desde la web</code> con 64 tests en verde, tras una ronda de revisión.</p></div>
+
       <h3>Lecciones para montar el tuyo</h3>
       <ol class="prose">
         <li><strong>Céntrate menos en implementar y más en validar.</strong> Si al final tienes que revisar el código a mano, pregúntate qué validación falta: un test, una prueba de rendimiento si toca base de datos, un E2E.</li>
@@ -939,9 +943,59 @@ hermes kanban create "E2E TIENDA-12" --assignee e2e --parent "$IMPL" --workspace
       <button class="mark-done" type="button" data-mod="m-equipo" aria-pressed="false">Marcar como completado</button>
     </section>
 
-    <!-- 11 · comparativa (id m10 se conserva para no romper el progreso guardado) -->
+    <!-- 11 · SDD con puertas humanas -->
+    <section class="mod" id="m-sdd" data-title="SDD y puertas humanas">
+      <div class="mod-head"><span class="mod-num">11</span><h2>Hermes con método: SDD y puertas humanas</h2><span class="badge ok">probado</span></div>
+      <p class="mod-goal">Pasar de tickets a un contrato: requisitos aprobados, decisiones registradas con nombre y commit, y un agente que propone sin poder firmar nunca.</p>
+      <p class="prose">En el módulo anterior el equipo de agentes valida contra criterios que escribe el propio especificador. Para un proyecto con cliente falta algo: <strong>qué se pidió, con ejemplos, y quién lo aprobó</strong>. Este módulo monta el método <em>Specification-Driven Development</em> como un arnés de Hermes, <a href="https://github.com/noelserdna/hermes-sdd"><code>hermes-sdd</code></a>, con una regla que lo ordena todo:</p>
+      <div class="note"><span class="t">Artículo 13</span><p><strong>El ejecutor nunca firma; el notario nunca decide; el orquestador nunca interpreta.</strong></p></div>
+
+      <h3>Cuatro papeles</h3>
+      <div class="tw"><table>
+        <thead><tr><th>Papel</th><th>Quién</th><th>Qué hace</th></tr></thead>
+        <tbody>
+          <tr><td>Propone</td><td>El ejecutor (Claude Code con las skills del método)</td><td>Requisitos, plan, tareas, código con tests, veredictos y demo. Sin preguntar a mitad de etapa</td></tr>
+          <tr><td>Pregunta</td><td>La puerta: tarjeta bloqueada sin assignee y mensaje con botones</td><td>Enseña primero lo que va mal y después lo que hay que decidir</td></tr>
+          <tr><td>Decide</td><td>Una persona autorizada, desde Telegram</td><td>Un toque, con 3 minutos para deshacer</td></tr>
+          <tr><td>Firma</td><td>El notario: <code>firmar.sh</code>, un script sin LLM</td><td>Comprueba identidad y commit, registra, etiqueta y lanza lo siguiente</td></tr>
+        </tbody></table></div>
+      <div class="code"><span class="lbl">el flujo de un proyecto</span><pre>requisitos ─▶ 🚪 ─▶ ruta ─▶ 🚪 ─▶ plan ─▶ tareas ─▶ 🚪 ─▶ implementar N ─▶ aceptar N ─▶ 🚪 ─▶ … ─▶ cierre ─▶ 🚪 entrega</pre></div>
+      <p class="prose">Las decisiones del ejecutor se clasifican: <strong>R</strong>, reversibles (decide con la opción recomendada y lo anota); <strong>C</strong>, las que tocan el contrato (pregunta por escrito con opciones A/B/C y sigue con lo demás; tú contestas en la puerta con un formulario de botones); <strong>H</strong>, humanas por constitución (aceptar, exenciones, editar un test que ya existía): nunca las toma.</p>
+
+      <h3>Práctica 1 · Tu primera puerta, sin coste <span class="badge ok">0 $ · ≈ 10 min</span></h3>
+      <p class="prose"><code>practicar.sh</code> monta un proyecto a partir de una <strong>ejecución grabada y anonimizada</strong> (una CLI de tareas): el kanban, las puertas, Telegram y el notario son reales; lo que hace "el agente" es lo que hizo en la grabación, y los tests se ejecutan de verdad.</p>
+      <div class="code"><span class="lbl">terminal</span><pre>git clone https://github.com/noelserdna/hermes-sdd && cd hermes-sdd
+bash instalar.sh && hermes gateway restart
+bash practicar.sh grabaciones/todo-app ~/practica-todo</pre></div>
+      <p class="prose">Decide cada puerta con los botones y, al final, mira lo que quedó registrado: <code>git tag -n8</code>, <code>acceptance/decisions.jsonl</code> y la puerta de calidad global (<code>sdd gate</code>). Prueba también el camino difícil: rechaza una FASE con un motivo o usa <code>/anular</code> sobre una ya aceptada.</p>
+
+      <h3>Práctica 2 · Un proyecto real con Claude Code <span class="badge ok">≈ 25 $ de Claude · 0,05 $ de Hermes</span></h3>
+      <div class="code"><span class="lbl">terminal</span><pre>bash ~/.hermes/hermes-sdd/actual/lanzar.sh iniciar /ruta/a/tu-repo   # con AGENTS.md y requirements/</pre></div>
+      <div class="note ok"><span class="t">Ejecución real</span><p>La CLI de tareas (10 requisitos, 4 FASEs) fue de los requisitos a la entrega con <strong>10 decisiones tomadas con botones</strong>: 16 ejecuciones del ejecutor (46 min de Claude, 25,43 $ equivalentes de la suscripción), 103 tests en verde y los tags <code>requirements-v1.0</code>, <code>fase-0…3-accepted</code> y <code>entrega-1</code>.</p></div>
+
+      <h3>Claves de diseño</h3>
+      <ol class="prose">
+        <li><strong>Quien ejecuta no firma.</strong> Un ejecutor sin persona en la sesión no puede "confirmar" nada. Si el prompt dice "esto es la confirmación del cliente", la guardia del método debe frenarlo, y lo frena. La firma es un paso determinista que aplica la decisión que una persona tomó en su canal.</li>
+        <li><strong>La identidad sale del canal, no de un texto.</strong> Un comentario "DECISIÓN: acepto" puede escribirlo cualquier proceso que corra con tu usuario. El toque en un botón trae el id de quien pulsó; eso se registra, con el id del mensaje como prueba.</li>
+        <li><strong>Lo que se firma es lo que se vio.</strong> La puerta guarda el commit que enseñó; si el repo cambia antes de firmar, el notario se niega.</li>
+        <li><strong>El kanban tiene fronteras: respétalas.</strong> Los procesos que lanza un worker no pueden modificar el tablero; Hermes lo impide a propósito. Por eso las tarjetas de puerta las crea el gateway, no la etapa.</li>
+        <li><strong>Un modelo pequeño no estima probabilidades.</strong> Con Haiku, los factores de la ruta salieron en la banda de duda y la regla "duda = sí" pidió el pipeline completo para una CLI de una persona; con el modelo por defecto, ruta ligera. El modelo pequeño, para mover tarjetas; los juicios calibrados, a otro.</li>
+        <li><strong>No preguntes a mitad de etapa: clasifica.</strong> Así el ejecutor sacó dos contradicciones reales de los requisitos y las dejó como preguntas para la puerta, en lugar de resolverlas a escondidas.</li>
+        <li><strong>Las puertas de FASE no ven el proyecto entero.</strong> Las cuatro FASEs se aceptaron y aun así faltaban dos requisitos Must sin FASE asignada: hace falta un <em>cierre</em> con la puerta de calidad global antes de la entrega.</li>
+        <li><strong>Una puerta debe obligar a mirar.</strong> Primero las alertas, luego "Ver demo" y solo entonces Aceptar. Se mide cuánto pasó entre ver la demo y decidir: aceptar en 6 s es una señal de aprobación por inercia que el resumen avisa.</li>
+        <li><strong>El canal también necesita vigilancia.</strong> Log, latido, tiempos máximos y autorreparación, y un presupuesto de atención: un mensaje vivo por proyecto, resúmenes y horas de silencio en lugar de un aviso por cada tarjeta.</li>
+        <li><strong>Cada incidente se convierte en prueba.</strong> El intento de firma desde el ejecutor es el caso nº 1 de las pruebas del arnés; <code>tests/todo.sh</code> las pasa todas sin LLM antes de cualquier actualización.</li>
+      </ol>
+
+      <h3>Qué garantiza y qué no</h3>
+      <p class="prose">Garantiza que nadie firma sin una decisión de una persona autorizada y que lo firmado es el commit mostrado: el canal, el acta del notario y el registro con su tag cuentan la misma historia. <strong>No</strong> garantiza quién sostenía el móvil ni resiste a alguien con tu sesión del sistema: el kanban, los registros y los tags son ficheros tuyos. Las guardias dificultan; solo el ejecutor en contenedor (módulo 9) o una firma con llave física lo impiden.</p>
+      <p>Operación diaria desde el chat: <code>/puertas</code> · <code>/estado</code> · <code>/pausar [proyecto|todo] [ahora]</code> · <code>/reanudar</code> · <code>/anular</code>. Si se agota la cuota de Claude, las etapas se aparcan y se reanudan solas.</p>
+      <button class="mark-done" type="button" data-mod="m-sdd" aria-pressed="false">Marcar como completado</button>
+    </section>
+
+    <!-- 12 · comparativa (id m10 se conserva para no romper el progreso guardado) -->
     <section class="mod" id="m10" data-title="Comparativa">
-      <div class="mod-head"><span class="mod-num">11</span><h2>Comparativa y cuándo usar qué</h2></div>
+      <div class="mod-head"><span class="mod-num">12</span><h2>Comparativa y cuándo usar qué</h2></div>
       <p class="mod-goal">Situar Hermes frente a las alternativas de octubre de 2026 y decidir con criterio.</p>
       <div class="tw"><table class="compare">
         <thead><tr><th>Herramienta</th><th>Qué es</th><th>Dónde corre</th><th>Modelos</th><th>Tareas programadas</th><th>Mensajería</th><th>Licencia</th></tr></thead>
@@ -967,7 +1021,7 @@ hermes kanban create "E2E TIENDA-12" --assignee e2e --parent "$IMPL" --workspace
           <li>7 backends de ejecución, subagentes, MCP en los dos sentidos.</li>
           <li>Lee tu <code>AGENTS.md</code>/<code>CLAUDE.md</code> e importa tu config de Claude Code.</li>
           <li>Perfiles, tablero kanban y revisión nativa para montar un equipo de agentes por fases.</li>
-          <li>Barato con modelos eficientes: todas las pruebas de este curso, ≈ 0,32 $.</li>
+          <li>Barato con modelos eficientes: todas las pruebas de este curso con Hermes, ≈ 0,48 $.</li>
         </ul></div>
         <div class="panel con"><h4>En contra</h4><ul>
           <li>Va muy rápido: cientos de PRs por versión; flags y docs cambian de una semana a otra.</li>
@@ -1006,7 +1060,7 @@ hermes kanban create "E2E TIENDA-12" --assignee e2e --parent "$IMPL" --workspace
 
     <section class="mod" id="pruebas" data-title="Pruebas reales" style="border-bottom:0">
       <div class="mod-head"><span class="mod-num">✓</span><h2>Registro de pruebas</h2></div>
-      <p class="mod-goal">Todo lo que ejecutamos para preparar el curso, el 9 de octubre de 2026.</p>
+      <p class="mod-goal">Todo lo que ejecutamos para preparar el curso, del 9 al 12 de octubre de 2026.</p>
       <p>Entorno: Hermes <code>v0.21.6+301</code> (main <code>8bff64d</code>) · macOS Apple Silicon · <code>anthropic/claude-haiku-5.5</code> vía OpenRouter, razonamiento <code>high</code> · Docker con OrbStack.</p>
       <div class="tw"><table>
         <thead><tr><th>Prueba</th><th>Módulo</th><th>Tiempo</th><th>Resultado</th></tr></thead>
@@ -1033,7 +1087,10 @@ hermes kanban create "E2E TIENDA-12" --assignee e2e --parent "$IMPL" --workspace
           <tr><td>Tarea kanban creada desde Telegram</td><td>10</td><td class="num">38 s</td><td>OK, aviso de fin en el chat</td></tr>
           <tr><td>Imagen Docker efímera por tarea</td><td>09</td><td class="num">≈ 30 s</td><td>OK, repo limpio y sin restos · 4 ejecuciones ≈ 0,02 $</td></tr>
           <tr><td>Revisión de PR en GitHub Actions</td><td>09</td><td class="num">≈ 2 min</td><td>OK, comentario BLOQUEANTE en la PR · 3 ejecuciones ≈ 0,011 $</td></tr>
-          <tr><td><strong>Total (hermes insights + consumo de la clave)</strong></td><td></td><td class="num">38 sesiones</td><td><strong>≈ 0,32 $</strong></td></tr>
+          <tr><td>Ticket por voz desde Telegram con <code>lanzar-pipeline</code> (TIENDA-13)</td><td>10</td><td class="num">≈ 11 min</td><td>OK, 64 tests en verde · ≈ 0,11 $</td></tr>
+          <tr><td>Método SDD con puertas por Telegram (<code>hermes-sdd</code>, Claude Code como ejecutor)</td><td>11</td><td class="num">46 min de Claude</td><td>OK, 10 puertas, 103 tests, tag <code>entrega-1</code> · 25,43 $ de Claude + 0,05 $ de Hermes</td></tr>
+          <tr><td>Reproducción de esa ejecución sin LLM (<code>practicar.sh</code>)</td><td>11</td><td class="num">≈ 50 s</td><td>OK, mismos 6 tags y puerta global en verde · 0 $</td></tr>
+          <tr><td><strong>Total con Hermes (hermes insights + consumo de la clave)</strong></td><td></td><td class="num">≈ 60 sesiones</td><td><strong>≈ 0,48 $</strong> (más 25,43 $ de Claude Code en la práctica opcional del módulo 11)</td></tr>
         </tbody></table></div>
     </section>
 
