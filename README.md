@@ -44,7 +44,7 @@ Hermes publica versiones casi cada semana: si un flag no existe en tu versión, 
 - Un modelo con **≥ 64K tokens** de contexto.
 - Una API key de un proveedor: recomendamos **[OpenRouter](https://openrouter.ai)** (una clave, todos los modelos).
 - Para los módulos 6 y 9: [`uv`](https://docs.astral.sh/uv/) (y `jq` en el 9). Para el módulo 8: Docker.
-- Coste real medido con `hermes insights`: **las ~60 sesiones de prueba de este curso con Hermes (perfiles, contenedores, GitHub Actions y el arnés SDD) costaron ~0,48 $ en total** con Claude Haiku 5.5. La práctica opcional del módulo 10 con Claude Code como ejecutor costó además ~25 $ de la suscripción de Claude; su versión reproducida, 0 $.
+- Coste real medido con `hermes insights`: **las ~60 sesiones de prueba de este curso con Hermes (perfiles, contenedores, GitHub Actions y el arnés SDD) costaron ~0,56 $ en total** con Claude Haiku 5.5. Las prácticas opcionales del módulo 10 con Claude Code como ejecutor (proyecto completo, un cambio y una adopción) costaron además ~37 $ de la suscripción de Claude; su versión reproducida, 0 $.
 
 ## Cómo usar este repo
 

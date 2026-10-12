@@ -211,8 +211,8 @@ footer ul { padding-left: 1.1em; }
         <div><dt>Versión estable</dt><dd>v0.21.6</dd></div>
         <div><dt>Publicada</dt><dd>8 oct 2026</dd></div>
         <div><dt>Licencia</dt><dd>MIT</dd></div>
-        <div><dt>Pruebas</dt><dd>25 reales</dd></div>
-        <div><dt>Coste de todas las pruebas</dt><dd>≈ 0,48 $ con Hermes</dd></div>
+        <div><dt>Pruebas</dt><dd>28 reales</dd></div>
+        <div><dt>Coste de todas las pruebas</dt><dd>≈ 0,56 $ con Hermes</dd></div>
       </dl>
       <div class="audience">
         <span class="chip">≈ 6 h de clase</span>
@@ -973,6 +973,15 @@ bash practicar.sh grabaciones/todo-app ~/practica-todo</pre></div>
       <div class="code"><span class="lbl">terminal</span><pre>bash ~/.hermes/hermes-sdd/actual/lanzar.sh iniciar /ruta/a/tu-repo   # con AGENTS.md y requirements/</pre></div>
       <div class="note ok"><span class="t">Ejecución real</span><p>La CLI de tareas (10 requisitos, 4 FASEs) fue de los requisitos a la entrega con <strong>10 decisiones tomadas con botones</strong>: 16 ejecuciones del ejecutor (46 min de Claude, 25,43 $ equivalentes de la suscripción), 103 tests en verde y los tags <code>requirements-v1.0</code>, <code>fase-0…3-accepted</code> y <code>entrega-1</code>.</p></div>
 
+      <h3>Práctica 3 · Cambios y proyectos que ya existen <span class="badge ok">probado</span></h3>
+      <div class="tw"><table>
+        <thead><tr><th>Caso</th><th>Qué hace el arnés</th><th>Medido</th></tr></thead>
+        <tbody>
+          <tr><td><code>/cambio todo-app quiero poder cambiar el título de una tarea</code></td><td>Guarda la petición literal, crea la versión 1.1 de los requisitos y te pide aprobarla; replanifica solo lo nuevo (FASE-4; las aceptadas no se tocan) y acaba en la entrega 2</td><td class="num">19 min · 8,66 $</td></tr>
+          <tr><td><code>lanzar.sh adoptar</code> sobre la tienda del módulo 10</td><td>Lee el código, propone 9 requisitos y 3 FASEs retroactivas y pregunta lo que no puede deducir: la búsqueda no mira el SKU ni ignora tildes, "79,90" se rechaza y "1e2" se acepta como 100 €</td><td class="num">9 min · 3,08 $</td></tr>
+          <tr><td>La ruta estimada por un agente de Hermes</td><td>Perfil <code>sdd-ejecutor</code> con Sonnet en lugar de Claude Code: misma ruta</td><td class="num">0,075 $ frente a 0,24 $</td></tr>
+        </tbody></table></div>
+
       <h3>Claves de diseño</h3>
       <ol class="prose">
         <li><strong>Quien ejecuta no firma.</strong> Un ejecutor sin persona en la sesión no puede "confirmar" nada. Si el prompt dice "esto es la confirmación del cliente", la guardia del método debe frenarlo, y lo frena. La firma es un paso determinista que aplica la decisión que una persona tomó en su canal.</li>
@@ -984,6 +993,7 @@ bash practicar.sh grabaciones/todo-app ~/practica-todo</pre></div>
         <li><strong>Las puertas de FASE no ven el proyecto entero.</strong> Las cuatro FASEs se aceptaron y aun así faltaban dos requisitos Must sin FASE asignada: hace falta un <em>cierre</em> con la puerta de calidad global antes de la entrega.</li>
         <li><strong>Una puerta debe obligar a mirar.</strong> Primero las alertas, luego "Ver demo" y solo entonces Aceptar. Se mide cuánto pasó entre ver la demo y decidir: aceptar en 6 s es una señal de aprobación por inercia que el resumen avisa.</li>
         <li><strong>El canal también necesita vigilancia.</strong> Log, latido, tiempos máximos y autorreparación, y un presupuesto de atención: un mensaje vivo por proyecto, resúmenes y horas de silencio en lugar de un aviso por cada tarjeta.</li>
+        <li><strong>Lo que el ejecutor deja a medias, a la vista.</strong> En un cierre, el ejecutor repitió una medición y no hizo commit del registro; el notario se negó a firmar con el árbol sucio. El arnés commitea esos restos con un mensaje que lo dice y abre una puerta nueva: nunca se "arregla" una puerta vieja, porque su commit ya no es el que se mostró.</li>
         <li><strong>Cada incidente se convierte en prueba.</strong> El intento de firma desde el ejecutor es el caso nº 1 de las pruebas del arnés; <code>tests/todo.sh</code> las pasa todas sin LLM antes de cualquier actualización.</li>
       </ol>
 
@@ -1021,7 +1031,7 @@ bash practicar.sh grabaciones/todo-app ~/practica-todo</pre></div>
           <li>7 backends de ejecución, subagentes, MCP en los dos sentidos.</li>
           <li>Lee tu <code>AGENTS.md</code>/<code>CLAUDE.md</code> e importa tu config de Claude Code.</li>
           <li>Perfiles, tablero kanban y revisión nativa para montar un equipo de agentes por fases.</li>
-          <li>Barato con modelos eficientes: todas las pruebas de este curso con Hermes, ≈ 0,48 $.</li>
+          <li>Barato con modelos eficientes: todas las pruebas de este curso con Hermes, ≈ 0,56 $.</li>
         </ul></div>
         <div class="panel con"><h4>En contra</h4><ul>
           <li>Va muy rápido: cientos de PRs por versión; flags y docs cambian de una semana a otra.</li>
@@ -1090,7 +1100,10 @@ bash practicar.sh grabaciones/todo-app ~/practica-todo</pre></div>
           <tr><td>Ticket por voz desde Telegram con <code>lanzar-pipeline</code> (TIENDA-13)</td><td>10</td><td class="num">≈ 11 min</td><td>OK, 64 tests en verde · ≈ 0,11 $</td></tr>
           <tr><td>Método SDD con puertas por Telegram (<code>hermes-sdd</code>, Claude Code como ejecutor)</td><td>11</td><td class="num">46 min de Claude</td><td>OK, 10 puertas, 103 tests, tag <code>entrega-1</code> · 25,43 $ de Claude + 0,05 $ de Hermes</td></tr>
           <tr><td>Reproducción de esa ejecución sin LLM (<code>practicar.sh</code>)</td><td>11</td><td class="num">≈ 50 s</td><td>OK, mismos 6 tags y puerta global en verde · 0 $</td></tr>
-          <tr><td><strong>Total con Hermes (hermes insights + consumo de la clave)</strong></td><td></td><td class="num">≈ 60 sesiones</td><td><strong>≈ 0,48 $</strong> (más 25,43 $ de Claude Code en la práctica opcional del módulo 11)</td></tr>
+          <tr><td>Cambio sobre un proyecto entregado (<code>/cambio</code>: requisitos v1.1 → FASE-4 → entrega 2)</td><td>11</td><td class="num">19 min de Claude</td><td>OK, FASEs aceptadas intactas · 8,66 $ de Claude</td></tr>
+          <tr><td>Adopción de un repo existente (la tienda)</td><td>11</td><td class="num">9 min de Claude</td><td>OK, 9 requisitos, 3 FASEs y 3 hallazgos reales · 3,08 $ de Claude</td></tr>
+          <tr><td>Ruta con el ejecutor Hermes (Sonnet) y guardia en el dialecto de Hermes</td><td>11</td><td class="num">≈ 1 min</td><td>OK, misma ruta; el tag de aceptación, bloqueado · 0,08 $</td></tr>
+          <tr><td><strong>Total con Hermes (hermes insights + consumo de la clave)</strong></td><td></td><td class="num">≈ 60 sesiones</td><td><strong>≈ 0,56 $</strong> (más ≈ 37 $ de Claude Code en las prácticas opcionales del módulo 11)</td></tr>
         </tbody></table></div>
     </section>
 

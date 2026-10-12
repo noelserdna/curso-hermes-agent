@@ -59,6 +59,19 @@ Resultado medido el 11-12 de octubre de 2026 con la CLI de tareas (10 requisitos
 ejecutor (46 min de Claude, 25,43 $ equivalentes de la suscripción), 0,05 $ de Hermes, 10 puertas resueltas con
 botones, 103 tests en verde y los tags `requirements-v1.0`, `fase-0…3-accepted` y `entrega-1`.
 
+## Práctica 3 · Cambios y proyectos que ya existen ✅
+
+- **Una funcionalidad nueva** en un proyecto entregado, desde Telegram: `/cambio todo-app quiero poder cambiar el
+  título de una tarea`. El arnés guarda tu petición literal, la convierte en la versión 1.1 de los requisitos, te
+  pide aprobarla, replanifica solo lo nuevo (una FASE-4; las cuatro aceptadas no se tocan) y termina en la entrega 2.
+  Medido: 19 min de Claude y 8,66 $.
+- **Un repo que nunca usó el método** (la tienda del módulo 9): `lanzar.sh adoptar <repo>`. El ejecutor lee el
+  código, propone 9 requisitos y 3 FASEs retroactivas, y pregunta lo que no puede deducir. Encontró tres
+  comportamientos que nadie había decidido: la búsqueda no mira el SKU ni ignora tildes, "79,90" se rechaza como
+  precio y "1e2" se acepta como 100 €. Tu aprobación es la línea base. Medido: 9 min y 3,08 $.
+- **Etapas ligeras con Hermes:** la ruta del proyecto la estima un agente de Hermes con Sonnet (0,075 $) en vez de
+  Claude Code (0,24 $), con la misma ruta resultante.
+
 ## Claves de diseño
 
 1. **Quien ejecuta no firma.** Un ejecutor sin persona en la sesión no puede "confirmar" nada: si el prompt dice
@@ -84,7 +97,11 @@ botones, 103 tests en verde y los tags `requirements-v1.0`, `fase-0…3-accepted
 9. **El canal también necesita vigilancia.** Un bucle que se para sin dejar rastro deja decisiones sin firmar: log,
    latido, tiempos máximos y autorreparación. Y un presupuesto de atención: un mensaje vivo por proyecto, resúmenes y
    horas de silencio en lugar de un aviso por cada tarjeta.
-10. **Cada incidente se convierte en prueba.** El intento de firma desde el ejecutor es el caso nº 1 de las pruebas del
+10. **Lo que el ejecutor deja a medias, a la vista.** En un cierre, el ejecutor repitió una medición y no hizo
+    commit del registro; el notario se negó a firmar con el árbol sucio (bien hecho). El arnés ahora commitea esos
+    restos con un mensaje que lo dice, y la puerta se vuelve a abrir sobre el commit nuevo: nunca se "arregla" una
+    puerta vieja, porque su commit ya no es el que se mostró.
+11. **Cada incidente se convierte en prueba.** El intento de firma desde el ejecutor es el caso nº 1 de las pruebas del
     arnés; `tests/todo.sh` los pasa todos sin LLM antes de cualquier actualización.
 
 ## Qué garantiza y qué no
