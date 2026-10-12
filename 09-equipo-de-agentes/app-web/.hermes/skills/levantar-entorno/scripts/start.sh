@@ -11,7 +11,8 @@ if curl -fs "$URL/salud" >/dev/null 2>&1; then
 fi
 
 cd "$RAIZ"
-PUERTO="$PUERTO" PYTHONPATH=src nohup python3 -m tienda.app > .servidor.log 2>&1 &
+# Con uv, el mismo Python que los tests (el python3 del sistema puede ser más antiguo)
+PUERTO="$PUERTO" PYTHONPATH=src nohup uv run --quiet python -m tienda.app > .servidor.log 2>&1 &
 echo $! > .servidor.pid
 
 for _ in $(seq 1 20); do

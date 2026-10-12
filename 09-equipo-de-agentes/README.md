@@ -105,6 +105,28 @@ El chat que crea la tarjeta queda suscrito y recibe un aviso al terminar, bloque
 
 Resultado en 38 s: [`salida-ejemplo/telegram-deuda-tecnica.md`](salida-ejemplo/telegram-deuda-tecnica.md).
 
+### Un ticket por voz, sin comandos: la skill `lanzar-pipeline` ✅ (~11 min, ~0,11 $)
+
+Escribir `/kanban create …` en el móvil no es práctico. La skill [`skills/lanzar-pipeline/`](skills/lanzar-pipeline/)
+le enseña al agente del chat a convertir una petición (también una nota de voz) en un ticket y a lanzarlo al
+equipo, en lugar de programarlo él:
+
+1. Comprueba que el repo está limpio y elige el siguiente ID (`TIENDA-13` tras `TIENDA-12`).
+2. Escribe `tickets/<ID>.md` con la petición literal, lo esperado y lo que queda fuera, y hace commit.
+3. Ejecuta `scripts/lanzar-ticket.sh`, que crea las tres tarjetas encadenadas y suscribe el chat a sus avisos.
+
+**Cada proyecto tiene su tablero** (el nombre de la carpeta del repo, con el repo como carpeta de trabajo por
+defecto): las tarjetas de proyectos distintos no se mezclan y el dashboard tiene un selector de tablero. Si es un
+proyecto nuevo, la skill prepara el repo (`git init`, `tickets/`, un `AGENTS.md` con la línea `- Tests: …`) y el
+implementador da su tarea por terminada cuando ese comando está en verde, sea del lenguaje que sea.
+
+```bash
+cp -R skills/lanzar-pipeline ~/.hermes/skills/software-development/
+```
+
+Ejemplo real: una nota de voz pidiendo "un botón para añadir productos a la tienda" acabó en el commit
+`TIENDA-13: alta de productos desde la web` (64 tests en verde), con una ronda de revisión por el camino.
+
 ### Limpieza
 
 ```bash
