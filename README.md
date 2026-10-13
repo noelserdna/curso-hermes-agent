@@ -4,7 +4,9 @@ Material práctico del curso sobre **[Hermes Agent](https://github.com/NousResea
 licencia MIT): el agente de IA open source que vive en tu servidor o tu portátil, recuerda lo que aprende,
 crea sus propias *skills* y te habla por Telegram, Slack, Discord o la terminal.
 
-> 📘 **Teoría y explicación de cada módulo:** [web del curso](https://claude.ai/artifact/CJDyTBktoG98YFqMxcQEdT) (el fuente está en [`web/index.html`](web/index.html)).
+> 📘 **Teoría y explicación de cada módulo:** [web del curso](https://noelserdna.github.io/curso-hermes-agent/) en GitHub Pages
+> (también como [artifact de claude.ai](https://claude.ai/artifact/CJDyTBktoG98YFqMxcQEdT); el fuente de las dos está en [`web/index.html`](web/index.html)
+> y [`.github/workflows/pages.yml`](.github/workflows/pages.yml) la vuelve a publicar en Pages cada vez que cambia `web/` en `main`).
 > Este repo contiene **los ejemplos ejecutables**.
 
 ## Versión probada

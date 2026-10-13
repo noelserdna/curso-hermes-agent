@@ -1,0 +1,45 @@
+# Publica web/ en GitHub Pages: https://noelserdna.github.io/curso-hermes-agent/
+# web/index.html es el mismo fuente que el artifact de claude.ai, que no lleva
+# <!doctype>, charset ni viewport porque el artifact los añade al publicar.
+# Aquí se los añadimos antes de desplegar, así hay un único fuente para las dos webs.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+    paths: ["web/**", ".github/workflows/pages.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Montar el sitio
+        run: |
+          mkdir -p _site
+          {
+            printf '<!doctype html>\n<html lang="es">\n<head>\n<meta charset="utf-8">\n'
+            printf '<meta name="viewport" content="width=device-width, initial-scale=1">\n</head>\n<body>\n'
+            cat web/index.html
+            printf '\n</body>\n</html>\n'
+          } > _site/index.html
+          find web -type f ! -name index.html ! -name .DS_Store -exec cp {} _site/ \;
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+      - id: deployment
+        uses: actions/deploy-pages@v4
