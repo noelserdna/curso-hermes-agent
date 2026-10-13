@@ -231,11 +231,12 @@ footer ul { padding-left: 1.1em; }
       <p class="mod-goal">Entender las piezas de un agente y qué hace distinto a Hermes antes de instalar nada.</p>
       <div class="prose">
         <p><strong>Hermes Agent</strong> es un agente de IA autónomo y open source publicado por <a href="https://github.com/NousResearch/hermes-agent">Nous Research</a> el 25 de febrero de 2026. No es un modelo: es el programa que rodea a un modelo (Claude, GPT, Gemini, Hermes 4, uno local…) y le da manos, memoria y presencia.</p>
-        <p>Un chatbot responde; un agente <strong>actúa en bucle</strong>: piensa, llama a una herramienta (terminal, ficheros, web, navegador, MCP…), lee el resultado y decide el siguiente paso hasta terminar. Hermes añade a ese bucle tres cosas que lo diferencian:</p>
+        <p><em>Open source</em> significa que el código es público (en GitHub) y puedes leerlo, instalarlo y modificarlo. El <strong>modelo</strong> es el que «piensa» y escribe texto; por sí solo no puede tocar tu ordenador. Hermes es el programa que le deja hacerlo.</p>
+        <p>Un chatbot responde; un agente <strong>actúa en bucle</strong>: piensa, llama a una herramienta (terminal, ficheros, web, navegador, MCP…), lee el resultado y decide el siguiente paso hasta terminar. Una <em>herramienta</em> (<em>tool</em>) es una función concreta que el agente puede invocar: ejecutar un comando, leer un fichero, buscar en la web. <strong>MCP</strong> (<em>Model Context Protocol</em>) es un estándar abierto para enchufar herramientas externas (GitHub, una base de datos, un CRM…) a cualquier agente compatible. Hermes añade a ese bucle tres cosas que lo diferencian:</p>
         <ul>
-          <li><strong>Vive fuera de tu sesión.</strong> Un proceso llamado <em>gateway</em> lo mantiene encendido en tu Mac o en un VPS, y puedes hablarle desde Telegram, Slack, Discord, WhatsApp, iMessage, email…</li>
+          <li><strong>Vive fuera de tu sesión.</strong> Un proceso llamado <em>gateway</em> lo mantiene encendido en tu Mac o en un VPS (<em>Virtual Private Server</em>: un servidor alquilado en la nube que está siempre encendido), y puedes hablarle desde Telegram, Slack, Discord, WhatsApp, iMessage, email…</li>
           <li><strong>Aprende.</strong> Guarda memoria sobre ti y tu entorno, y convierte lo que resuelve en <em>skills</em> reutilizables que él mismo escribe y mejora.</li>
-          <li><strong>Trabaja solo.</strong> Programa tareas con cron, recibe webhooks y entrega resultados donde le digas.</li>
+          <li><strong>Trabaja solo.</strong> Programa tareas con cron (el nombre clásico en Unix para «ejecutar algo a una hora fija o cada cierto tiempo»), recibe webhooks (avisos HTTP que otro servicio envía cuando pasa algo, p. ej. «se ha abierto un pull request») y entrega resultados donde le digas.</li>
         </ul>
       </div>
 
@@ -280,6 +281,21 @@ footer ul { padding-left: 1.1em; }
         </svg>
       </div>
 
+      <div class="prose">
+        <p><strong>Cómo leer el diagrama.</strong> A la izquierda, las formas de darle trabajo; en el centro, el bucle; a la derecha, lo que puede usar y dónde guarda lo que recuerda.</p>
+        <ul>
+          <li><strong>CLI · TUI · Desktop</strong>: CLI (<em>Command Line Interface</em>) es el chat en la terminal; TUI (<em>Text User Interface</em>) es una interfaz más rica dentro de la misma terminal; Desktop es la app de escritorio.</li>
+          <li><strong>Cron · blueprints</strong>: tareas programadas; un <em>blueprint</em> es una plantilla de tarea programada lista para rellenar (comando <code>/blueprint</code>).</li>
+          <li><strong>Webhooks · CI (<code>hermes -z</code>)</strong>: CI (<em>Integración Continua</em>) son las automatizaciones que se ejecutan en cada cambio de un repositorio, como GitHub Actions. <code>hermes -z</code> es el modo «una pregunta, una respuesta y salir», pensado para scripts; lo verás en el módulo 02.</li>
+          <li><strong>Editor (ACP) · MCP serve</strong>: ACP (<em>Agent Client Protocol</em>) permite usar Hermes dentro de editores como VS Code, Zed o JetBrains (<code>hermes acp</code>). <code>hermes mcp serve</code> hace lo contrario que conectar un MCP: expone Hermes como servidor MCP para que otros agentes lo usen.</li>
+          <li><strong><code>AGENTS.md</code></strong>: fichero de instrucciones del proyecto que Hermes lee si está en la carpeta donde trabajas (convenciones, comandos, qué no tocar).</li>
+          <li><strong>Modelo: OpenRouter, Anthropic, Nous…</strong>: son <em>proveedores</em>, las empresas que sirven el modelo por Internet. Te identificas con una <em>API key</em> (clave secreta) y pagas por uso.</li>
+          <li><strong>Terminal: local · Docker · SSH · nube</strong>: dónde se ejecutan los comandos. Docker es un contenedor aislado; SSH es una conexión a otra máquina remota.</li>
+          <li><strong>Subagentes (<code>delegate_task</code>)</strong>: el agente puede lanzar otros agentes para tareas parciales; <code>delegate_task</code> es el nombre de esa herramienta.</li>
+          <li><strong><code>~/.hermes</code></strong>: <code>~</code> es tu carpeta personal (en Mac, <code>/Users/tu-usuario</code>). Ahí guarda Hermes todo su estado; el módulo 01 detalla cada carpeta.</li>
+        </ul>
+      </div>
+
       <div class="cols">
         <div class="panel"><h4>Para qué sirve bien</h4><ul>
           <li>Un asistente personal o de equipo 24/7, accesible desde el móvil.</li>
@@ -288,18 +304,20 @@ footer ul { padding-left: 1.1em; }
           <li>Rodear tu trabajo de programación: CI, revisión de código, subagentes, entornos aislados.</li>
         </ul></div>
         <div class="panel"><h4>Para qué no es la mejor opción</h4><ul>
-          <li>Programar dentro del IDE con el mejor agente de código posible (ahí ganan Claude Code o Codex; Hermes los puede orquestar).</li>
-          <li>Flujos 100 % deterministas con cientos de integraciones (n8n, Zapier).</li>
+          <li>Programar dentro del IDE (el editor de código, como VS Code) con el mejor agente de código posible (ahí ganan Claude Code o Codex; Hermes los puede orquestar, es decir, encargarles trabajo y recoger el resultado).</li>
+          <li>Flujos 100 % deterministas (misma entrada, mismo resultado, sin un modelo que decida) con cientos de integraciones (n8n, Zapier).</li>
           <li>Usuarios no técnicos que no quieren tocar una terminal.</li>
         </ul></div>
       </div>
       <details class="ex"><summary>Glosario rápido</summary>
         <ul>
           <li><strong>Toolset</strong>: grupo de herramientas que el agente puede usar (<code>file</code>, <code>terminal</code>, <code>web</code>, <code>browser</code>…).</li>
-          <li><strong>Skill</strong>: carpeta con un <code>SKILL.md</code> que explica un procedimiento. Estándar abierto compartido con Claude.</li>
+          <li><strong>Skill</strong>: carpeta con un <code>SKILL.md</code> que explica un procedimiento. Estándar abierto compartido con Claude. El agente solo carga una skill cuando la tarea la necesita.</li>
+          <li><strong>Memoria</strong>: notas que el agente guarda entre conversaciones (<code>MEMORY.md</code> sobre el entorno, <code>USER.md</code> sobre ti).</li>
+          <li><strong>Sesión</strong>: una conversación guardada, con su historial; se puede retomar más tarde.</li>
           <li><strong>Gateway</strong>: proceso en segundo plano que conecta Hermes con mensajería y ejecuta el cron.</li>
           <li><strong>Backend de terminal</strong>: dónde se ejecutan los comandos (tu máquina, Docker, SSH, sandbox en la nube).</li>
-          <li><strong>Perfil</strong>: un Hermes independiente con su propia config, memoria y skills (<code>hermes -p trabajo</code>).</li>
+          <li><strong>Perfil</strong>: un Hermes independiente con su propia config, memoria y skills (<code>hermes -p trabajo</code>; <code>-p</code> es la forma corta de <code>--profile</code> y elige el perfil llamado <code>trabajo</code>).</li>
         </ul>
       </details>
       <button class="mark-done" type="button" data-mod="m0" aria-pressed="false">Marcar como completado</button>
@@ -323,6 +341,22 @@ footer ul { padding-left: 1.1em; }
           <tr><td>Red</td><td>Conexión a Internet</td><td>Para instalar y para hablar con el modelo (salvo modelo local)</td></tr>
         </tbody></table></div>
       <p class="prose" style="margin-top:8px">Fuente: <em>Platform Support</em>, <em>Installation</em> y <em>Docker → Resource limits</em> de la documentación oficial. Las cifras de disco son las medidas en nuestra instalación.</p>
+      <details class="ex"><summary>Qué significa cada término de la tabla</summary>
+        <ul>
+          <li><strong>Apple Silicon / Intel</strong>: los chips M1, M2… de Apple frente a los Mac antiguos con procesador Intel.</li>
+          <li><strong><code>x86_64</code>, <code>ARM64</code>, <code>aarch64</code></strong>: arquitecturas de procesador. <code>x86_64</code> es la de casi todos los PC; <code>ARM64</code> y <code>aarch64</code> son dos nombres de la misma arquitectura ARM de 64 bits.</li>
+          <li><strong>glibc</strong>: la biblioteca básica de C de la mayoría de distribuciones Linux (Ubuntu, Debian, Fedora). Si tu distribución la usa, cumples este requisito.</li>
+          <li><strong>WSL2</strong>: <em>Windows Subsystem for Linux</em>, un Linux real que corre dentro de Windows.</li>
+          <li><strong>Tier 1</strong>: plataformas con soporte prioritario: el proyecto procura no romper nunca su instalación y sus fallos se corrigen primero.</li>
+          <li><strong>MSIX</strong>: el formato de paquete de instalación moderno de Windows.</li>
+          <li><strong><code>git</code>, <code>curl</code>, <code>tar</code>, <code>shasum</code>/<code>sha256sum</code></strong>: descargar el código, descargar ficheros, descomprimirlos y comprobar con una huella SHA-256 que lo descargado no está corrupto ni alterado.</li>
+          <li><strong><code>sudo</code> / <code>libatomic1</code></strong>: <code>sudo</code> ejecuta un comando como administrador; <code>libatomic1</code> es una biblioteca del sistema que el Node incluido necesita y que algunas distribuciones mínimas no traen.</li>
+          <li><strong><code>uv</code>, ripgrep, FFmpeg, Chromium</strong>: gestor de entornos de Python, buscador de texto muy rápido, conversor de audio y vídeo, y el navegador que el agente controla.</li>
+          <li><strong>Token y contexto</strong>: un token es un trozo de palabra (unos 4 caracteres en inglés); los proveedores cobran por tokens. El <em>contexto</em> es cuántos tokens puede tener el modelo a la vista a la vez: instrucciones, historial, resultados de herramientas. Hermes necesita al menos 64K (unos 64 000).</li>
+          <li><strong>Ollama, llama.cpp y <code>ctx-size</code></strong>: programas para ejecutar modelos en tu propia máquina. Por defecto suelen arrancar con un contexto menor; hay que subirlo: en llama.cpp con la opción <code>--ctx-size</code> y en Ollama con <code>OLLAMA_CONTEXT_LENGTH</code> o <code>num_ctx</code>.</li>
+          <li><strong>API key</strong>: clave secreta que identifica tu cuenta ante el proveedor y con la que te cobra el uso. Trátala como una contraseña.</li>
+        </ul>
+      </details>
       <h3>Instalar</h3>
       <div class="tabs" data-tabs>
         <div class="tablist" role="tablist">
@@ -331,11 +365,16 @@ footer ul { padding-left: 1.1em; }
           <button role="tab" aria-selected="false" aria-controls="os-docker" id="t-docker" tabindex="-1">Docker</button>
           <button role="tab" aria-selected="false" aria-controls="os-app" id="t-app" tabindex="-1">App de escritorio</button>
         </div>
-        <div class="code" role="tabpanel" id="os-unix" aria-labelledby="t-unix"><pre>curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash</pre></div>
-        <div class="code" role="tabpanel" id="os-win" aria-labelledby="t-win" hidden><pre><span class="c"># PowerShell</span>
+        <div class="code" role="tabpanel" id="os-unix" aria-labelledby="t-unix"><pre><span class="c"># curl descarga el script del instalador y | (pipe) se lo pasa a bash, que lo ejecuta.</span>
+<span class="c"># -f: falla si el servidor da error · -s: sin barra de progreso · -S: pero sí muestra errores · -L: sigue redirecciones</span>
+curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash</pre></div>
+        <div class="code" role="tabpanel" id="os-win" aria-labelledby="t-win" hidden><pre><span class="c"># PowerShell. irm (Invoke-RestMethod) descarga el script; iex (Invoke-Expression) lo ejecuta</span>
 iex (irm https://hermes-agent.nousresearch.com/install.ps1)</pre></div>
-        <div class="code" role="tabpanel" id="os-docker" aria-labelledby="t-docker" hidden><pre>docker pull nousresearch/hermes-agent:stable
-<span class="c"># monta un volumen en /opt/data para que la memoria y la config persistan</span></pre></div>
+        <div class="code" role="tabpanel" id="os-docker" aria-labelledby="t-docker" hidden><pre><span class="c"># descarga la imagen oficial; :stable es la etiqueta de la versión estable</span>
+docker pull nousresearch/hermes-agent:stable
+<span class="c"># monta un volumen en /opt/data para que la memoria y la config persistan</span>
+<span class="c"># (p. ej. -v ~/.hermes:/opt/data: la carpeta de tu máquina se ve dentro del contenedor;</span>
+<span class="c">#  sin volumen, todo se pierde al borrar el contenedor)</span></pre></div>
         <div class="code" role="tabpanel" id="os-app" aria-labelledby="t-app" hidden><pre><span class="c"># Descarga desde https://hermes-agent.nousresearch.com</span>
 <span class="c"># macOS: Apple Silicon (Intel tiene bundle aparte) · Windows 11 22H2+ (MSIX)</span>
 <span class="c"># Linux: sin paquete de escritorio oficial; instala la CLI y ejecuta hermes desktop</span>
@@ -345,6 +384,14 @@ hermes desktop</pre></div>
       <div class="prose">
         <p>El instalador trae su propio Python 3.14, Node, ripgrep, FFmpeg, <code>uv</code> y un Chromium para el navegador. No toca el Python de tu sistema. En nuestra prueba (Mac mini M-series) tardó unos 3 minutos y dejó instaladas <strong>58 skills de serie</strong>.</p>
         <p>Opciones útiles: <code>--non-interactive</code>, <code>--skip-browser</code>, <code>--skip-computer-use</code>. Ojo: el instalador sigue la rama <code>main</code> (nuestra prueba quedó en <code>v0.21.6+301</code>); para fijar una versión exacta usa <code>--commit &lt;sha&gt;</code>.</p>
+        <ul>
+          <li><code>--non-interactive</code>: se salta los pasos que piden datos (asistente de configuración y gateway). Útil en servidores y scripts; luego configuras con los comandos de abajo.</li>
+          <li><code>--skip-browser</code>: no instala las herramientas de navegador ni su Chromium (ahorra unos 330 MB).</li>
+          <li><code>--skip-computer-use</code>: no instala el driver que permite al agente mover el ratón y teclear en tu escritorio.</li>
+          <li><code>main</code> es la rama principal del repositorio en git: recibe cambios cada día, así que dos instalaciones hechas en días distintos pueden diferir. <code>v0.21.6+301</code> se lee «la versión publicada v0.21.6 más 301 cambios (<em>commits</em>) posteriores».</li>
+          <li><code>--commit &lt;sha&gt;</code>: el <em>sha</em> es el identificador de un commit (p. ej. <code>8bff64d</code>). Fijarlo hace la instalación reproducible: todos los alumnos tienen exactamente el mismo código.</li>
+        </ul>
+        <p>Como el script llega por un pipe, las opciones se pasan así: <code>curl -fsSL …/install.sh | bash -s -- --skip-browser</code>. <code>-s</code> le dice a <code>bash</code> que lea el script de la entrada estándar y <code>--</code> separa sus opciones de las del instalador.</p>
       </div>
       <h3>Dónde queda cada cosa</h3>
       <div class="code"><span class="lbl">árbol</span><pre>~/.local/bin/hermes        <span class="c">← lanzador (se añade al PATH en ~/.zprofile)</span>
@@ -356,22 +403,42 @@ hermes desktop</pre></div>
 ├── memories/              <span class="c">← MEMORY.md y USER.md</span>
 ├── skills/                <span class="c">← skills incluidas, instaladas y creadas por el agente</span>
 ├── cron/                  <span class="c">← jobs y sus salidas</span>
-└── sessions/ logs/ checkpoints/</pre></div>
+└── sessions/ logs/ checkpoints/   <span class="c">← conversaciones · registros · copias previas a cambios</span></pre></div>
+      <div class="prose">
+        <p><code>~</code> es tu carpeta personal. Un nombre que empieza por punto (<code>.hermes</code>, <code>.env</code>) es <em>oculto</em>: no aparece en Finder ni con <code>ls</code> a secas, sí con <code>ls -a</code>.</p>
+        <ul>
+          <li><strong>PATH</strong>: la lista de carpetas donde la terminal busca los programas. Gracias a ella escribes <code>hermes</code> en lugar de <code>~/.local/bin/hermes</code>.</li>
+          <li><strong><code>~/.zprofile</code></strong>: script que <code>zsh</code> (la terminal por defecto en macOS) ejecuta al abrir una sesión. El instalador añade ahí la línea que mete <code>~/.local/bin</code> en el PATH; en Linux con <code>bash</code> el equivalente es <code>~/.bashrc</code>.</li>
+          <li><strong>Lanzador</strong>: un pequeño ejecutable que arranca el programa real, instalado en <code>hermes-agent/</code>.</li>
+          <li><strong><code>config.yaml</code> y <code>.env</code></strong>: la configuración se separa en dos ficheros a propósito. <code>config.yaml</code> (formato YAML: claves y valores con sangría) guarda ajustes que puedes enseñar o copiar; <code>.env</code> guarda solo secretos, en líneas <code>NOMBRE=valor</code> (<em>variables de entorno</em>). Así compartes tu configuración sin filtrar claves.</li>
+          <li><strong><code>SOUL.md</code></strong>: texto en Markdown que se le inyecta al agente en cada conversación para fijar su personalidad y tono.</li>
+          <li><strong><code>checkpoints/</code></strong>: copias de los ficheros antes de que el agente los modifique, para poder deshacer. Solo se crean si activas los checkpoints; lo verás con <code>/rollback</code> en el módulo 02.</li>
+        </ul>
+      </div>
       <h3>Conectar un modelo (OpenRouter)</h3>
       <div class="code"><pre>hermes model     <span class="c"># asistente: elige OpenRouter, pega la clave, elige modelo</span>
 hermes setup     <span class="c"># asistente completo: modelo, terminal, gateway, herramientas</span></pre></div>
+      <p><strong>OpenRouter</strong> es un intermediario: con una sola API key das acceso a modelos de muchas empresas (Anthropic, OpenAI, Google…) y pagas en una sola cuenta. Por eso lo usamos en el curso: cambiar de modelo no exige abrir otra cuenta. En <code>hermes setup</code>, «terminal» significa dónde se ejecutan los comandos (tu Mac, Docker, SSH…) y «gateway» la conexión con apps de mensajería; puedes dejarlos por defecto ahora.</p>
       <div class="note key"><span class="t">Antes de lanzar los asistentes</span>
         <p>Abre una <strong>terminal nueva</strong> tras instalar: el instalador añade Hermes al PATH en <code>~/.zprofile</code>. <code>hermes model</code> y <code>hermes setup</code> son asistentes interactivos, así que necesitan una terminal real; desde un script, un pipe u otro agente usa la alternativa de abajo.</p></div>
       <p>Alternativa sin asistente. <code>hermes config set</code> decide el fichero según la clave: MAYÚSCULAS van a <code>.env</code>, rutas con puntos a <code>config.yaml</code>.</p>
-      <div class="code"><pre>hermes config set OPENROUTER_API_KEY sk-or-...
-hermes config set model.provider openrouter
-hermes config set model.default anthropic/claude-haiku-5.5</pre></div>
+      <div class="code"><pre><span class="c"># sintaxis: hermes config set &lt;clave&gt; &lt;valor&gt;</span>
+hermes config set OPENROUTER_API_KEY sk-or-...    <span class="c"># tu clave de OpenRouter (empieza por sk-or-) → ~/.hermes/.env</span>
+hermes config set model.provider openrouter        <span class="c"># qué proveedor usar → config.yaml, sección model</span>
+hermes config set model.default anthropic/claude-haiku-5.5   <span class="c"># modelo por defecto → config.yaml</span></pre></div>
+      <p><code>model.provider</code> se lee «la clave <code>provider</code> dentro de la sección <code>model</code>» de <code>config.yaml</code>. El nombre del modelo sigue el formato de OpenRouter, <code>empresa/modelo</code>: aquí, Claude Haiku 5.5 de Anthropic, un modelo rápido y barato, adecuado para las pruebas. Para comprobar dónde ha quedado cada cosa: <code>hermes config path</code> y <code>hermes config env-path</code> imprimen la ruta de cada fichero, y <code>hermes config get model</code> muestra la sección.</p>
       <h3>Comprobar</h3>
-      <div class="code"><pre>hermes --version
-hermes doctor
+      <div class="code"><pre>hermes --version   <span class="c"># qué versión tienes instalada</span>
+hermes doctor      <span class="c"># revisa configuración y dependencias, y señala lo que falte</span>
 hermes -z "Responde solo: OK y tu modelo" --usage-file uso.json
-<span class="c"># → OK. Soy Hermes Agent con anthropic/claude-haiku-5.5 vía OpenRouter.   (8 s, 0,0025 $)</span></pre></div>
-      <p>Requisito del modelo: <strong>al menos 64K tokens de contexto</strong>. Actualizar: <code>hermes update</code>. Copia de seguridad: <code>hermes backup</code> (incluye credenciales). Desinstalar: <code>hermes uninstall --dry-run</code> y luego <code>--full</code>.</p>
+<span class="c"># → OK. Soy Hermes Agent con anthropic/claude-haiku-5.5 vía OpenRouter.   (8 s, 0,0025 $)</span>
+cat uso.json       <span class="c"># muestra el informe de tokens y coste de esa llamada</span></pre></div>
+      <p>Qué significa cada parte de la tercera línea:</p>
+      <ul>
+        <li><code>-z "…"</code> (forma larga <code>--oneshot</code>): modo <em>one-shot</em>. Envía una sola pregunta, imprime solo la respuesta final y termina. Es la prueba más corta posible de que la clave, el proveedor y el modelo funcionan de punta a punta.</li>
+        <li><code>--usage-file uso.json</code>: al acabar, Hermes escribe en <code>uso.json</code> un informe en formato JSON (texto estructurado en pares clave-valor, fácil de leer desde un script) con el modelo, los tokens de entrada y salida, el número de llamadas a la API y el coste estimado en dólares. Lo pedimos para saber cuánto cuesta cada prueba en lugar de suponerlo: de ahí sale la cifra 0,0025 $. El nombre <code>uso.json</code> es libre; el fichero se crea en la carpeta donde estés y se sobrescribe en cada ejecución. Solo funciona junto a <code>-z</code>, y se escribe incluso si la ejecución falla.</li>
+      </ul>
+      <p>Requisito del modelo: <strong>al menos 64K tokens de contexto</strong>. Actualizar: <code>hermes update</code> (descarga la última versión de <code>main</code> y reinstala dependencias; <code>hermes update --check</code> solo comprueba si hay una nueva). Copia de seguridad: <code>hermes backup</code> (crea un <code>.zip</code> con toda tu configuración, skills, sesiones y datos; incluye credenciales, así que guárdalo como guardarías una contraseña). Desinstalar: <code>hermes uninstall --dry-run</code> (<em>ensayo</em>: enseña lo que borraría sin borrar nada) y luego <code>--full</code> (lo borra todo, configuración y datos incluidos).</p>
       <button class="mark-done" type="button" data-mod="m1" aria-pressed="false">Marcar como completado</button>
     </section>
 
@@ -387,23 +454,41 @@ hermes -z "Responde solo: OK y tu modelo" --usage-file uso.json
           <tr><td>One-shot con sesión</td><td><code>hermes chat -Q -q "…"</code></td><td>Igual, y muestra el <code>session_id</code> para retomarla</td></tr>
           <tr><td>Desde stdin</td><td><code>… | hermes chat -Q --query-file -</code></td><td>Pasarle datos generados por otro comando</td></tr>
         </tbody></table></div>
+      <div class="prose">
+        <ul>
+          <li><strong>Interactivo</strong>: abres una conversación y vas escribiendo turno a turno. <code>hermes</code> abre la CLI clásica; <code>hermes --tui</code> abre la TUI, una interfaz más rica dentro de la misma terminal.</li>
+          <li><strong>One-shot</strong> («de un tiro»): una pregunta, una respuesta y el programa termina. Como no espera a que escribas nada, sirve dentro de scripts, de CI (las automatizaciones de un repositorio, como GitHub Actions) o de tareas programadas.</li>
+          <li><strong>Pipe</strong> (<code>|</code>): conecta la salida de un comando con la entrada del siguiente. A esa entrada se le llama <strong>stdin</strong> (entrada estándar).</li>
+          <li><code>hermes chat</code> es el subcomando de conversación. <code>-q "…"</code> (<code>--query</code>) le da la pregunta; <code>-Q</code> (<code>--quiet</code>, «silencioso») quita banner, animación y avisos de herramientas, y responde y sale. Al final imprime el <code>session_id</code>, el identificador de la sesión guardada, que sirve para retomarla.</li>
+          <li><code>--query-file -</code>: lee la pregunta de un fichero; el guion <code>-</code> significa «de stdin». Lo que llega por el pipe se toma tal cual, sin que la shell interprete comillas ni <code>$</code>.</li>
+        </ul>
+      </div>
       <div class="note warn"><span class="t">Cambio en v0.21</span><p><code>hermes chat -q "…"</code> en una terminal real <strong>abre</strong> una sesión interactiva con ese primer mensaje. Para que responda y salga añade <code>-Q</code>, <code>--oneshot</code> o usa <code>-z</code>.</p></div>
       <div class="code"><span class="lbl">ejercicios</span><pre><span class="c"># 1. Pregunta con coste medido</span>
+<span class="c">#    --usage-file guarda en uso.json los tokens y el coste de esta llamada (solo con -z)</span>
 hermes -z "Explica en 3 líneas qué es un agente de IA" --usage-file uso.json
+cat uso.json              <span class="c"># mira estimated_cost_usd, input_tokens y output_tokens</span>
 
 <span class="c"># 2. Prompt + datos por stdin</span>
+<span class="c">#    ( … ; … ) agrupa dos comandos y junta su salida: primero la pregunta (echo),</span>
+<span class="c">#    luego la lista de tu carpeta personal con los ocultos (ls -a ~). Todo entra por el pipe.</span>
 (echo "¿Qué ficheros ocultos son de configuración?"; ls -a ~) | hermes chat -Q --query-file -
 
-<span class="c"># 3. Otro modelo solo para esta consulta</span>
+<span class="c"># 3. Otro modelo solo para esta consulta (no cambia tu config.yaml)</span>
+<span class="c">#    -m: modelo, en formato empresa/modelo · --provider: quién lo sirve (exige -m)</span>
 hermes -z "¿Quién eres?" -m openai/gpt-6.1-sol --provider openrouter
 
 <span class="c"># 4. Superficie mínima: solo ficheros y web</span>
+<span class="c">#    -t (--toolsets): lista separada por comas, sin espacios, de los toolsets permitidos</span>
 hermes -t file,web -z "Resume https://hermes-agent.nousresearch.com en 3 viñetas"
 
 <span class="c"># 5. Retomar</span>
-hermes -c                 <span class="c"># continúa la última sesión</span>
-hermes --resume &lt;id&gt;</pre></div>
+hermes -c                 <span class="c"># (--continue) continúa la última sesión</span>
+hermes --resume &lt;id&gt;      <span class="c"># retoma una sesión concreta por su session_id</span></pre></div>
+      <div class="note key"><span class="t">Por qué <code>-t file,web</code></span>
+        <p>Un <em>toolset</em> es un grupo de herramientas. <code>file</code> trae leer, escribir, editar y buscar ficheros; <code>web</code> trae buscar en Internet y extraer el contenido de una página. Con <code>-t file,web</code> el agente solo tiene esos dos grupos para esta ejecución: no tiene terminal, ni navegador, ni la herramienta de memoria. Para resumir una web no necesita más, y cuantas menos herramientas tiene, menos puede hacer fuera de lo que pides (eso es la <em>superficie mínima</em>) y menos texto de definiciones de herramientas se envía al modelo. Sin <code>-t</code>, usa los toolsets activados en tu configuración; <code>hermes tools list</code> te los enseña todos.</p></div>
       <h3>Slash commands que vas a usar a diario</h3>
+      <p>Un <em>slash command</em> es una orden que escribes dentro del chat interactivo empezando por <code>/</code>. No se envía al modelo: la ejecuta Hermes directamente.</p>
       <div class="tw"><table>
         <thead><tr><th>Comando</th><th>Para qué</th></tr></thead>
         <tbody>
@@ -418,6 +503,19 @@ hermes --resume &lt;id&gt;</pre></div>
           <tr><td><code>/memory</code> · <code>/skills</code> · <code>/tools</code></td><td>Ver lo que sabe y lo que puede usar</td></tr>
           <tr><td><code>/yolo</code></td><td>Quitar aprobaciones. Solo en un entorno aislado</td></tr>
         </tbody></table></div>
+      <div class="prose">
+        <p>Qué hay detrás de cada fila:</p>
+        <ul>
+          <li><strong>Paleta de comandos</strong> (<code>Ctrl+P</code>): buscador de todos los comandos y skills; escribes unas letras y eliges.</li>
+          <li><strong>Nivel de razonamiento</strong>: cuánto «piensa» el modelo antes de responder (<code>none</code>, <code>minimal</code>, <code>low</code>, <code>medium</code>, <code>high</code>, <code>xhigh</code>, <code>max</code>, <code>ultra</code>). Más nivel suele dar mejores respuestas en tareas difíciles, a cambio de más tiempo y más tokens.</li>
+          <li><strong>Contexto y <code>/compress</code></strong>: <code>/context</code> enseña qué parte de la ventana de contexto del modelo está ocupada; <code>/compress</code> resume la conversación para liberar espacio sin empezar de cero.</li>
+          <li><strong><code>/plan</code></strong>: escribe un plan en Markdown en <code>.hermes/plans/</code> dentro de la carpeta de trabajo, sin ejecutar nada. Lo revisas y luego le pides que lo ejecute.</li>
+          <li><strong><code>/goal</code></strong>: tras cada turno, un segundo modelo (el <em>juez</em>) decide si el objetivo está cumplido; si no, Hermes sigue trabajando solo, con un límite de turnos.</li>
+          <li><strong><code>/bg</code>, <code>/agents</code>, <code>/steer</code></strong>: <code>/bg</code> lanza una tarea en una sesión aparte y te deja seguir; <code>/agents</code> lista las tareas y subagentes en marcha; <code>/steer</code> le añade una indicación al agente mientras trabaja, sin interrumpirlo.</li>
+          <li><strong><code>/diff</code> y <code>/rollback</code></strong>: <code>/diff</code> muestra los cambios de ficheros según git; <code>/rollback</code> restaura una copia anterior desde <code>~/.hermes/checkpoints/</code>. Esas copias solo se hacen si los <em>checkpoints</em> están activados (<code>hermes chat --checkpoints</code> o <code>checkpoints.enabled: true</code> en <code>config.yaml</code>).</li>
+          <li><strong>Aprobaciones y <code>/yolo</code></strong>: antes de un comando peligroso (borrar, sobrescribir…) Hermes te pide permiso. <code>/yolo</code> quita esas preguntas; por eso solo tiene sentido en un entorno aislado, donde un error no puede dañar nada importante.</li>
+        </ul>
+      </div>
       <button class="mark-done" type="button" data-mod="m2" aria-pressed="false">Marcar como completado</button>
     </section>
 
@@ -425,18 +523,31 @@ hermes --resume &lt;id&gt;</pre></div>
     <section class="mod" id="m3" data-title="Ofimática">
       <div class="mod-head"><span class="mod-num">03</span><h2>Hermes en la oficina</h2><span class="badge ok">probado</span></div>
       <p class="mod-goal">Describir el resultado que quieres y dejar que Hermes elija las herramientas: Excel, Word, carpetas.</p>
-      <div class="prose"><p>Hermes trae skills para <strong>docx, xlsx, pptx, pdf, Google Workspace, Notion, Airtable, Obsidian, Apple Notes/Reminders y correo</strong>. No hay que programar: el truco está en escribir el prompt como un encargo a un becario muy rápido: formato de salida, restricciones y qué hacer ante la duda. Ficheros en <a href="https://github.com/noelserdna/curso-hermes-agent/tree/main/02-ofimatica"><code>02-ofimatica/</code></a>.</p></div>
+      <div class="prose"><p>Hermes trae skills para <strong>docx, xlsx, pptx, pdf, Google Workspace, Notion, Airtable, Obsidian, Apple Notes/Reminders y correo</strong>. No hay que programar: el truco está en escribir el prompt como un encargo a un becario muy rápido: formato de salida, restricciones y qué hacer ante la duda. Ficheros en <a href="https://github.com/noelserdna/curso-hermes-agent/tree/main/02-ofimatica"><code>02-ofimatica/</code></a>.</p>
+        <p>Una <strong>skill</strong> es un paquete de instrucciones (a veces con scripts) que enseña al agente a hacer una tarea concreta, por ejemplo crear un <code>.docx</code>. Las de serie viven en <code>~/.hermes/skills/</code>, agrupadas por categoría (<code>productivity/docx</code>, <code>productivity/xlsx</code>…). No tienes que nombrarlas: Hermes lee la descripción de cada una y elige la que encaja con tu encargo. Luego la ejecuta con sus herramientas: leer y escribir ficheros y lanzar comandos en el terminal. En el módulo 04 escribiremos una propia.</p></div>
+      <p>Los tres ejemplos usan la misma forma de lanzar a Hermes:</p>
+      <div class="code"><pre>cd &lt;carpeta-del-ejemplo&gt;      <span class="c"># 1. entra en la carpeta: Hermes trabaja en el directorio actual</span>
+hermes chat -Q -q "encargo"   <span class="c"># 2. un único encargo, sin conversación</span></pre></div>
+      <ul>
+        <li><code>cd</code>: cambia de carpeta. Para pasar al siguiente ejemplo, vuelve antes a <code>02-ofimatica/</code> con <code>cd ..</code>.</li>
+        <li><code>hermes chat</code>: abre una sesión con el agente.</li>
+        <li><code>-q "…"</code> (<code>--query</code>): el encargo, entre comillas dobles. Puede ocupar varias líneas: mientras no cierres las comillas, el terminal sigue leyendo.</li>
+        <li><code>-Q</code> (<code>--quiet</code>): modo silencioso. Quita el banner, la animación de espera y la vista previa de cada herramienta, y deja solo la respuesta final. Además, con <code>-Q</code> Hermes responde y termina; sin él, <code>-q</code> solo abre un chat interactivo con ese primer mensaje.</li>
+      </ul>
+      <p>Por qué así: para un encargo cerrado no necesitas conversar, y una salida limpia es más fácil de leer y de copiar. Los ficheros que pidas aparecen en la carpeta desde la que lanzas el comando, así que ejecuta cada ejemplo <strong>desde su carpeta</strong>. Cada una trae <code>salida-ejemplo/</code> con lo que generó Hermes en nuestra prueba, para que compares.</p>
 
       <div class="example">
         <h4>A · CSV de gastos → Excel con fórmulas e informe <span class="badge ok">72 s</span></h4>
         <div class="meta">02-ofimatica/gastos-csv · 43 gastos del tercer trimestre</div>
-        <div class="code"><pre>hermes chat -Q -q "Analiza gastos_T3_2026.csv. Crea informe_gastos_T3.xlsx con: hoja 'Datos'
+        <div class="code"><pre><span class="c"># desde 02-ofimatica/gastos-csv/</span>
+hermes chat -Q -q "Analiza gastos_T3_2026.csv. Crea informe_gastos_T3.xlsx con: hoja 'Datos'
 (los datos como tabla), hoja 'Resumen' con total por categoría y por mes (con fórmulas de
 Excel, no valores fijos) y un gráfico de barras por categoría. Después escribe resumen.md
 con 5 conclusiones para dirección, incluyendo cualquier gasto anómalo que detectes."</pre></div>
+        <p>Un <code>.csv</code> es una tabla en texto plano: una fila por línea y columnas separadas por comas. Por qué pedimos <strong>fórmulas y no valores fijos</strong>: si mañana corriges un gasto en la hoja <em>Datos</em>, el resumen se recalcula solo, y cualquiera puede pinchar en una celda y ver de dónde sale el número. <code>resumen.md</code> es un fichero Markdown: texto plano con formato ligero (<code>#</code> para títulos, <code>-</code> para listas), legible tal cual.</p>
         <p><strong>Qué hizo:</strong></p>
         <ul class="found">
-          <li>Usó <code>SUMIFS</code>/<code>COUNTIF</code> reales y añadió celdas de control que deben dar 0.</li>
+          <li>Usó <code>SUMIFS</code>/<code>COUNTIF</code> reales (en Excel en español, <code>SUMAR.SI.CONJUNTO</code> y <code>CONTAR.SI</code>: suman o cuentan solo las filas que cumplen una condición, como «categoría = Viajes»). Y añadió celdas de control que deben dar 0: restan dos formas de calcular el mismo total; si no sale 0, algo no cuadra.</li>
           <li>Encontró el gasto trampa que escondimos: un vuelo de 4.850 €, el 33 % del trimestre.</li>
           <li>Señaló dos partidas más a revisar, con su razonamiento.</li>
           <li>Total 14.505,46 €: lo verificamos con Python y cuadra al céntimo.</li>
@@ -446,9 +557,11 @@ con 5 conclusiones para dirección, incluyendo cualquier gasto anómalo que dete
       <div class="example">
         <h4>B · Transcripción de reunión → acta en Word <span class="badge ok">67 s</span></h4>
         <div class="meta">02-ofimatica/acta-reunion</div>
-        <div class="code"><pre>hermes chat -Q -q "A partir de transcripcion.txt genera acta_reunion.docx: título, fecha de hoy,
+        <div class="code"><pre><span class="c"># desde 02-ofimatica/acta-reunion/</span>
+hermes chat -Q -q "A partir de transcripcion.txt genera acta_reunion.docx: título, fecha de hoy,
 asistentes, resumen en 3 líneas, decisiones tomadas, tabla de tareas (responsable, tarea,
 fecha límite) y temas pendientes. Formato profesional."</pre></div>
+        <p>Por qué listamos las secciones: así el acta sale igual cada vez y se compara fácil con la reunión. La tabla de tareas con responsable y fecha es lo que luego reutilizaremos en el módulo 04 para generar un correo por persona.</p>
         <ul class="found">
           <li>Revisó el documento renderizado antes de entregarlo.</li>
           <li>Avisó de que "el jueves 16" no existe en octubre de 2026 (el 16 es viernes) y lo marcó en rojo.</li>
@@ -459,21 +572,24 @@ fecha límite) y temas pendientes. Formato profesional."</pre></div>
       <div class="example">
         <h4>C · Ordenar una carpeta caótica <span class="badge ok">47 s</span></h4>
         <div class="meta">02-ofimatica/ordenar-carpeta · 9 ficheros con nombres sin criterio</div>
-        <div class="code"><pre>hermes chat -Q -q "La carpeta entrada/ está desordenada. Lee el contenido de cada fichero y
+        <div class="code"><pre><span class="c"># desde 02-ofimatica/ordenar-carpeta/</span>
+hermes chat -Q -q "La carpeta entrada/ está desordenada. Lee el contenido de cada fichero y
 organízalos en ordenado/ (facturas/, contratos/, notas/, otros/). Renombra con el formato
 AAAA-MM-DD_tipo_descripcion.txt usando la fecha del contenido (si no hay: 'sin-fecha').
 No borres nada: copia, no muevas. Crea ordenado/INDICE.md con nombre original, nuevo y carpeta."</pre></div>
+        <p>El porqué de cada restricción. <strong>Fecha <code>AAAA-MM-DD</code> al principio</strong> (año-mes-día): al ordenar por nombre, los ficheros quedan también en orden cronológico. <strong>Copiar, no mover</strong>: si la clasificación falla, los originales siguen intactos en <code>entrada/</code>. <strong><code>INDICE.md</code></strong>: una tabla para comprobar de un vistazo qué ha hecho con cada fichero, sin abrir carpeta por carpeta.</p>
         <ul class="found">
           <li>Clasificó por contenido, no por nombre: <code>IMG_2041.txt</code> era una foto de la pizarra y acabó en notas.</li>
           <li>Con "09/12" sin año prefirió preguntar antes que adivinar.</li>
         </ul>
       </div>
       <div class="note key"><span class="t">Patrón de prompt que funciona</span>
-        <p><strong>Entrada</strong> (qué fichero) + <strong>salida exacta</strong> (nombre, formato, secciones) + <strong>restricciones</strong> (copiar, no mover; fórmulas, no valores) + <strong>algo auditable</strong> (índice, resumen). Para tus carpetas reales añade <code>--checkpoints</code>.</p></div>
+        <p><strong>Entrada</strong> (qué fichero) + <strong>salida exacta</strong> (nombre, formato, secciones) + <strong>restricciones</strong> (copiar, no mover; fórmulas, no valores) + <strong>algo auditable</strong> (índice, resumen). Para tus carpetas reales añade <code>--checkpoints</code>.</p>
+        <p><code>hermes chat --checkpoints</code> guarda una copia del estado de los ficheros antes de cada operación que pueda destruir algo (sobrescribir, borrar). Si el resultado no te gusta, dentro del chat <code>/rollback</code> lista esas copias y restaura la que elijas. Es la red de seguridad para cuando no puedes «copiar, no mover».</p></div>
       <details class="ex"><summary>Ejercicios propuestos</summary><ul>
         <li>"Convierte los PDF de <code>facturas/</code> en una hoja con proveedor, fecha, base, IVA y total."</li>
         <li>"Hazme una presentación de 6 diapositivas a partir de <code>resumen.md</code>."</li>
-        <li>Con la skill <code>email-inbox-triage</code>: "¿Qué correos de hoy requieren respuesta?"</li>
+        <li>Con la skill <code>email-inbox-triage</code>: "¿Qué correos de hoy requieren respuesta?" Necesita tener configurado <code>himalaya</code>, un cliente de correo de terminal (IMAP para leer, SMTP para enviar) que Hermes usa a través de su skill del mismo nombre.</li>
       </ul></details>
       <button class="mark-done" type="button" data-mod="m3" aria-pressed="false">Marcar como completado</button>
     </section>
@@ -483,18 +599,25 @@ No borres nada: copia, no muevas. Crea ordenado/INDICE.md con nombre original, n
       <div class="mod-head"><span class="mod-num">04</span><h2>Memoria y skills</h2><span class="badge ok">probado</span></div>
       <p class="mod-goal">Hacer que Hermes recuerde quién eres y enseñarle procedimientos propios.</p>
       <h3>Memoria persistente</h3>
+      <p>Cada sesión con un modelo empieza en blanco: solo «sabe» lo que va en su <strong>contexto</strong>, el texto que recibe en esa llamada (instrucciones, conversación, ficheros leídos). Ese texto se mide en <strong>tokens</strong>, trozos de palabra por los que pagas y que tienen un tope. La memoria de Hermes son dos ficheros de texto que se añaden al contexto al empezar cada sesión. Viven en <code>~/.hermes/</code>, la carpeta de Hermes dentro de tu carpeta personal (<code>~</code>).</p>
       <div class="tw"><table>
         <thead><tr><th>Fichero</th><th>Qué guarda</th><th>Límite</th></tr></thead>
         <tbody>
           <tr><td><code>memories/USER.md</code></td><td>Quién eres y tus preferencias</td><td class="num">≈ 1.375 caracteres</td></tr>
           <tr><td><code>memories/MEMORY.md</code></td><td>Lo que ha aprendido de tu entorno</td><td class="num">≈ 2.200 caracteres</td></tr>
         </tbody></table></div>
+      <p>Por qué tienen límite: se cargan en <strong>todas</strong> las sesiones, así que cada carácter ocupa contexto y cuesta tokens siempre. Hermes guarda ahí solo lo esencial; para lo demás busca en el historial (más abajo).</p>
       <div class="code"><pre>hermes -z "Recuerda para siempre: prefiero importes con formato 1.234,56 € y fechas tipo 'viernes 9 de octubre'."
 cat ~/.hermes/memories/USER.md          <span class="c"># entradas separadas por §</span>
 hermes -z "¿Cómo formateas 1500 euros?" <span class="c"># sesión nueva → 1.500,00 €</span></pre></div>
-      <p>Se inyecta al inicio de cada sesión, también en cron: nuestro job programado del módulo 5 formateó los importes así sin pedírselo. Para el historial completo el agente usa <code>session_search</code> sobre las sesiones pasadas.</p>
+      <ul>
+        <li><code>hermes -z "…"</code> (<code>--oneshot</code>): manda un único mensaje e imprime solo la respuesta final, sin banner ni vista previa de herramientas. Pensado para scripts. Ojo: en este modo las aprobaciones de comandos se saltan solas.</li>
+        <li>Por qué dos llamadas separadas: cada <code>-z</code> es una sesión nueva, sin la conversación anterior. Si la segunda acierta el formato, solo puede ser por la memoria.</li>
+        <li><code>cat</code> muestra un fichero en el terminal. <code>§</code> es el separador que usa Hermes entre una entrada de memoria y la siguiente.</li>
+      </ul>
+      <p>Se inyecta al inicio de cada sesión, también en cron (las tareas programadas): nuestro job programado del módulo 5 formateó los importes así sin pedírselo. Para el historial completo el agente usa <code>session_search</code>, una de sus herramientas: busca por texto en las sesiones pasadas, que Hermes guarda en una base de datos local (SQLite). Dentro del chat, <code>/memory</code> muestra las escrituras de memoria pendientes de aprobar (ver «Higiene», más abajo).</p>
       <h3>Skills: procedimientos reutilizables</h3>
-      <p>Una skill es una carpeta con <code>SKILL.md</code> (estándar <a href="https://agentskills.io">agentskills.io</a>, el mismo que usan Claude Code y Claude Desktop) y, si hace falta, <code>templates/</code>, <code>scripts/</code> o <code>references/</code>. Hermes solo carga el nombre y la descripción de cada una; el cuerpo lo lee cuando la necesita.</p>
+      <p>Una skill es una carpeta con <code>SKILL.md</code> (estándar <a href="https://agentskills.io">agentskills.io</a>, el mismo que usan Claude Code y Claude Desktop) y, si hace falta, <code>templates/</code>, <code>scripts/</code> o <code>references/</code>. Hermes solo carga el nombre y la descripción de cada una; el cuerpo lo lee cuando la necesita (con su herramienta <code>skill_view</code>). Por eso puedes tener decenas de skills sin llenar el contexto, y por eso la <strong>descripción es lo más importante</strong>: es lo único que el agente ve para decidir si la usa.</p>
       <div class="code"><span class="lbl">03-memoria-y-skills/skills/email-seguimiento/SKILL.md</span><pre><span class="k">---</span>
 <span class="k">name:</span> email-seguimiento
 <span class="k">description:</span> "Genera un correo de seguimiento por responsable a partir de un acta."
@@ -513,14 +636,36 @@ hermes -z "¿Cómo formateas 1500 euros?" <span class="c"># sesión nueva → 1.
 5. Valida: python3 ${HERMES_SKILL_DIR}/scripts/validar_correos.py correos/
 ## Comprobaciones antes de terminar
 - Cada tarea aparece exactamente en un correo.</pre></div>
-      <div class="code"><pre>cp -r skills/email-seguimiento ~/.hermes/skills/productivity/
-hermes chat -Q -s email-seguimiento -q "Prepara los correos de seguimiento de transcripcion.txt"</pre></div>
+      <p>Qué significa cada parte:</p>
+      <ul>
+        <li>El bloque entre <code>---</code> es el <strong>frontmatter</strong>: datos en formato YAML (<code>clave: valor</code>) que Hermes lee sin abrir el resto.</li>
+        <li><code>name</code>: el identificador; es lo que escribes tras <code>-s</code>. <code>description</code>: qué hace y cuándo usarla. <code>version</code>: para saber qué copia tienes.</li>
+        <li><code>metadata.hermes</code>: datos propios de Hermes. <code>tags</code> son etiquetas para buscar; <code>related_skills</code>, skills que conviene tener a mano (<code>docx</code> para leer un acta en Word).</li>
+        <li>Debajo, en Markdown, el <strong>cuerpo</strong>: el procedimiento paso a paso y las comprobaciones finales. <code>templates/email.md</code> es la plantilla del correo, con huecos <code>{{nombre}}</code>, <code>{{filas_tareas}}</code>… que el agente rellena.</li>
+      </ul>
+      <div class="code"><pre><span class="c"># instalar: copiar la carpeta de la skill (desde 03-memoria-y-skills/)</span>
+cp -r skills/email-seguimiento ~/.hermes/skills/productivity/
+hermes skills list | grep seguimiento     <span class="c"># comprueba que Hermes la ve</span>
+
+<span class="c"># usar: desde la carpeta donde está la transcripción del módulo 03</span>
+cd ../02-ofimatica/acta-reunion
+hermes chat -Q -s email-seguimiento -q "Prepara los correos de seguimiento de transcripcion.txt"
+ls correos/                               <span class="c"># un .md por persona</span></pre></div>
+      <ul>
+        <li><code>cp -r</code> copia una carpeta entera (<code>-r</code>, recursivo: con todo lo que tiene dentro). Instalar una skill es solo eso: ponerla en <code>~/.hermes/skills/</code>. <code>productivity/</code> es la categoría, la misma carpeta donde están <code>docx</code> o <code>meeting-action-items</code>.</li>
+        <li><code>hermes skills list</code> lista las skills instaladas; <code>| grep seguimiento</code> filtra las líneas que contienen esa palabra.</li>
+        <li><code>-s email-seguimiento</code> (<code>--skills</code>) <strong>precarga</strong> la skill en la sesión. Sin <code>-s</code> también funciona, porque Hermes la descubre por su descripción; con <code>-s</code> te aseguras de que la usa. <code>-Q</code> y <code>-q</code> son los del módulo 03: encargo único, salida limpia.</li>
+      </ul>
       <div class="note ok"><span class="t">Resultado de la prueba (57 s)</span><p>Cuatro borradores, uno por persona, con la plantilla aplicada. Además detectó que el 24 de octubre de 2026 cae en sábado y pidió confirmarlo.</p></div>
       <h3>Scripts dentro de la skill: el punto medio</h3>
-      <p class="prose">La versión 1.1 de la skill trae <code>scripts/validar_correos.py</code>, y su <code>SKILL.md</code> obliga a ejecutarlo antes de terminar. <code>${HERMES_SKILL_DIR}</code> se sustituye por la ruta de la skill. El script comprueba sin LLM lo que se puede comprobar con código: nombres de fichero, cabeceras, huecos sin rellenar y si cada día de la semana cuadra con el calendario.</p>
-      <div class="code"><pre>python3 ${HERMES_SKILL_DIR}/scripts/validar_correos.py correos/
+      <p class="prose">La versión 1.1 de la skill trae <code>scripts/validar_correos.py</code>, y su <code>SKILL.md</code> obliga a ejecutarlo antes de terminar. <code>${HERMES_SKILL_DIR}</code> se sustituye por la ruta de la skill: Hermes la cambia al cargar el <code>SKILL.md</code>, así el paso funciona esté donde esté instalada. En tu terminal esa variable no existe; para ejecutarlo tú, usa la ruta real (segundo comando del bloque). El script comprueba sin LLM (sin modelo de lenguaje, es decir, sin IA) lo que se puede comprobar con código: nombres de fichero, cabeceras, huecos sin rellenar y si cada día de la semana cuadra con el calendario.</p>
+      <div class="code"><pre><span class="c"># así lo ejecuta el agente, dentro de la skill:</span>
+python3 ${HERMES_SKILL_DIR}/scripts/validar_correos.py correos/
+<span class="c"># así lo ejecutas tú, desde 03-memoria-y-skills/, sobre la salida de ejemplo:</span>
+python3 skills/email-seguimiento/scripts/validar_correos.py salida-ejemplo/correos 2026
 <span class="c"># OK 2026-10-09_marta.md</span>
 <span class="c">#   ~ aviso (ya marcado para revisar): 'jueves 16 de octubre': el 16/10/2026 es viernes</span></pre></div>
+      <p>El primer argumento es la carpeta de correos. El segundo, <code>2026</code>, es el año que aplica a las fechas escritas sin año («jueves 16 de octubre»); si no lo pones, usa el año en curso. Un <strong>error</strong> hace que el script termine con código 1 y el agente debe corregir y repetir; un <strong>aviso</strong> es una fecha incoherente que ya viene marcada con <code>[revisar: …]</code>, porque está mal en la fuente y no se corrige, se señala.</p>
       <div class="tw"><table>
         <thead><tr><th></th><th>Qué es</th><th>Cuándo</th></tr></thead>
         <tbody>
@@ -529,6 +674,7 @@ hermes chat -Q -s email-seguimiento -q "Prepara los correos de seguimiento de tr
           <tr><td><strong>No determinista</strong></td><td>Un prompt suelto</td><td>Explorar, redactar, decidir</td></tr>
         </tbody></table></div>
       <h3>Skills de proyecto frente a skills de Hermes</h3>
+      <p>Las skills pueden vivir en dos sitios: en tu Hermes (<code>~/.hermes/skills/</code>) o dentro de un repositorio de código (<code>&lt;repo&gt;</code>, la carpeta raíz del proyecto).</p>
       <div class="tw"><table>
         <thead><tr><th></th><th><code>~/.hermes/skills/</code></th><th><code>&lt;repo&gt;/.hermes/skills/</code></th></tr></thead>
         <tbody>
@@ -537,9 +683,15 @@ hermes chat -Q -s email-seguimiento -q "Prepara los correos de seguimiento de tr
           <tr><td>Se activan</td><td>Siempre</td><td>Tras <code>hermes skills trust</code>, y tienen prioridad</td></tr>
           <tr><td>¿Las toca el agente?</td><td>Sí: <code>skill_manage</code> y el curator</td><td>Esos dos no; pero no son de solo lectura</td></tr>
         </tbody></table></div>
+      <ul>
+        <li><code>hermes skills trust</code>, ejecutado dentro del repo, marca ese proyecto como de confianza para que carguen sus skills. Por qué hace falta: al clonar un repo ajeno no quieres que sus skills (que pueden ejecutar scripts) se activen solas. <code>hermes skills untrust</code> lo revoca.</li>
+        <li><code>skill_manage</code> es la herramienta con la que el agente crea, edita y borra skills.</li>
+        <li>El <strong>curator</strong> es una tarea en segundo plano que, cada cierto tiempo, revisa las skills creadas por el agente: consolida las repetidas y archiva las que no se usan. No toca las de serie ni las instaladas del hub, y lo archivado se puede recuperar.</li>
+      </ul>
       <p>Así un mismo Hermes trabaja en varios productos: el flujo vive en Hermes y la ejecución, en cada repo. Lo usamos en el módulo 10.</p>
       <h3>Higiene: que tu entorno no derive</h3>
-      <p class="prose">Por defecto, una <strong>revisión en segundo plano</strong> tras cada turno puede crear o parchear skills y memoria sin preguntarte. Con semanas de uso, tu entorno ya no se parece al de nadie, y aparece el síntoma típico: <strong>sale un modelo nuevo y "a mí no me funciona"</strong>, porque instrucciones pensadas para el modelo anterior lo frenan.</p>
+      <p class="prose">Por defecto, una <strong>revisión en segundo plano</strong> (un modelo auxiliar que repasa lo que acabas de hacer, sin que lo veas) tras cada turno puede crear o parchear skills y memoria sin preguntarte. Con semanas de uso, tu entorno ya no se parece al de nadie, y aparece el síntoma típico: <strong>sale un modelo nuevo y "a mí no me funciona"</strong>, porque instrucciones pensadas para el modelo anterior lo frenan.</p>
+      <p>Estas claves están en <code>~/.hermes/config.yaml</code>, el fichero de configuración de Hermes. El punto indica anidamiento: <code>skills.write_approval</code> es la clave <code>write_approval</code> dentro del bloque <code>skills:</code>. Las órdenes que empiezan por <code>/</code> (<code>/skills pending</code>) se escriben dentro del chat, no en el terminal.</p>
       <div class="tw"><table>
         <thead><tr><th>Clave</th><th>Por defecto</th><th>Qué hace</th></tr></thead>
         <tbody>
@@ -552,8 +704,13 @@ hermes chat -Q -s email-seguimiento -q "Prepara los correos de seguimiento de tr
 hermes curator status
 hermes profile export default -o mi-entorno.tar.gz   <span class="c"># foto de tu entorno, sin credenciales</span></pre></div>
       <ul>
-        <li><strong>Que las escriba él:</strong> tras resolver algo, <code>/learn</code> o "guarda esto como skill".</li>
-        <li><strong>Hub:</strong> <code>hermes skills search pdf</code>, <code>inspect</code> antes de <code>install</code> (una skill puede ejecutar scripts).</li>
+        <li><code>hermes config set &lt;clave&gt; &lt;valor&gt;</code> cambia una clave de <code>config.yaml</code> sin abrir el fichero.</li>
+        <li><code>hermes curator status</code> muestra el estado del curator y las estadísticas de tus skills.</li>
+        <li><code>hermes profile export</code> empaqueta un <strong>perfil</strong> (una instancia aislada de Hermes; <code>default</code> es la tuya) en un <code>.tar.gz</code>, un fichero comprimido. <code>-o</code> indica el fichero de salida. Deja fuera las credenciales (<code>auth.json</code>, <code>.env</code>). Sirve como copia de seguridad o para comparar tu entorno con el de otra persona; revisa antes la memoria, que puede llevar datos personales.</li>
+      </ul>
+      <ul>
+        <li><strong>Que las escriba él:</strong> tras resolver algo, <code>/learn</code> o "guarda esto como skill". <code>/learn</code> crea una skill reutilizable a partir de lo que le indiques: esta conversación, una carpeta, una URL o unas notas.</li>
+        <li><strong>Hub:</strong> <code>hermes skills search pdf</code>, <code>inspect</code> antes de <code>install</code> (una skill puede ejecutar scripts). El hub es el conjunto de registros públicos de skills; <code>search</code> busca en ellos, <code>inspect &lt;id&gt;</code> muestra una sin instalarla e <code>install &lt;id&gt;</code> la instala.</li>
       </ul>
       <button class="mark-done" type="button" data-mod="m4" aria-pressed="false">Marcar como completado</button>
     </section>
@@ -562,8 +719,9 @@ hermes profile export default -o mi-entorno.tar.gz   <span class="c"># foto de t
     <section class="mod" id="m5" data-title="Automatización">
       <div class="mod-head"><span class="mod-num">05</span><h2>Automatización: cron y blueprints</h2><span class="badge ok">probado</span></div>
       <p class="mod-goal">Programar trabajo recurrente, con o sin LLM, y elegir dónde llega el resultado.</p>
-      <p class="prose">Las tareas las dispara el <strong>gateway</strong>, que revisa el calendario cada 60 s. Sin gateway los jobs se crean pero no se ejecutan solos (Hermes te lo avisa al crearlos).</p>
+      <p class="prose">Tres palabras para empezar. Un <strong>job</strong> es una tarea programada: qué hacer y cuándo. <strong>Cron</strong> es el nombre clásico de Unix para el programador de tareas, y Hermes lo usa para su propio programador. El <strong>gateway</strong> es un proceso de Hermes que vive en segundo plano: conecta la mensajería (módulo 06) y, cada 60 s, revisa el calendario y lanza los jobs que tocan. Sin gateway los jobs se crean pero no se ejecutan solos (Hermes te lo avisa al crearlos).</p>
       <div class="code"><pre>hermes gateway install &amp;&amp; hermes gateway start    <span class="c"># launchd en macOS, systemd en Linux</span>
+hermes cron status                                  <span class="c"># ¿está vivo el programador?</span>
 
 hermes cron create "every monday 9am" \
   "Lee /ruta/gastos_T3_2026.csv y dame en 3 viñetas el total y la categoría con más gasto." \
@@ -571,11 +729,19 @@ hermes cron create "every monday 9am" \
 
 hermes cron list
 hermes cron run &lt;id&gt;        <span class="c"># dispararlo ya, para probar</span></pre></div>
+      <p><strong>Qué significa cada parte:</strong></p>
+      <ul>
+        <li><code>gateway install</code> registra el gateway como <em>servicio</em> del sistema; <code>gateway start</code> lo arranca. <code>launchd</code> (macOS) y <code>systemd</code> (Linux) son los gestores de servicios del sistema operativo: lo mantienen vivo y lo relanzan al reiniciar. Así los jobs corren aunque cierres la terminal. <code>&amp;&amp;</code> ejecuta el segundo comando solo si el primero termina bien.</li>
+        <li><code>cron create</code> recibe dos argumentos entre comillas: el <strong>horario</strong> (<code>"every monday 9am"</code>, cada lunes a las 9) y el <strong>prompt</strong>, la instrucción que el agente ejecutará cada vez. El prompt debe valerse solo: el job no ve tu conversación, por eso la ruta al CSV es absoluta.</li>
+        <li>La <code>\</code> al final de línea solo parte un comando largo en varias líneas; la shell lo lee como uno.</li>
+        <li><code>--name</code> le pone un nombre legible. <code>--deliver</code> dice adónde llega el resultado (ver «Destinos»). Si no lo pones, el resultado se guarda en local.</li>
+        <li><code>cron list</code> muestra los jobs con su <code>id</code> (12 caracteres) y su próxima ejecución. <code>cron run &lt;id&gt;</code> lo pone en cola para el siguiente repaso del programador (como mucho 60 s), sin esperar a su hora.</li>
+      </ul>
       <div class="cols">
         <div class="panel"><h4>Horarios</h4><ul>
-          <li>Una vez: <code>in 30m</code>, <code>2026-11-03T09:00:00</code></li>
-          <li>Intervalo: <code>30m</code>, <code>every 2h</code></li>
-          <li>Natural: <code>weekdays at 9am</code>, <code>daily at 7am</code></li>
+          <li>Una vez: <code>in 30m</code> (dentro de 30 minutos), <code>2026-11-03T09:00:00</code> (fecha y hora exactas, formato ISO)</li>
+          <li>Intervalo: <code>30m</code>, <code>every 2h</code> (cada 30 minutos, cada 2 horas)</li>
+          <li>Natural: <code>weekdays at 9am</code> (laborables a las 9), <code>daily at 7am</code></li>
           <li>Cron: <code>0 9 * * 1-5</code></li>
         </ul></div>
         <div class="panel"><h4>Destinos (--deliver)</h4><ul>
@@ -585,12 +751,22 @@ hermes cron run &lt;id&gt;        <span class="c"># dispararlo ya, para probar</
           <li>Si no hay nada nuevo responde <code>[SILENT]</code> y no envía nada</li>
         </ul></div>
       </div>
+      <p>La expresión cron clásica tiene cinco campos separados por espacios: <strong>minuto</strong>, <strong>hora</strong>, <strong>día del mes</strong>, <strong>mes</strong> y <strong>día de la semana</strong>. <code>*</code> significa «cualquiera» y <code>1-5</code> es un rango (lunes a viernes; 0 es domingo). Así, <code>0 9 * * 1-5</code> se lee «en el minuto 0 de las 9, cualquier día del mes, cualquier mes, de lunes a viernes»: lo mismo que <code>weekdays at 9am</code>.</p>
+      <p>En los destinos, <code>~</code> es tu carpeta de usuario y <code>~/.hermes/</code> es la carpeta (oculta, por el punto) donde Hermes guarda su configuración, sus jobs y sus salidas. <code>[SILENT]</code> es una palabra de control: en un job con LLM, el agente la responde cuando no hay nada nuevo que contar, y Hermes entonces no envía nada. Así un resumen diario no te manda mensajes vacíos.</p>
       <h3>Watchdog sin LLM: coste cero</h3>
-      <div class="code"><pre>cp scripts/espacio_disco.sh ~/.hermes/scripts/
+      <p class="prose">Un <em>watchdog</em> (perro guardián) es un vigilante: comprueba algo cada cierto tiempo y solo avisa si hay un problema. Para eso no hace falta un modelo de lenguaje (LLM): basta un script. Sin LLM no se gastan tokens, así que cuesta cero.</p>
+      <div class="code"><pre>mkdir -p ~/.hermes/scripts                <span class="c"># la carpeta de scripts de cron (-p: créala si no existe)</span>
+cp scripts/espacio_disco.sh ~/.hermes/scripts/
 hermes cron create "every 1h" --name watchdog-disco --no-agent --script espacio_disco.sh --deliver telegram
 <span class="c"># el script solo imprime si el disco supera el 85 %: salida vacía = no se notifica</span></pre></div>
+      <ul>
+        <li><code>--script espacio_disco.sh</code>: el nombre de un script que está en <code>~/.hermes/scripts/</code>. Hermes solo ejecuta scripts de esa carpeta: así sabes exactamente qué código puede lanzar un job. Los <code>.sh</code> se ejecutan con bash; el resto, con Python.</li>
+        <li><code>--no-agent</code>: no se llama al modelo. El script <em>es</em> el job y lo que imprime (su salida estándar, <em>stdout</em>) se envía tal cual. Si no imprime nada, no llega ningún mensaje.</li>
+        <li>El script mira el uso del disco con <code>df</code> y solo imprime si pasa del umbral. El 85 % es un valor por defecto que deja margen para reaccionar; se cambia dentro del script (variable <code>UMBRAL</code>).</li>
+      </ul>
       <p>Sin <code>--no-agent</code>, la salida del script se inyecta en el prompt: el script recoge datos y el modelo los interpreta.</p>
       <div class="note ok"><span class="t">Lo que vimos en la prueba</span><p>El job con LLM devolvió cifras exactas y aplicó la memoria (formato 1.234,56 €). También vimos la seguridad desatendida: en cron los comandos de terminal que necesitan aprobación se deniegan, así que el agente calculó sin ejecutar su script y lo avisó.</p></div>
+      <p>«Desatendida» significa que nadie está mirando: en un job no hay una persona que pulse «aprobar», así que Hermes deniega por defecto lo que pediría permiso en un chat. Si un job necesita ejecutar algo, dale un script con <code>--script</code>: ese código lo has revisado tú.</p>
       <h3>Desde el chat o con blueprints</h3>
       <div class="code"><pre>&gt; Todos los días laborables a las 8:30 mándame por Telegram los titulares de IA de Hacker News
 
@@ -598,13 +774,29 @@ hermes cron create "every 1h" --name watchdog-disco --no-agent --script espacio_
                                              <span class="c"># price-watch, competitor-watch, news-digest…</span>
 /blueprint morning-brief time=07:30 deliver=telegram
 
-hermes pause    <span class="c"># parada de emergencia: cron, kanban y gateway</span></pre></div>
+hermes pause    <span class="c"># parada de emergencia: cron, kanban y gateway</span>
+hermes resume   <span class="c"># levanta la parada</span></pre></div>
+      <ul>
+        <li>El <code>&gt;</code> indica algo que escribes <em>dentro</em> del chat de Hermes, no en la terminal. Hermes entiende la petición y crea el job él mismo con su herramienta <code>cronjob</code>.</li>
+        <li>Las órdenes que empiezan por <code>/</code> (<em>slash commands</em>) también se escriben dentro del chat. Un <strong>blueprint</strong> es una plantilla de automatización ya hecha: <code>/blueprint</code> sin nada lista las disponibles, y con un nombre la crea. Los huecos que rellenas se pasan como <code>clave=valor</code>: aquí <code>time=07:30</code> (a qué hora) y <code>deliver=telegram</code> (adónde).</li>
+        <li><code>hermes pause</code> detiene el trabajo <em>nuevo</em> (jobs de cron, tareas del tablero kanban, el tablero de tareas para equipos de agentes que verás más adelante, y mensajes nuevos al gateway) hasta <code>hermes resume</code>. Lo que ya está en marcha termina; no se mata a medias.</li>
+      </ul>
+      <div class="code"><pre>hermes cron pause &lt;id&gt;     <span class="c"># desactivar un job sin borrarlo</span>
+hermes cron resume &lt;id&gt;    <span class="c"># reactivarlo</span>
+hermes cron remove &lt;id&gt;    <span class="c"># borrarlo</span>
+hermes cron runs &lt;id&gt;      <span class="c"># historial de ejecuciones: cuándo corrió y cómo acabó</span></pre></div>
       <h3>Disparo único tras un despliegue</h3>
       <p class="prose">Un job de una sola vez sirve para encadenar trabajo a algo que tarda: despliegas una preview, sabes que tarda unos minutos y programas la comprobación para cuando esté lista. Al ejecutarse, el job se borra solo.</p>
+      <p>Una <em>preview</em> es una versión de prueba de tu app publicada para revisarla antes de darla por buena. La comprobación es un <em>smoke test</em> (prueba de humo): una verificación rápida de que lo básico funciona, sin entrar en detalle.</p>
       <div class="code"><pre>cp scripts/smoke_despliegue.sh ~/.hermes/scripts/   <span class="c"># la URL se fija dentro del script</span>
 hermes cron create "in 5m" --no-agent --script smoke_despliegue.sh --name smoke-pr-42 --deliver telegram
 <span class="c"># → ✅ http://127.0.0.1:8765 responde: 6 productos en el catálogo   (llegó al móvil)</span></pre></div>
-      <p>Sin <code>--no-agent</code>, el mismo job puede lanzar un agente que abra la URL en el navegador y recorra la feature: el E2E del módulo 10, disparado por el despliegue.</p>
+      <ul>
+        <li><code>"in 5m"</code>: una sola vez, dentro de 5 minutos. <code>smoke-pr-42</code> es solo un nombre: la comprobación del <em>pull request</em> (PR) número 42 de tu proyecto.</li>
+        <li>El script hace dos peticiones con <code>curl</code>: <code>/salud</code> (¿está viva la app?) y <code>/api/productos</code> (¿devuelve datos?). Cuenta los productos e imprime una línea con ✅ o ❌. <code>127.0.0.1:8765</code> es tu propia máquina, puerto 8765: la tienda de ejemplo del módulo 10.</li>
+        <li>Por qué la URL va escrita en el script: el script lo ejecuta el gateway, no tu terminal. Una variable de entorno que pongas en tu shell al crear el job no le llega.</li>
+      </ul>
+      <p>Sin <code>--no-agent</code>, el mismo job puede lanzar un agente que abra la URL en el navegador y recorra la feature: el E2E del módulo 10, disparado por el despliegue. E2E (<em>end to end</em>, de extremo a extremo) es una prueba que usa la app como lo haría una persona.</p>
       <button class="mark-done" type="button" data-mod="m5" aria-pressed="false">Marcar como completado</button>
     </section>
 
@@ -612,26 +804,42 @@ hermes cron create "in 5m" --no-agent --script smoke_despliegue.sh --name smoke-
     <section class="mod" id="m6" data-title="Mensajería">
       <div class="mod-head"><span class="mod-num">06</span><h2>Mensajería: Hermes en Telegram</h2><span class="badge ok">probado</span></div>
       <p class="mod-goal">Hablar con tu agente desde el móvil, con la misma memoria y skills.</p>
+      <p class="prose">La pieza que lo hace posible es el <strong>gateway</strong> (módulo 05): el proceso de Hermes en segundo plano que escucha las plataformas de mensajería y pasa cada mensaje al agente. En Telegram, tu agente aparece como un <strong>bot</strong>: una cuenta de Telegram manejada por un programa en vez de por una persona.</p>
       <ol class="prose">
         <li>En Telegram, <strong>@BotFather</strong> → <code>/newbot</code> → copia el token.</li>
         <li>Tu ID de usuario te lo da <strong>@userinfobot</strong>.</li>
         <li>Configura y arranca:</li>
       </ol>
+      <ul>
+        <li><strong>@BotFather</strong> es el bot oficial de Telegram para crear bots. <code>/newbot</code> te pide un nombre y un usuario (debe acabar en <code>bot</code>) y te devuelve el <strong>token</strong>.</li>
+        <li>El <strong>token</strong> es la contraseña del bot: quien lo tenga puede hacerse pasar por él. No lo subas a git ni lo pegues en un chat.</li>
+        <li>Tu <strong>ID de usuario</strong> es un número que identifica tu cuenta (tu nombre visible puede cambiar; el ID no). <strong>@userinfobot</strong> es un bot que te lo responde al escribirle. Hermes lo usa para saber quién puede hablar con tu agente.</li>
+      </ul>
       <div class="code"><pre>hermes gateway setup                                   <span class="c"># asistente, o bien:</span>
 hermes config set TELEGRAM_BOT_TOKEN 123456:ABC...
 hermes config set TELEGRAM_ALLOWED_USERS 111222333     <span class="c"># imprescindible</span>
-hermes gateway run                                     <span class="c"># primer plano, para probar</span></pre></div>
+hermes gateway run                                     <span class="c"># primer plano, para probar</span>
+hermes gateway install &amp;&amp; hermes gateway start         <span class="c"># como servicio permanente</span></pre></div>
+      <ul>
+        <li><code>gateway setup</code> es un asistente interactivo: te pregunta lo mismo paso a paso. Las dos líneas de <code>config set</code> son la alternativa manual.</li>
+        <li><code>hermes config set CLAVE valor</code> guarda un ajuste. Las claves en MAYÚSCULAS como estas van a <code>~/.hermes/.env</code>, el fichero de secretos de Hermes, separado de la configuración normal. Los valores del ejemplo son inventados.</li>
+        <li><code>TELEGRAM_ALLOWED_USERS</code> es la <strong>lista blanca</strong>: los IDs que pueden hablar con el bot. Si sois varios, sepáralos con comas.</li>
+        <li><code>gateway run</code> lo arranca en <strong>primer plano</strong>: ves los registros en la terminal y se para con Ctrl+C. Ideal para probar. <code>install</code> + <code>start</code> lo dejan como servicio que sigue vivo aunque cierres la terminal.</li>
+      </ul>
       <div class="note warn"><span class="t">No te saltes la lista blanca</span><p>Sin <code>TELEGRAM_ALLOWED_USERS</code> (o el emparejamiento con <code>hermes pairing approve</code>), cualquiera que encuentre tu bot tendría una terminal en tu máquina.</p></div>
+      <p>El <strong>emparejamiento</strong> (<em>pairing</em>) es la alternativa a escribir IDs: cuando alguien desconocido escribe al bot, el bot le responde con un código; tú lo apruebas desde tu terminal con <code>hermes pairing approve telegram &lt;código&gt;</code>, y <code>hermes pairing list</code> muestra los pendientes y los aprobados.</p>
       <div class="tw"><table>
         <thead><tr><th>En el chat</th><th>Para qué</th></tr></thead>
         <tbody>
-          <tr><td><code>/approve</code> · <code>/deny</code></td><td>Autorizar comandos peligrosos desde el móvil</td></tr>
-          <tr><td><code>/sethome</code></td><td>Este chat recibe las entregas del cron</td></tr>
-          <tr><td><code>/handoff</code></td><td>Continuar la conversación en otra plataforma</td></tr>
-          <tr><td><code>/update</code> · <code>/restart</code></td><td>Mantener el agente en remoto</td></tr>
+          <tr><td><code>/approve</code> · <code>/deny</code></td><td>Autorizar o rechazar comandos peligrosos desde el móvil. <code>/approve session</code> autoriza ese tipo de comando durante el resto de la conversación</td></tr>
+          <tr><td><code>/sethome</code></td><td>Este chat pasa a ser tu <em>home channel</em>: recibe las entregas del cron con <code>--deliver telegram</code></td></tr>
+          <tr><td><code>/handoff telegram</code></td><td>Desde el chat de la terminal: continuar la conversación en el móvil</td></tr>
+          <tr><td><code>/update</code> · <code>/restart</code></td><td>Mantener el agente en remoto: actualizar Hermes y reiniciar el gateway</td></tr>
         </tbody></table></div>
-      <div class="note ok"><span class="t">Lo que vimos en la prueba</span><p>El bot conectó en unos 15 s en modo <em>polling</em> (no hace falta abrir puertos). Con <code>/sethome</code>, los avisos del cron y del tablero kanban llegaron al móvil. Una nota de voz <strong>no</strong> funcionó: hace falta un motor de voz a texto (Whisper local o un proveedor con API), y el propio bot lo explicó y ofreció alternativas.</p></div>
+      <div class="note ok"><span class="t">Lo que vimos en la prueba</span><p>El bot conectó en unos 15 s en modo <em>polling</em> (no hace falta abrir puertos). Con <code>/sethome</code>, los avisos del cron y del tablero kanban (el tablero de tareas de los equipos de agentes, más adelante en el curso) llegaron al móvil. Una nota de voz <strong>no</strong> funcionó: hace falta un motor de voz a texto (Whisper local o un proveedor con API), y el propio bot lo explicó y ofreció alternativas.</p></div>
+      <p><em>Polling</em> significa que es tu máquina la que pregunta a Telegram, cada poco, si hay mensajes nuevos. La alternativa (<em>webhook</em>) es que Telegram llame a tu máquina, y eso exige una dirección pública y un puerto abierto. Con polling basta con tener salida a internet, por eso funciona desde casa sin tocar el router. Whisper es un modelo de voz a texto que puede ejecutarse en tu propio ordenador.</p>
       <p>Otras plataformas: Discord, Slack (Socket Mode), WhatsApp, Signal, iMessage (BlueBubbles), Email, Matrix, Teams, Google Chat… Para tenerlo 24/7, un VPS pequeño basta si el modelo está en la nube.</p>
+      <p>Socket Mode es el modo de Slack que, como el polling, no necesita dirección pública. BlueBubbles es un servidor que corre en un Mac y hace de puente con iMessage. Un VPS (servidor privado virtual) es una máquina alquilada en la nube que está encendida siempre; si el modelo se usa por API, el VPS solo mueve mensajes y no necesita potencia.</p>
       <button class="mark-done" type="button" data-mod="m6" aria-pressed="false">Marcar como completado</button>
     </section>
 
@@ -640,7 +848,14 @@ hermes gateway run                                     <span class="c"># primer 
       <div class="mod-head"><span class="mod-num">07</span><h2>Hermes para programadores</h2><span class="badge ok">probado</span></div>
       <p class="mod-goal">Darle contexto de proyecto, dejarle arreglar bugs con red de seguridad y deshacer si hace falta.</p>
       <h3>Contexto de proyecto</h3>
+      <p class="prose">Un agente que entra en un repositorio no sabe cómo se ejecutan sus tests ni qué normas sigue el equipo. Un <strong>fichero de contexto</strong> se lo dice: es un Markdown en la raíz del proyecto que Hermes lee al empezar y añade a sus instrucciones.</p>
       <p class="prose">Hermes carga <strong>un</strong> fichero de contexto, por este orden: <code>.hermes.md</code>/<code>HERMES.md</code> → <code>AGENTS.md</code> (encadenados desde la raíz git) → <code>CLAUDE.md</code> → <code>.cursorrules</code>. Si ya usas Claude Code o Cursor, tus ficheros funcionan sin cambios. <code>/init</code> genera uno, y <code>hermes import-agent</code> importa tu configuración de <code>~/.claude</code> o <code>~/.codex</code>.</p>
+      <ul>
+        <li>Usa el primero que encuentra en ese orden: si hay <code>HERMES.md</code>, ese gana y los demás no se cargan. <code>AGENTS.md</code> es una convención compartida por varios agentes de código; por eso es la opción recomendada.</li>
+        <li>«Encadenados desde la raíz git»: si trabajas en una subcarpeta, Hermes reúne los <code>AGENTS.md</code> que haya desde la raíz del repositorio hasta tu carpeta. Así una subcarpeta puede añadir reglas propias a las generales.</li>
+        <li><code>CLAUDE.md</code> es el fichero de Claude Code y <code>.cursorrules</code> el del editor Cursor.</li>
+        <li><code>/init</code> (dentro del chat) recorre el repo y escribe o actualiza un <code>AGENTS.md</code>. <code>hermes import-agent</code> traslada instrucciones, permisos, servidores MCP (módulo 08), skills y memorias de Claude Code o Codex; enseña una vista previa antes de cambiar nada y nunca importa claves.</li>
+      </ul>
       <div class="code"><span class="lbl">06-programador/demo-app/AGENTS.md</span><pre># Inventario — instrucciones para agentes
 ## Comandos
 - Tests: `uv run pytest -q`
@@ -648,6 +863,7 @@ hermes gateway run                                     <span class="c"># primer 
 - Precios en euros como float, redondeados a 2 decimales al devolverlos.
 - Cualquier cambio de comportamiento lleva su test en tests/.
 - No añadas dependencias sin preguntar.</pre></div>
+      <p>Cada línea responde a una pregunta que el agente se haría: cómo compruebo que no rompo nada (los tests), qué formato tienen los datos (euros, 2 decimales) y qué límites tengo (tests obligatorios, nada de dependencias nuevas). <code>uv</code> es un gestor de proyectos Python: <code>uv run</code> ejecuta un comando dentro del entorno del proyecto e instala antes lo que falte. <code>pytest</code> lanza los tests y <code>-q</code> (<em>quiet</em>) resume la salida en una línea.</p>
       <div class="example">
         <h4>Ejercicio: arreglar bugs con checkpoints <span class="badge ok">43 s</span></h4>
         <div class="meta">06-programador/demo-app · 1 test en rojo y un segundo bug sin test</div>
@@ -656,20 +872,30 @@ hermes chat -Q --checkpoints -q "Ejecuta los tests, encuentra la causa del fallo
 Revisa además si hay otros bugs en src/ que los tests no cubran; si los hay, corrígelos
 y añade su test. Termina con un resumen breve de los cambios."
 uv run pytest -q          <span class="c"># 6 passed</span></pre></div>
+        <ul>
+          <li>«Test en rojo» es un test que falla; «en verde», uno que pasa. Al empezar hay 3 tests: 1 falla y 2 pasan.</li>
+          <li><code>hermes chat -q "…"</code> manda una sola petición (<em>query</em>), espera a que el agente termine y sale. Con <code>-Q</code> (<em>quiet</em>) no muestra el banner ni cada herramienta que usa: solo la respuesta final.</li>
+          <li><code>--checkpoints</code> activa los puntos de restauración (ver abajo): la red de seguridad por si el agente rompe algo.</li>
+          <li>El prompt pide dos cosas a propósito: arreglar lo que el test señala y buscar lo que ningún test cubre. Así medimos si el agente razona sobre el código o solo persigue el rojo.</li>
+        </ul>
         <ul class="found">
           <li>Corrigió el descuento, que se restaba en euros después del IVA.</li>
           <li>Encontró el bug oculto: <code>&lt;=</code> donde el docstring decía "estrictamente".</li>
           <li>Añadió validación del rango del descuento y 3 tests que fallaban antes del cambio.</li>
           <li>No hizo commit y explicó un cambio de comportamiento que conviene confirmar.</li>
         </ul>
+        <p>El <em>docstring</em> es el texto entre triples comillas que documenta una función en Python. Decía «por debajo (estrictamente)», es decir <code>&lt;</code>, pero el código usaba <code>&lt;=</code>: un producto con el stock justo en el mínimo salía como «bajo mínimo». Que no hiciera commit es lo que queremos: el cambio queda en tu copia de trabajo para que lo revises tú.</p>
         <p>El diff completo está en <a href="https://github.com/noelserdna/curso-hermes-agent/blob/main/06-programador/solucion-referencia.patch"><code>solucion-referencia.patch</code></a>.</p>
+        <p>Un <em>diff</em> muestra qué líneas cambiaron: <code>-</code> las quitadas, <code>+</code> las añadidas. Un fichero <code>.patch</code> es ese diff guardado; puedes compararlo con lo que haga tu agente o aplicarlo con <code>git apply 06-programador/solucion-referencia.patch</code> desde la raíz del repositorio del curso.</p>
       </div>
       <h3>Checkpoints y rollback</h3>
       <p class="prose">Con <code>--checkpoints</code>, Hermes guarda un repo git <em>sombra</em> en <code>~/.hermes/checkpoints/</code> antes de cada escritura o comando destructivo. No toca tu <code>.git</code>.</p>
+      <p>Un <strong>checkpoint</strong> es una foto de los ficheros justo antes de que el agente los cambie. Hermes guarda esas fotos con git, pero en un repositorio aparte (<em>sombra</em>): tu historial y tus commits no se mezclan con ellas. Comando destructivo es el que puede borrar o sobrescribir ficheros. Para activarlo siempre, sin el flag: <code>checkpoints.enabled: true</code> en <code>~/.hermes/config.yaml</code>.</p>
       <div class="code"><pre>/rollback            <span class="c"># lista de puntos de restauración</span>
 /rollback diff 2     <span class="c"># qué cambió desde el 2</span>
 /rollback 2          <span class="c"># volver</span>
-hermes checkpoints status</pre></div>
+hermes checkpoints status   <span class="c"># en la terminal: espacio que ocupan, por proyecto</span></pre></div>
+      <p>Las órdenes con <code>/</code> se escriben dentro del chat de Hermes; <em>rollback</em> significa «volver atrás». Los números identifican cada checkpoint en la lista que muestra <code>/rollback</code>.</p>
       <div class="tw"><table>
         <thead><tr><th>Necesidad</th><th>Cómo</th></tr></thead>
         <tbody>
@@ -679,45 +905,70 @@ hermes checkpoints status</pre></div>
           <tr><td>Delegar en otro agente de código</td><td>skills incluidas <code>claude-code</code>, <code>codex</code>, <code>opencode</code></td></tr>
           <tr><td>Metodología</td><td>skills <code>test-driven-development</code>, <code>systematic-debugging</code>, <code>requesting-code-review</code></td></tr>
         </tbody></table></div>
+      <ul>
+        <li>Un <strong>git worktree</strong> es una segunda carpeta de trabajo del mismo repositorio, con su propia rama. Dos agentes en dos worktrees pueden editar a la vez sin pisarse los ficheros.</li>
+        <li><code>/goal</code> fija un objetivo que el agente persigue turno tras turno hasta cumplirlo. <code>ruff</code> es un <em>linter</em> de Python: revisa el estilo y errores comunes sin ejecutar el código.</li>
+        <li>ACP (<em>Agent Client Protocol</em>) es un protocolo para que un editor hable con un agente. <code>hermes acp</code> arranca Hermes en ese modo para usarlo desde el editor.</li>
+        <li>Las skills <code>claude-code</code>, <code>codex</code> y <code>opencode</code> enseñan a Hermes a pasar el trabajo a esas herramientas de línea de comandos, si las tienes instaladas.</li>
+        <li>Las skills de metodología: <em>test-driven development</em> (escribir primero el test que falla, luego el código), depuración sistemática (hipótesis y pruebas, no cambios a ciegas) y pedir revisión de código.</li>
+      </ul>
       <button class="mark-done" type="button" data-mod="m7" aria-pressed="false">Marcar como completado</button>
     </section>
 
     <!-- 8 -->
     <section class="mod" id="m8" data-title="MCP">
       <div class="mod-head"><span class="mod-num">08</span><h2>MCP: tus propias herramientas</h2><span class="badge ok">probado</span></div>
-      <p class="mod-goal">Construir un servidor MCP en 60 líneas y conectarlo a Hermes (y a cualquier otro agente).</p>
-      <p class="prose"><a href="https://modelcontextprotocol.io">MCP</a> es el estándar para dar herramientas a un agente. El mismo servidor sirve para Hermes, Claude Desktop, Claude Code o Cursor. El nuestro expone el inventario de una tienda en SQLite.</p>
-      <div class="code"><span class="lbl">07-mcp/servidor_tienda.py (extracto)</span><pre><span class="c"># /// script
-# dependencies = ["mcp>=2.3"]
+      <p class="mod-goal">Construir un servidor MCP en unas 50 líneas de código y conectarlo a Hermes (y a cualquier otro agente).</p>
+      <p class="prose"><a href="https://modelcontextprotocol.io">MCP</a> (<em>Model Context Protocol</em>) es el estándar para dar herramientas a un agente. Un <strong>servidor MCP</strong> es un programa pequeño que anuncia sus herramientas (nombre, descripción y parámetros) y las ejecuta cuando el agente las llama. El mismo servidor sirve para Hermes, Claude Desktop, Claude Code o Cursor: lo escribes una vez y lo conecta cualquier cliente MCP. El nuestro expone el inventario de una tienda guardado en SQLite, una base de datos que vive en un único fichero (<code>tienda.db</code>, que el servidor crea junto al script la primera vez que arranca, con cinco productos de ejemplo).</p>
+      <div class="code"><span class="lbl">07-mcp/servidor_tienda.py (extracto)</span><pre><span class="c"># /// script                      ← metadatos del script (formato PEP 723)
+# dependencies = ["mcp>=2.3"]     ← uv instala esto solo, al ejecutarlo
 # ///</span>
 <span class="k">from</span> mcp.server.mcpserver <span class="k">import</span> MCPServer   <span class="c"># mcp 2.x (en 1.x: FastMCP)</span>
 
-mcp = MCPServer(<span class="k">"tienda"</span>)
+mcp = MCPServer(<span class="k">"tienda"</span>)           <span class="c"># nombre con el que se presenta el servidor</span>
 
-@mcp.tool()
+@mcp.tool()                          <span class="c"># convierte la función en una herramienta MCP</span>
 <span class="k">def</span> stock_bajo() -&gt; str:
-    <span class="k">"""Productos con stock estrictamente por debajo de su mínimo."""</span>
+    <span class="k">"""Productos con stock estrictamente por debajo de su mínimo."""</span>   <span class="c"># ← lo lee el modelo</span>
     ...
 
 @mcp.tool()
-<span class="k">def</span> registrar_pedido(sku: str, unidades: int) -&gt; str:
+<span class="k">def</span> registrar_pedido(sku: str, unidades: int) -&gt; str:   <span class="c"># los tipos definen los parámetros</span>
     <span class="k">"""Registra una venta y descuenta el stock."""</span>
     ...
 
 <span class="k">if</span> __name__ == <span class="k">"__main__"</span>:
-    mcp.run()</pre></div>
+    mcp.run()                        <span class="c"># escucha por stdio (entrada/salida estándar)</span></pre></div>
+      <p>Qué significa cada parte:</p>
+      <ul class="prose">
+        <li><strong>El bloque <code># /// script</code></strong> declara las dependencias dentro del propio fichero. Con <code>uv run servidor_tienda.py</code>, <a href="https://docs.astral.sh/uv/">uv</a> (el gestor de paquetes de Python que usamos en el curso) crea un entorno aislado con <code>mcp</code> y lo ejecuta. Así no hay <code>requirements.txt</code> ni <code>pip install</code> previo: el servidor es un solo fichero que se puede copiar.</li>
+        <li><strong><code>@mcp.tool()</code></strong> publica la función como herramienta. El SDK lee la <em>docstring</em> (el texto entre <code>"""</code>) como descripción y la firma (<code>sku: str, unidades: int</code>) como esquema de parámetros. El modelo decide cuándo llamar a cada herramienta solo por esa descripción, así que escríbela como una instrucción clara.</li>
+        <li><strong><code>SKU</code></strong> es el código interno de cada producto (<code>TEC-01</code> es el teclado). El fichero completo trae una tercera herramienta, <code>listar_productos</code>.</li>
+        <li><strong>stdio</strong> es el transporte más simple de MCP: el cliente (Hermes) arranca el servidor como un proceso hijo y hablan por su entrada y salida estándar. No hay puertos ni red; el servidor vive mientras lo usa el agente.</li>
+      </ul>
       <div class="note key"><span class="t">SDK de MCP 2.x</span><p>Este servidor usa la versión actual del SDK oficial, la 2.x, donde la clase se llama <code>MCPServer</code>. En la 1.x se llamaba <code>FastMCP</code>: si sigues un tutorial de 2025 y ves <code>ModuleNotFoundError</code>, es por eso. Fija la versión en las dependencias del script.</p></div>
       <div class="code"><pre>hermes mcp add tienda --command uv --args run "$PWD/servidor_tienda.py"
 hermes -z "Dime qué productos hay que reponer y registra un pedido de 2 teclados TEC-01."
 <span class="c"># → AUR-BT y RAT-01 bajo mínimo. Pedido registrado; stock de TEC-01: 10.   (12 s)</span></pre></div>
-      <div class="code"><span class="lbl">~/.hermes/config.yaml</span><pre><span class="k">mcp_servers:</span>
+      <p>Qué significa cada parte del primer comando:</p>
+      <div class="tw"><table>
+        <thead><tr><th>Parte</th><th>Qué hace</th></tr></thead>
+        <tbody>
+          <tr><td><code>hermes mcp add tienda</code></td><td>Registra un servidor MCP llamado <code>tienda</code>. Ese nombre es la clave en la config y el prefijo con el que verás sus herramientas</td></tr>
+          <tr><td><code>--command uv</code></td><td>El programa que Hermes lanzará para arrancar el servidor (transporte stdio)</td></tr>
+          <tr><td><code>--args run "$PWD/servidor_tienda.py"</code></td><td>Los argumentos de ese programa: Hermes ejecutará <code>uv run …/servidor_tienda.py</code>. <code>--args</code> se traga todo lo que viene detrás, por eso va siempre al final</td></tr>
+          <tr><td><code>"$PWD/…"</code></td><td><code>$PWD</code> es la carpeta actual. La ruta debe ser absoluta porque Hermes arranca el servidor desde otra carpeta, y una ruta relativa dejaría de encontrarlo</td></tr>
+        </tbody></table></div>
+      <p>El segundo comando es el modo <em>one-shot</em> del módulo 02: <code>hermes -z "…"</code> envía una sola petición, imprime la respuesta final y sale. Hermes arranca el servidor, descubre sus herramientas y el modelo elige llamar a <code>stock_bajo</code> y a <code>registrar_pedido</code>. Para comprobar la conexión sin gastar en el modelo, el repositorio usa <code>hermes mcp test tienda</code>, que conecta con el servidor y lista sus herramientas.</p>
+      <div class="code"><span class="lbl">~/.hermes/config.yaml</span><pre><span class="k">mcp_servers:</span>                       <span class="c"># lo que escribe hermes mcp add</span>
   <span class="k">tienda:</span>
     <span class="k">command:</span> uv
     <span class="k">args:</span> [run, /ruta/absoluta/servidor_tienda.py]
-    <span class="c"># tools: { exclude: [registrar_pedido] }</span>
-    <span class="c"># trust: untrusted</span></pre></div>
+    <span class="c"># tools: { exclude: [registrar_pedido] }   ← oculta esa herramienta al agente</span>
+    <span class="c"># trust: untrusted                         ← pide aprobación antes de las que pueden escribir</span></pre></div>
+      <p><code>~/.hermes/config.yaml</code> es el fichero de configuración principal de Hermes (<code>~</code> es tu carpeta personal). Las dos líneas comentadas son las palancas de seguridad: <code>tools.exclude</code> quita herramientas concretas (y <code>tools.include</code> deja solo las que listes); <code>trust: untrusted</code> hace que Hermes pida aprobación antes de cada herramienta del servidor que no esté marcada como de solo lectura y, si nadie puede aprobar, la bloquea. Por defecto un servidor es de confianza plena.</p>
       <div class="note warn"><span class="t">Lección de seguridad</span><p>El pedido se registró <strong>sin pedir aprobación</strong>. Las aprobaciones de Hermes protegen la terminal, no las herramientas MCP. Diseña servidores de solo lectura por defecto, filtra con <code>tools.exclude</code> o pon la confirmación dentro de la propia herramienta.</p></div>
-      <p>Al revés también funciona: <code>hermes mcp serve</code> expone Hermes como servidor MCP para Claude Desktop o Cursor.</p>
+      <p>Al revés también funciona: <code>hermes mcp serve</code> expone Hermes como servidor MCP para Claude Desktop o Cursor. Lo que publica son tus conversaciones de Hermes en las plataformas de mensajería (módulo 06): el otro agente puede listarlas, leer su historial, enviar mensajes y responder aprobaciones pendientes.</p>
       <button class="mark-done" type="button" data-mod="m8" aria-pressed="false">Marcar como completado</button>
     </section>
 
@@ -726,6 +977,7 @@ hermes -z "Dime qué productos hay que reponer y registra un pedido de 2 teclado
       <div class="mod-head"><span class="mod-num">09</span><h2>Entornos: dónde trabaja el agente</h2><span class="badge ok">probado</span></div>
       <p class="mod-goal">Separar el cerebro (modelo) de las manos (entorno) y preparar el entorno para que el agente rinda.</p>
       <p class="prose">Un agente programador rinde tanto como el entorno que le das: dónde ejecuta, qué ve, qué herramientas tiene y cómo comprueba su trabajo. Invertir en eso suele dar más que acumular skills.</p>
+      <p class="prose">En Hermes, el <strong>backend de terminal</strong> decide dónde se ejecutan los comandos que lanza el agente (su herramienta <code>terminal</code>). El modelo es el mismo; lo que cambia es la máquina en la que actúan sus «manos».</p>
       <div class="tw"><table>
         <thead><tr><th>Backend</th><th>Uso típico</th></tr></thead>
         <tbody>
@@ -735,23 +987,47 @@ hermes -z "Dime qué productos hay que reponer y registra un pedido de 2 teclado
           <tr><td><code>modal</code> · <code>daytona</code> · <code>vercel_sandbox</code></td><td>Sandboxes efímeros en la nube</td></tr>
           <tr><td><code>singularity</code></td><td>Clústeres HPC</td></tr>
         </tbody></table></div>
+      <ul class="prose">
+        <li><strong>Docker</strong> ejecuta programas dentro de un <strong>contenedor</strong>: un Linux aislado, con sus propios ficheros y procesos, que arranca en segundos. El contenedor se crea a partir de una <strong>imagen</strong>, una plantilla de solo lectura con el sistema y las herramientas ya instaladas. Lo que pase dentro no toca tu Mac.</li>
+        <li><strong>SSH</strong> es la conexión segura a otra máquina por terminal: el agente ejecuta sus comandos allí.</li>
+        <li><strong>Sandbox</strong> («caja de arena») es un entorno aislado y desechable. <code>modal</code>, <code>daytona</code> y <code>vercel_sandbox</code> son servicios que te lo dan en la nube y lo destruyen al acabar.</li>
+        <li><strong>HPC</strong> (<em>High Performance Computing</em>) son los clústeres de cálculo de universidades y centros de investigación; <code>singularity</code> es el sistema de contenedores que suelen usar en lugar de Docker.</li>
+      </ul>
       <div class="code"><span class="lbl">~/.hermes/config.yaml</span><pre><span class="k">terminal:</span>
-  <span class="k">backend:</span> docker
-  <span class="k">docker_image:</span> python:3.13-slim
+  <span class="k">backend:</span> docker                        <span class="c"># los comandos del agente corren en un contenedor</span>
+  <span class="k">docker_image:</span> python:3.13-slim        <span class="c"># imagen oficial de Python 3.13, versión reducida</span>
   <span class="k">docker_mount_cwd_to_workspace:</span> true   <span class="c"># monta el directorio de lanzamiento en /workspace</span>
   <span class="k">cwd:</span> "."                              <span class="c"># NO "/workspace": desactiva el montaje</span></pre></div>
       <div class="note key"><span class="t">Cómo se monta tu proyecto</span><p><code>docker_mount_cwd_to_workspace</code> monta el directorio desde el que lanzas <code>hermes</code> en <code>/workspace</code>, y <code>cwd: "."</code> le dice que trabaje ahí. Si fijas <code>cwd: /workspace</code> explícitamente, el montaje se desactiva y el contenedor arranca vacío. Con esta configuración los tests de la demo corren en Linux aarch64 dentro del contenedor en 21 s. Con backends de contenedor, <code>/rollback</code> no aplica.</p></div>
+      <p><strong>Montar</strong> una carpeta significa que el contenedor ve tu carpeta real en una ruta suya (<code>/workspace</code>): lo que el agente cambie ahí cambia en tu disco, y el resto del contenedor sigue aislado. <code>cwd</code> es el directorio de trabajo (<em>current working directory</em>), la carpeta donde empiezan los comandos. <code>aarch64</code> es la arquitectura ARM de 64 bits de los Mac con chip Apple: el contenedor es un Linux para ese procesador. <code>/rollback</code> es el comando de Hermes que deshace cambios de ficheros con los <em>checkpoints</em> (copias previas) que guarda en tu máquina; con contenedores los ficheros viven en el sandbox y esas copias no existen.</p>
       <h3>Imagen efímera por tarea</h3>
       <p class="prose">Un paso más allá: en vez de un Hermes "vivo" que acumula memoria y skills, cada tarea arranca <strong>un contenedor nuevo de Hermes</strong> a partir de una imagen que controla el equipo. Mejorar el flujo es publicar una imagen nueva, no limpiar la máquina de cada persona. <span class="badge ok">probado</span></p>
+      <p>La carpeta <code>08-entornos/imagen-equipo/</code> trae cuatro ficheros: el <code>Dockerfile</code> (la receta de la imagen), <code>config.yaml</code> (modelo, proveedor, máximo de 20 turnos y memoria desactivada, sin secretos), <code>SOUL.md</code> (el fichero que Hermes lee como identidad e instrucciones fijas del agente: aquí, «lee <code>AGENTS.md</code>, ejecuta los tests y resume qué comprobaste») y <code>tarea.sh</code> (el script que lanza cada tarea).</p>
       <div class="code"><span class="lbl">imagen-equipo/Dockerfile</span><pre><span class="k">FROM</span> nousresearch/hermes-agent:v0.21.6          <span class="c"># versión fijada</span>
 <span class="k">COPY</span> --from=ghcr.io/astral-sh/uv:0.11.20 /uv /uvx /usr/local/bin/   <span class="c"># lo que necesitan tus repos</span>
 <span class="k">COPY</span> config.yaml SOUL.md /opt/data/          <span class="c"># config del equipo, sin secretos</span></pre></div>
+      <ul class="prose">
+        <li><code>FROM</code> parte de la imagen oficial de Hermes. Lo que va tras <code>:</code> es la <em>etiqueta</em> (versión): fijarla evita que la imagen cambie sola cuando Nous publique otra.</li>
+        <li><code>COPY --from=…</code> copia ficheros desde <em>otra</em> imagen: aquí, los ejecutables <code>uv</code> y <code>uvx</code> de la imagen oficial de uv, publicada en <code>ghcr.io</code> (el registro de imágenes de GitHub). Es la forma más corta de instalar uv sin descargar nada más.</li>
+        <li><code>COPY config.yaml SOUL.md /opt/data/</code> mete la config del equipo en <code>/opt/data</code>, que en esta imagen es el <code>HERMES_HOME</code>: la carpeta que en tu Mac es <code>~/.hermes</code>.</li>
+      </ul>
       <div class="code"><span class="lbl">imagen-equipo/tarea.sh (resumen)</span><pre>docker build -q -t hermes-equipo:local imagen-equipo
 docker run --rm \
   --env-file &lt;(grep '^OPENROUTER_API_KEY=' ~/.hermes/.env) \   <span class="c"># solo la clave, no todo el .env</span>
   -v "$REPO:/workspace" -w /workspace \
   hermes-equipo:local -z "Ejecuta los tests y resume el estado. No modifiques ningún fichero."</pre></div>
+      <div class="tw"><table>
+        <thead><tr><th>Parte</th><th>Qué hace</th></tr></thead>
+        <tbody>
+          <tr><td><code>docker build -q -t hermes-equipo:local imagen-equipo</code></td><td>Construye la imagen con el <code>Dockerfile</code> de esa carpeta y la llama <code>hermes-equipo:local</code> (<code>-t</code>, <em>tag</em>). <code>-q</code> la hace silenciosa. Si nada cambió, Docker reutiliza lo ya construido y tarda un instante</td></tr>
+          <tr><td><code>docker run --rm</code></td><td>Arranca un contenedor nuevo y lo borra al terminar (<code>--rm</code>): no quedan restos entre tareas</td></tr>
+          <tr><td><code>--env-file &lt;(grep …)</code></td><td>Pasa variables de entorno leídas de un fichero. <code>&lt;(…)</code> convierte la salida de <code>grep</code> en un fichero temporal, así solo entra la línea <code>OPENROUTER_API_KEY=…</code> de tu <code>~/.hermes/.env</code> (el fichero donde Hermes guarda tus claves)</td></tr>
+          <tr><td><code>-v "$REPO:/workspace"</code></td><td>Monta la carpeta del repositorio (<code>$REPO</code>, el primer argumento del script) en <code>/workspace</code> dentro del contenedor</td></tr>
+          <tr><td><code>-w /workspace</code></td><td>Fija esa carpeta como directorio de trabajo, donde arranca Hermes</td></tr>
+          <tr><td><code>hermes-equipo:local -z "…"</code></td><td>La imagen que se ejecuta y, detrás, los argumentos que recibe <code>hermes</code> dentro del contenedor: <code>-z</code> es el modo <em>one-shot</em> del módulo 02 (una petición, la respuesta final y sale)</td></tr>
+        </tbody></table></div>
       <p class="prose">Resultado real sobre la tienda del módulo 10: <strong>"4 de 5 tests pasan y 1 falla"</strong>, con la causa exacta, <code>git status</code> limpio al terminar y ningún contenedor ni volumen sobrante. Unos <strong>30 s y 0,005 $</strong> por tarea. La imagen ocupa <strong>4,5 GB</strong> (trae Chromium, Node y ffmpeg): tenlo en cuenta al dimensionar el servidor.</p>
+      <p><code>git status</code> limpio significa que git no ve ningún fichero modificado: el agente cumplió el «no modifiques nada». Un <strong>volumen</strong> es una carpeta que Docker guarda aparte del contenedor para que sus datos sobrevivan; con <code>--rm</code> también se borran los volúmenes anónimos que creó ese contenedor.</p>
       <h4>Cuatro decisiones de diseño</h4>
       <ul class="prose">
         <li><strong>La config va dentro de la imagen, no montada.</strong> <code>/opt/data</code> (el <code>HERMES_HOME</code>) es un <code>VOLUME</code> de la imagen y Hermes escribe en él su estado: skills incluidas, cachés, <code>state.db</code>, los entornos que monte el agente… Si montas ahí la carpeta del equipo, la ensucias con decenas de MB en cada tarea. Copiada en la imagen, cada <code>docker run --rm</code> parte de cero y lo tira todo al acabar.</li>
@@ -759,7 +1035,9 @@ docker run --rm \
         <li><strong>La clave nunca va en la imagen.</strong> Entra al ejecutar, y solo la del proveedor, no el <code>.env</code> entero. Hermes no la escribe en disco: en <code>auth.json</code> guarda solo su huella.</li>
         <li><strong>Decide dónde va la visibilidad.</strong> Con <code>--rm</code> se van también las sesiones y <code>hermes insights</code>. Monta solo <code>logs/</code> y <code>sessions/</code> en un volumen, envía la salida a tu sistema de logs o mide el coste con el consumo de la clave en el proveedor, como hicimos aquí.</li>
       </ul>
+      <p>Términos de esta lista: <code>VOLUME</code> es la instrucción del Dockerfile que declara una carpeta como volumen. <code>state.db</code> es la base de datos donde Hermes guarda sesiones e historial. <code>AGENTS.md</code> es el fichero del repositorio con las instrucciones para agentes (cómo instalar, cómo pasar los tests), que viste en el módulo 07. Un <em>venv</em> es un entorno virtual de Python creado a mano con <code>pip</code>, justo lo que <code>uv</code> automatiza. <code>auth.json</code> es el fichero de credenciales de Hermes; la «huella» es un resumen que identifica la clave sin permitir reconstruirla. <code>hermes insights</code> muestra estadísticas de uso a partir de las sesiones guardadas.</p>
       <h3>Worktrees y permisos mínimos</h3>
+      <p>Un <strong>worktree</strong> de git es una segunda carpeta de trabajo del mismo repositorio, en su propia rama: dos agentes pueden editar a la vez sin pisarse los ficheros.</p>
       <div class="tw"><table>
         <thead><tr><th>Necesidad</th><th>Cómo</th></tr></thead>
         <tbody>
@@ -770,23 +1048,45 @@ docker run --rm \
           <tr><td>Prohibir comandos siempre (incluso con <code>--yolo</code>)</td><td><code>approvals.deny: ["git push*"]</code></td></tr>
           <tr><td>Limitar dónde escribe <code>write_file</code></td><td><code>HERMES_WRITE_SAFE_ROOT=/ruta</code></td></tr>
         </tbody></table></div>
+      <ul class="prose">
+        <li><code>hermes -w</code> abre la sesión en un worktree nuevo; <code>delegation.worktree_isolation</code> da uno a cada subagente; <code>kanban create --workspace worktree</code> da uno a cada tarjeta del tablero (módulo 10). Redis es una base de datos en memoria muy usada como caché: si dos worktrees comparten la misma, sus pruebas se mezclan.</li>
+        <li><code>hermes tools disable …</code> desactiva <strong>toolsets</strong>, los grupos de herramientas de Hermes: <code>web</code> (buscar y leer páginas), <code>browser</code> (manejar un navegador) y <code>computer_use</code> (controlar el escritorio). <code>hermes tools list</code> muestra todos y cuáles están activos.</li>
+        <li><code>tools.include</code> deja a un servidor MCP (módulo 08) solo las herramientas listadas.</li>
+        <li><code>approvals.deny</code> es una lista de patrones de comandos que Hermes bloquea siempre; el <code>*</code> vale por «cualquier cosa». <code>--yolo</code> es la opción que salta todas las aprobaciones, y aun así esta lista se respeta.</li>
+        <li><code>HERMES_WRITE_SAFE_ROOT</code> es una <strong>variable de entorno</strong> (un valor que recibe el proceso al arrancar). Si existe, las herramientas de escritura de ficheros (<code>write_file</code> y <code>patch</code>) solo pueden escribir dentro de esa ruta y Hermes rechaza cualquier otra.</li>
+      </ul>
       <p>Un agente proactivo que se atasca <strong>se las ingenia</strong>: codifica en base64 lo que no pasa un filtro, levanta un servidor auxiliar… Cuantas menos herramientas tenga, menos rodeos raros.</p>
       <h3>Dónde vive Hermes 24/7</h3>
       <p class="prose">Para un equipo, el entorno local no escala. Lo habitual es una máquina que controla el equipo técnico, igual para todos: un VPS de 1–2 vCPU y 2–4 GB, un servidor propio o un mini PC (una Raspberry Pi 4/400 con SO de 64 bits cumple los requisitos), o el contenedor oficial. Se accede por mensajería, por SSH o con una VPN privada como Tailscale para el dashboard. Dimensiona por tareas <em>simultáneas</em>: tres con navegador y base de datos propia no caben en 2 GB.</p>
+      <p>Un <strong>VPS</strong> (<em>Virtual Private Server</em>) es un servidor virtual alquilado por meses; <strong>vCPU</strong> son sus núcleos de procesador y los GB, su memoria RAM. Una <strong>VPN privada</strong> como Tailscale conecta tus dispositivos con el servidor sin abrirlo a Internet, para entrar al panel web de Hermes (<code>hermes dashboard</code>).</p>
       <h3>Subagentes en paralelo</h3>
       <div class="code"><pre>hermes -z "Usa delegate_task para lanzar 3 subagentes EN PARALELO (sin modificar ficheros):
 1) revisor de seguridad de src/, 2) revisor de cobertura de tests, 3) redactor de un README
 de 10 líneas. Combina sus resultados en un informe."</pre></div>
+      <p><code>delegate_task</code> es la herramienta de Hermes que crea <strong>subagentes</strong>: copias del agente con una tarea acotada y una conversación propia, que devuelven solo su resultado. Así el agente principal no llena su contexto con los detalles de cada encargo.</p>
       <p>Tardó 31 s y cada subagente tuvo su propio contexto. Hasta 10 subagentes en paralelo; usa un modelo más barato para ellos con <code>delegation.model</code>.</p>
       <h3>Revisión de código en pre-push o CI</h3>
-      <div class="code"><span class="lbl">08-entornos/ci/revisar-diff.sh (núcleo)</span><pre>DIFF="$(git diff "$BASE" -- .)"
+      <p>Un <strong>diff</strong> es la lista de líneas añadidas y quitadas entre dos versiones del código. La idea: pasarle a Hermes el diff de tus cambios y que diga si hay algo bloqueante. Puedes lanzarlo como <em>hook</em> <code>pre-push</code> (un script que git ejecuta antes de cada <code>git push</code> y que cancela el envío si termina con error) o en CI (Integración Continua: automatizaciones que corren en cada cambio del repositorio).</p>
+      <div class="code"><span class="lbl">08-entornos/ci/revisar-diff.sh (núcleo)</span><pre>DIFF="$(git diff "$BASE" -- .)"        <span class="c"># cambios respecto a la rama base (main por defecto)</span>
 RESULTADO="$(hermes -t file -z "Revisa SOLO este diff... VEREDICTO: OK | BLOQUEANTE ... $DIFF" \
              --usage-file .hermes-review-usage.json)"
-grep -q "VEREDICTO: BLOQUEANTE" &lt;&lt;&lt;"$RESULTADO" &amp;&amp; exit 1</pre></div>
+grep -q "VEREDICTO: BLOQUEANTE" &lt;&lt;&lt;"$RESULTADO" &amp;&amp; exit 1   <span class="c"># error = push cancelado</span></pre></div>
       <p>Con <code>-t file</code> el revisor no tiene terminal ni web. Coste medido: <strong>0,003 $ por revisión</strong>.</p>
+      <div class="note key"><span class="t">Qué es <code>-t file</code></span><p><code>-t</code> es la forma corta de <code>--toolsets</code>: la lista, separada por comas, de los grupos de herramientas que tendrá el agente <strong>solo en esta ejecución</strong> (sin ella usa los que tengas activos en <code>hermes tools</code>). El toolset <code>file</code> incluye cuatro herramientas: <code>read_file</code> (leer), <code>search_files</code> (buscar en contenidos y nombres), <code>write_file</code> (escribir) y <code>patch</code> (editar un trozo). Fuera quedan <code>terminal</code>, <code>web</code>, <code>browser</code> y el resto. Para revisar código basta con leer, y un revisor sin terminal no puede ejecutar nada aunque el diff contenga instrucciones maliciosas.</p></div>
+      <div class="tw"><table>
+        <thead><tr><th>Parte</th><th>Qué hace</th></tr></thead>
+        <tbody>
+          <tr><td><code>git diff "$BASE" -- .</code></td><td>Saca el diff entre la rama base y tu código actual. <code>-- .</code> lo limita a la carpeta desde la que lo lanzas</td></tr>
+          <tr><td><code>-z "…"</code></td><td>Modo <em>one-shot</em>: imprime solo la respuesta final, cómoda de procesar en un script. Ojo: en este modo las aprobaciones se saltan automáticamente, otra razón para recortar las herramientas</td></tr>
+          <tr><td><code>VEREDICTO: OK | BLOQUEANTE</code></td><td>Formato de respuesta fijo que pide el prompt. Así el script puede buscar una cadena exacta en lugar de interpretar texto libre</td></tr>
+          <tr><td><code>--usage-file .hermes-review-usage.json</code></td><td>Al terminar, Hermes escribe en ese fichero un JSON con el coste estimado en dólares, los tokens de entrada y salida, el modelo y el número de llamadas. Se escribe incluso si la ejecución falla: es la forma de saber cuánto gasta cada revisión sin abrir el panel del proveedor. El punto inicial del nombre lo convierte en un fichero oculto</td></tr>
+          <tr><td><code>grep -q … &lt;&lt;&lt;"$RESULTADO" &amp;&amp; exit 1</code></td><td><code>&lt;&lt;&lt;</code> pasa el texto de la variable a <code>grep</code>; <code>-q</code> solo responde sí o no. Si aparece «BLOQUEANTE», el script sale con código 1 (error) y git cancela el push</td></tr>
+        </tbody></table></div>
       <h3>Revisión de cada PR en GitHub Actions <span class="badge ok">probado</span></h3>
+      <p class="prose">Una <strong>PR</strong> (<em>pull request</em>) es la propuesta de unir los cambios de una rama a la principal; el <em>merge</em> es la unión. <strong>GitHub Actions</strong> es el CI de GitHub: ejecuta en sus máquinas los <em>workflows</em> (ficheros YAML en <code>.github/workflows/</code>) cuando ocurre algo en el repositorio, como abrir una PR. Un <strong>secreto</strong> es un valor cifrado que GitHub guarda y entrega al workflow sin mostrarlo en los logs.</p>
       <p class="prose">La plantilla <code>08-entornos/ci/github-action-review.yml</code> revisa cada PR y deja el resultado como comentario. Cópiala a <code>.github/workflows/</code> y añade la clave como secreto del repo desde tu terminal:</p>
       <div class="code"><pre>gh secret set OPENROUTER_API_KEY --repo &lt;usuario&gt;/&lt;repo&gt;   <span class="c"># pide la clave sin mostrarla</span></pre></div>
+      <p><code>gh</code> es la CLI oficial de GitHub. <code>gh secret set</code> guarda el secreto con ese nombre en el repositorio que indicas; al escribir la clave en tu terminal no pasa por ningún chat ni queda en el historial de comandos.</p>
       <div class="code"><span class="lbl">github-action-review.yml (pasos clave)</span><pre>curl -fsSL https://hermes-agent.nousresearch.com/install.sh \
   | bash -s -- --non-interactive --skip-browser --skip-computer-use --branch v0.21.6
 
@@ -796,6 +1096,20 @@ hermes -t file -z "Revisa el diff de pr.diff… No modifiques ningún fichero. V
   --usage-file usage.json &gt; review.md
 gh pr comment $PR --body-file review.md</pre></div>
       <div class="tw"><table>
+        <thead><tr><th>Parte</th><th>Qué hace</th></tr></thead>
+        <tbody>
+          <tr><td><code>curl -fsSL … | bash -s -- …</code></td><td>Descarga el instalador oficial (<code>-fsSL</code>: silencioso, sigue redirecciones y falla si hay error) y se lo pasa a <code>bash</code>. <code>-s</code> le dice a <code>bash</code> que lea el script de esa entrada y <code>--</code> marca que lo que sigue son opciones del instalador</td></tr>
+          <tr><td><code>--non-interactive</code></td><td>Sin preguntas: en CI no hay nadie para responder</td></tr>
+          <tr><td><code>--skip-browser</code> · <code>--skip-computer-use</code></td><td>No instala el navegador ni el control de escritorio: el revisor no los usa y la instalación tarda menos</td></tr>
+          <tr><td><code>--branch v0.21.6</code></td><td>Instala esa versión concreta de Hermes</td></tr>
+          <tr><td><code>git diff origin/$BASE...HEAD &gt; pr.diff</code></td><td>Guarda en <code>pr.diff</code> los cambios de la PR. <code>$BASE</code> es la rama destino; los tres puntos comparan contra el punto en que la rama de la PR se separó de ella, así solo salen los cambios de la PR</td></tr>
+          <tr><td><code>HERMES_WRITE_SAFE_ROOT=$RUNNER_TEMP/hermes</code></td><td>Delante del comando, fija la variable solo para él. <code>$RUNNER_TEMP</code> es la carpeta temporal que GitHub da a cada ejecución</td></tr>
+          <tr><td><code>--usage-file usage.json</code></td><td>Mismo informe de coste y tokens que en el script local; el workflow lo imprime al final para verlo en el log</td></tr>
+          <tr><td><code>&gt; review.md</code></td><td>Guarda la respuesta (en Markdown) en un fichero</td></tr>
+          <tr><td><code>gh pr comment $PR --body-file review.md</code></td><td>Publica ese fichero como comentario en la PR número <code>$PR</code></td></tr>
+        </tbody></table></div>
+      <p>En el fichero real, <code>$BASE</code> y <code>$PR</code> son expresiones de GitHub (<code>${{ github.base_ref }}</code> y el número de la PR), y la clave llega como variable de entorno desde <code>${{ secrets.OPENROUTER_API_KEY }}</code>. El bloque <code>permissions</code> le da al workflow solo lectura del código y permiso para comentar PR.</p>
+      <div class="tw"><table>
         <thead><tr><th>Decisión</th><th>Por qué</th></tr></thead>
         <tbody>
           <tr><td>Versión fijada en el instalador y <code>hermes --version</code> en el log</td><td>Cada PR se revisa con la misma versión; actualizar es un cambio explícito</td></tr>
@@ -804,6 +1118,7 @@ gh pr comment $PR --body-file review.md</pre></div>
           <tr><td>Sin PR desde forks (<code>if:</code>)</td><td>No reciben secretos ni permiso de escritura</td></tr>
           <tr><td>Una clave propia para CI, con límite de gasto</td><td>Si se filtra o alguien abusa del workflow, el daño queda acotado</td></tr>
         </tbody></table></div>
+      <p>Un <strong>fork</strong> es una copia del repositorio en la cuenta de otra persona. GitHub no entrega secretos a las PR que vienen de forks, así que el workflow fallaría; la condición <code>if:</code> del job directamente no las lanza.</p>
       <div class="example">
         <h4>PR de prueba <span class="badge ok">≈ 2 min · ≈ 0,003 $</span></h4>
         <div class="meta">Fallo a propósito: <code>stock_bajo</code> pasa de <code>&lt;</code> a <code>&lt;=</code>, contra su docstring</div>
@@ -829,10 +1144,26 @@ gh pr comment $PR --body-file review.md</pre></div>
           <tr><td>Cada entorno diverge</td><td>Cada persona acumula memorias y skills distintas. Sale un modelo nuevo y "a mí no me va": el arnés viejo lo frena</td></tr>
           <tr><td>Las skills no fuerzan el proceso</td><td>Si el modelo no detecta que debe usar la skill, no la usa. "Ya lo tengo hecho"… sobre una rama vieja</td></tr>
           <tr><td>Mantener a mano no escala</td><td>Repartir skills o plugins y comprobar que todos los tienen al día es un trabajo en sí mismo</td></tr>
-          <tr><td>Recursos</td><td>Base de datos, Redis y navegador no caben en el portátil pequeño de alguien de ventas</td></tr>
+          <tr><td>Recursos</td><td>Base de datos, Redis (un almacén de datos en memoria) y navegador no caben en el portátil pequeño de alguien de ventas</td></tr>
           <tr><td>Cero visibilidad</td><td>Un agente en una terminal remota no te dice qué pasó en cada fase</td></tr>
         </tbody></table></div>
       <p class="prose">La salida no es escribir "mejores skills", sino montar <strong>un entorno compartido, controlado por el equipo técnico, igual para todos y observable</strong>. Hermes trae las piezas: perfiles, tablero kanban con dispatcher, <code>/goal</code>, revisión nativa, cron, mensajería y dashboard.</p>
+      <p class="prose">Antes de seguir, el vocabulario que usa todo el módulo:</p>
+      <div class="tw"><table>
+        <thead><tr><th>Término</th><th>Qué significa</th></tr></thead>
+        <tbody>
+          <tr><td>Arnés</td><td>Todo lo que rodea al modelo y guía su trabajo: instrucciones (<code>SOUL.md</code>, <code>AGENTS.md</code>), skills, herramientas y scripts. El modelo lo pone el proveedor; el arnés lo escribes tú.</td></tr>
+          <tr><td>Perfil</td><td>Una instancia aislada de Hermes con su propia carpeta, <code>~/.hermes/profiles/&lt;nombre&gt;/</code>: configuración (<code>config.yaml</code>), claves (<code>.env</code>), <code>SOUL.md</code>, skills, memoria y sesiones. Aquí, un perfil es un rol del equipo.</td></tr>
+          <tr><td><code>SOUL.md</code></td><td>El fichero de identidad del perfil. Hermes lo carga como instrucciones fijas en cada conversación: "eres el revisor; no modificas código…".</td></tr>
+          <tr><td>Toolset</td><td>Un grupo de herramientas que se activa o desactiva junto: <code>browser</code> (navegador), <code>web</code> (búsqueda), <code>memory</code>, <code>delegation</code> (subagentes)… Quitar toolsets es la forma de dar permisos mínimos a un perfil.</td></tr>
+          <tr><td>Kanban (tablero)</td><td>Un tablero de tareas por columnas: <em>Triage, Todo, Ready, Running, Review, Blocked, Done</em>. En Hermes es una base de datos SQLite que comparten todos los perfiles.</td></tr>
+          <tr><td>Tarjeta</td><td>Una tarea del tablero: título, cuerpo (el encargo), perfil asignado y, si quieres, una tarjeta padre de la que depende.</td></tr>
+          <tr><td>Gateway</td><td>El proceso de Hermes que se queda en marcha: conecta con Telegram y otras mensajerías (módulo 06) y aloja el dispatcher.</td></tr>
+          <tr><td>Dispatcher</td><td>El bucle que vigila el tablero. Cuando una tarjeta está lista, lanza un worker del perfil asignado.</td></tr>
+          <tr><td>Worker</td><td>Una ejecución de Hermes, con el perfil de la tarjeta, que trabaja en ella hasta terminarla, bloquearla o pedir revisión. Arranca con <strong>contexto limpio</strong>: no ve la conversación de las otras fases, solo el resumen que dejaron.</td></tr>
+          <tr><td><code>/goal</code> y juez</td><td>Modo en el que, tras cada turno, otro modelo (el juez) comprueba si el objetivo se ha cumplido. Si no, el agente sigue trabajando.</td></tr>
+          <tr><td>TDD y E2E</td><td><em>Test-driven development</em>: primero un test que falla ("en rojo"), luego el código que lo pasa ("en verde"). <em>End-to-end</em>: probar la app entera como un usuario, en un navegador real.</td></tr>
+        </tbody></table></div>
 
       <h3>La arquitectura</h3>
       <figure class="diagram" aria-label="Pipeline por fases: ticket, script determinista y cuatro perfiles encadenados">
@@ -883,33 +1214,73 @@ gh pr comment $PR --body-file review.md</pre></div>
           <tr><td>Cómo se arranca <em>este</em> producto</td><td>Skill de proyecto en <code>app-web/.hermes/skills/levantar-entorno</code> (tras <code>hermes skills trust</code>)</td></tr>
           <tr><td>Visibilidad</td><td><code>hermes dashboard</code> → Kanban, <code>hermes kanban watch</code>, <code>hermes kanban runs &lt;id&gt;</code></td></tr>
         </tbody></table></div>
+      <p class="prose">Cómo leer esta tabla:</p>
+      <ul class="prose">
+        <li><code>&lt;rol&gt;</code> e <code>&lt;id&gt;</code> son huecos: pones el nombre de un perfil (<code>revisor</code>) o el id que devuelve el tablero al crear una tarjeta.</li>
+        <li><code>--clone</code> copia del perfil activo su <code>config.yaml</code>, <code>.env</code>, <code>SOUL.md</code> y skills. Así el perfil nuevo hereda proveedor, modelo y clave. Los tokens de los bots de mensajería no se copian.</li>
+        <li><code>--assignee</code> dice qué perfil hará la tarjeta; <code>--parent</code>, de qué tarjeta depende.</li>
+        <li><code>kanban_request_review</code>, <code>kanban_request_changes</code> y <code>kanban_complete</code> no son comandos de terminal: son <strong>herramientas que el propio agente llama</strong> desde su tarjeta. El implementador pide revisión con <code>reviewer="revisor"</code> y la <strong>misma tarjeta</strong> pasa al revisor. Por eso hay cuatro perfiles y solo tres tarjetas.</li>
+        <li>El "resumen estructurado" que recibe cada fase es lo que la anterior dejó al cerrar: un <code>summary</code> en texto y un <code>metadata</code> con datos (criterios, ficheros cambiados, deuda…).</li>
+        <li>Una <strong>skill de proyecto</strong> vive dentro del repo (<code>.hermes/skills/</code>), no en tu <code>~/.hermes</code>. Como cualquiera puede meter ficheros en un repo, Hermes no las carga hasta que confías en él con <code>hermes skills trust &lt;ruta&gt;</code>. La confianza se guarda en la configuración de cada perfil.</li>
+        <li><code>hermes kanban watch</code> muestra los eventos del tablero en vivo; <code>hermes kanban runs &lt;id&gt;</code>, el historial de intentos de una tarjeta: perfil, resultado, duración y resumen.</li>
+      </ul>
 
       <h3>Claves de diseño del pipeline</h3>
       <div class="note key"><span class="t">La tarjeta dice QUÉ; el SOUL.md dice CÓMO</span><p>Con <code>--goal</code>, un juez revisa cada turno del worker contra el título y el cuerpo de la tarjeta, y no deja terminar hasta que se cumpla. Todo lo que escribas en la tarjeta se convierte en objetivo: si pones "cuando esté en verde, pide revisión con <code>kanban_request_review</code>", el juez exigirá esa llamada como parte del resultado y rechazará el paso a revisión. Por eso la tarjeta lleva solo el objetivo y los criterios ("Hecho cuando: criterios cumplidos y pytest en verde") y el procedimiento (TDD, commit, pedir revisión) vive en el <code>SOUL.md</code> del perfil.</p></div>
       <div class="note key"><span class="t">Cada fase sabe qué validan las demás</span><p>Un revisor riguroso pedirá tests para todo lo que vea sin cubrir, también para lo visual que la fase E2E va a comprobar en el navegador. Si el <code>SOUL.md</code> del revisor dice "lo visual lo valida el E2E", te ahorras rondas. En la ejecución de abajo lo dejamos sin esa línea para que veas el bucle de cambios en acción.</p></div>
-      <div class="note key"><span class="t">Grabar el E2E: navegador clásico</span><p>Desde la v0.21 el navegador por defecto es <code>browser_exec</code> (Browser Use), y <code>browser.record_sessions</code> solo graba con las herramientas clásicas (<code>browser_navigate</code>, <code>browser_click</code>…). Por eso <code>crear-perfiles.sh</code> pone <code>browser.backend: off</code> en el perfil <code>e2e</code>. La grabación es <em>evidencia</em>, no una demo: el agente verifica leyendo el DOM y el vídeo sale casi estático. Si quieres un vídeo para enseñar al equipo, añade una <strong>fase aparte</strong> con un recorrido de usuario lento y, si quieres, narración con <code>text_to_speech</code> y ffmpeg.</p></div>
+      <div class="note key"><span class="t">Grabar el E2E: navegador clásico</span><p>Desde la v0.21 el navegador por defecto es <code>browser_exec</code> (Browser Use), y <code>browser.record_sessions</code> solo graba con las herramientas clásicas (<code>browser_navigate</code>, <code>browser_click</code>…). Por eso <code>crear-perfiles.sh</code> pone <code>browser.backend: off</code> en el perfil <code>e2e</code>. La grabación es <em>evidencia</em>, no una demo: el agente verifica leyendo el DOM y el vídeo sale casi estático. Si quieres un vídeo para enseñar al equipo, añade una <strong>fase aparte</strong> con un recorrido de usuario lento y, si quieres, narración con <code>text_to_speech</code> y ffmpeg.</p><p>Qué es cada cosa: <code>browser_exec</code> es una sola herramienta que maneja el navegador a través de Browser Use; las clásicas son una herramienta por acción (navegar, pulsar, escribir). <code>browser.record_sessions: true</code> graba cada sesión de navegador en vídeo WebM. <code>browser.backend: off</code> <strong>no apaga el navegador</strong>: fuerza las herramientas clásicas. El DOM es la estructura de la página (sus elementos y textos), que el agente lee en lugar de mirar la imagen. <code>text_to_speech</code> es la herramienta de voz de Hermes y ffmpeg, un programa para montar audio y vídeo.</p></div>
 
       <h3>Práctica: el ticket TIENDA-12</h3>
       <p class="prose">Una tienda web mínima (solo la biblioteca estándar de Python) con un bug, la búsqueda distingue mayúsculas, y una feature pedida por ventas: resaltar en rojo lo que hay que reponer y mostrar un contador.</p>
       <div class="code"><span class="lbl">09-equipo-de-agentes</span><pre>./perfiles/crear-perfiles.sh   <span class="c"># 4 perfiles con permisos mínimos, sin memoria ni autoaprendizaje</span>
-hermes gateway run              <span class="c"># en otra terminal: aloja el dispatcher</span>
+hermes gateway run              <span class="c"># en otra terminal: aloja el dispatcher (queda en primer plano; Ctrl+C lo para)</span>
 ./pipeline.sh                   <span class="c"># copia la app a un repo git NUEVO y crea las 3 tarjetas</span>
-hermes kanban watch             <span class="c"># o: hermes dashboard → Kanban</span></pre></div>
+hermes kanban watch             <span class="c"># o: hermes dashboard → Kanban (http://127.0.0.1:9119)</span></pre></div>
+      <p class="prose">Requisitos: <code>uv</code>, <code>jq</code> y <code>git</code>. <code>uv</code> gestiona proyectos de Python: <code>uv run pytest -q</code> ejecuta los tests con el Python y las dependencias del proyecto, sin instalar nada a mano (<code>pytest</code> es el ejecutor de tests; <code>-q</code>, salida breve). <code>jq</code> lee JSON en la terminal: el script lo usa para sacar el id de cada tarjeta. Los perfiles se clonan de tu perfil activo, así que heredan proveedor, modelo y clave.</p>
+      <p class="prose">Lo que hace <code>crear-perfiles.sh</code> con cada rol, tomando el revisor como ejemplo:</p>
+      <div class="code"><span class="lbl">crear-perfiles.sh (para un perfil)</span><pre>hermes profile create revisor --clone --no-alias --description "Revisa el diff…"
+cp revisor/SOUL.md ~/.hermes/profiles/revisor/SOUL.md     <span class="c"># su rol</span>
+hermes -p revisor tools disable web memory delegation … browser vision
+hermes -p revisor config set auxiliary.background_review.enabled false
+hermes -p revisor config set curator.enabled false
+hermes -p revisor config set skills.write_approval true</pre></div>
+      <ul class="prose">
+        <li><code>-p &lt;perfil&gt;</code> (o <code>--profile</code>) ejecuta cualquier comando de <code>hermes</code> contra ese perfil, sin cambiar el perfil activo.</li>
+        <li><code>--no-alias</code>: sin esta opción, Hermes crea un comando con el nombre del perfil (por ejemplo, <code>revisor</code>) en <code>~/.local/bin</code>. Aquí no hace falta: todo se lanza con <code>-p</code> o desde el tablero.</li>
+        <li><code>--description</code>: una frase sobre qué hace el rol. El kanban la usa para repartir tareas por rol y no solo por nombre.</li>
+        <li><code>tools disable</code> quita toolsets. Todos los perfiles pierden los que nadie necesita (<code>web</code>, <code>image_gen</code>, <code>tts</code>, <code>computer_use</code>, <code>cronjob</code>, <code>delegation</code>, <code>memory</code>, <code>code_execution</code>, <code>connections</code>, <code>clarify</code>, <code>session_search</code>). Especificador, implementador y revisor pierden además <code>browser</code> y <code>vision</code>: solo el <code>e2e</code> conserva el navegador. <code>clarify</code> sirve para hacer preguntas al usuario, y en una tarjeta nadie está mirando para contestar.</li>
+        <li><code>auxiliary.background_review.enabled false</code> apaga la revisión en segundo plano que, tras cada turno, guarda memorias o corrige skills (el autoaprendizaje).</li>
+        <li><code>curator.enabled false</code> apaga el mantenimiento automático que marca y archiva las skills que no se usan.</li>
+        <li><code>skills.write_approval true</code>: cualquier cambio en una skill queda pendiente de tu aprobación.</li>
+      </ul>
+      <p class="prose">El porqué de esta "higiene": un equipo necesita que cada perfil se comporte igual el lunes que el viernes. Si aprendiera solo, cada ejecución partiría de un entorno distinto y no podrías comparar resultados.</p>
       <div class="code"><span class="lbl">pipeline.sh (núcleo)</span><pre>SPEC=$(hermes kanban create "Especificar TIENDA-12" --assignee especificador \
   --workspace "dir:$WORK" --body "$TICKET …" --json | jq -r .id)
 IMPL=$(hermes kanban create "Implementar TIENDA-12" --assignee implementador \
   --parent "$SPEC" --workspace "dir:$WORK" --goal --goal-max-turns 15 \
   --body "$TICKET  Hecho cuando: criterios cumplidos y pytest en verde." --json | jq -r .id)
 hermes kanban create "E2E TIENDA-12" --assignee e2e --parent "$IMPL" --workspace "dir:$WORK" …</pre></div>
+      <p class="prose">Qué significa cada parte:</p>
+      <ul class="prose">
+        <li><code>$WORK</code> es la carpeta del repo nuevo (por defecto, una temporal creada con <code>mktemp</code>, como <code>/tmp/tienda-a1B2</code>) y <code>$TICKET</code>, el texto de <code>ticket.md</code>.</li>
+        <li><code>SPEC=$(…)</code> guarda en la variable <code>SPEC</code> lo que imprime el comando. La <code>\</code> al final de una línea indica que el comando sigue en la siguiente.</li>
+        <li><code>--workspace "dir:$WORK"</code>: el worker trabaja directamente en esa carpeta. Sin esta opción usaría una carpeta temporal vacía (<code>scratch</code>) y no vería la app.</li>
+        <li><code>--body</code>: el encargo. Es lo que lee el worker y, con <code>--goal</code>, lo que evalúa el juez.</li>
+        <li><code>--json | jq -r .id</code>: <code>--json</code> hace que el comando responda en JSON y <code>jq -r .id</code> extrae solo el campo <code>id</code>, sin comillas. Con ese id, la tarjeta siguiente se encadena con <code>--parent</code>.</li>
+        <li><code>--goal --goal-max-turns 15</code>: el implementador trabaja en modo objetivo, con un máximo de 15 turnos (sin <code>--goal-max-turns</code> serían 20). Si se agotan, la tarjeta se bloquea para que la mire una persona.</li>
+        <li>En el script completo, cada tarjeta lleva también <code>--max-runtime</code> (10, 30 y 15 minutos): si un worker lo supera, el dispatcher lo para y devuelve la tarjeta a la cola.</li>
+      </ul>
+      <p class="prose">¿Por qué un repo git <strong>nuevo</strong> en cada ejecución? Porque así todas parten del mismo estado; git deja ver el diff y hacer commits; y Hermes solo reconoce una carpeta como proyecto (y busca sus skills de proyecto) si tiene <code>.git</code>. Antes de crear las tarjetas, el script ejecuta <code>hermes -p &lt;perfil&gt; skills trust "$WORK"</code> para los cuatro perfiles.</p>
+      <p class="prose">Esa skill de proyecto, <code>levantar-entorno</code>, es la que usa el perfil <code>e2e</code>. Su <code>start.sh</code> arranca la tienda en segundo plano en <code>http://127.0.0.1:8765</code>, espera a que responda en <code>/salud</code> y guarda el número de proceso en <code>.servidor.pid</code> para que <code>stop.sh</code> pueda pararla. Si ya hay un servidor en ese puerto, falla en lugar de lanzar otro. Va en el repo y no en Hermes porque cómo se arranca un producto es cosa del producto: el flujo vive en Hermes; la ejecución, en el repo.</p>
       <div class="example">
         <h4>Ejecución real <span class="badge ok">≈ 12 min · ≈ 0,14 $</span></h4>
         <div class="meta">claude-haiku-5.5 en los 4 perfiles · coste total de la práctica</div>
         <ul class="found">
-          <li><strong>Especificador (42 s):</strong> encontró la causa del bug y fijó criterios verificables, incluido uno que nadie pidió explícitamente: WEB-06, con stock exactamente 5, <em>no</em> se marca.</li>
-          <li><strong>Implementador:</strong> TDD (8 tests en rojo primero), commit y paso a revisión con evidencia criterio por criterio. Admitió lo que no pudo comprobar: "verificación visual en navegador: NO".</li>
+          <li><strong>Especificador (42 s):</strong> encontró la causa del bug y fijó criterios verificables, incluido uno que nadie pidió explícitamente: el producto WEB-06 (código del catálogo), con stock exactamente 5, <em>no</em> se marca.</li>
+          <li><strong>Implementador:</strong> TDD (8 tests en rojo primero, es decir, fallando), commit y paso a revisión con evidencia criterio por criterio. Admitió lo que no pudo comprobar: "verificación visual en navegador: NO".</li>
           <li><strong>Revisor, ronda 1:</strong> devolvió cambios. El resaltado en rojo vivía en JavaScript y ningún test lo ejecutaba; el test añadido solo buscaba el texto de la regla CSS. Es el bucle de revisión haciendo su trabajo (y una ronda que puedes ahorrarte: ver "Cada fase sabe qué validan las demás").</li>
           <li><strong>Implementador, ronda 2:</strong> añadió un test que ejecuta el JS de la página. <strong>Revisor:</strong> aprobado.</li>
-          <li><strong>E2E:</strong> levantó la app con la skill del repo, escribió en el buscador y comprobó colores y posiciones en un Chromium real. Además encontró un bug que nadie buscaba: <strong>una condición de carrera</strong> en el buscador (con escritura muy rápida, la tabla muestra resultados de una búsqueda anterior). Lo dejó como ticket aparte, sin bloquear.</li>
+          <li><strong>E2E:</strong> levantó la app con la skill del repo, escribió en el buscador y comprobó colores y posiciones en un Chromium real (el navegador de código abierto en el que se basa Chrome). Además encontró un bug que nadie buscaba: <strong>una condición de carrera</strong> en el buscador (con escritura muy rápida, la tabla muestra resultados de una búsqueda anterior). Lo dejó como ticket aparte, sin bloquear.</li>
         </ul>
         <p>El informe de cada tarjeta, el diff y el vídeo están en <a href="https://github.com/noelserdna/curso-hermes-agent/tree/main/09-equipo-de-agentes/salida-ejemplo"><code>salida-ejemplo/</code></a>.</p>
       </div>
@@ -922,24 +1293,40 @@ hermes kanban create "E2E TIENDA-12" --assignee e2e --parent "$IMPL" --workspace
       <p class="prose">Con el gateway conectado a Telegram (módulo 06), cualquiera del equipo puede encargar trabajo desde el móvil. El chat que crea la tarjeta queda suscrito y recibe un aviso cuando termina, se bloquea o falla:</p>
       <div class="code"><span class="lbl">en el chat del bot</span><pre>/kanban create "Deuda técnica de la tienda" --assignee revisor --workspace dir:/ruta/al/repo \
   --body "Resume en 5 viñetas la deuda técnica pendiente. No modifiques nada."</pre></div>
-      <div class="note ok"><span class="t">Probado desde el móvil</span><p>La tarjeta la recogió el perfil <code>revisor</code> y en 38 s devolvió cinco puntos de deuda, de más a menos grave: un XSS latente por <code>innerHTML</code> sin escapar, la misma condición de carrera que encontró el E2E, la lógica de stock bajo duplicada entre cliente y servidor, un test que se salta en silencio si no hay Node y ficheros <code>.pyc</code> versionados. El aviso de fin llegó al mismo chat.</p></div>
+      <p class="prose"><code>/kanban create</code> es el mismo comando que <code>hermes kanban create</code>, escrito en el chat: el gateway lo ejecuta por ti. <code>/ruta/al/repo</code> es un hueco: la ruta del repo en la máquina donde corre el gateway. "Deuda técnica" son los problemas que no rompen nada hoy, pero que conviene arreglar.</p>
+      <div class="note ok"><span class="t">Probado desde el móvil</span><p>La tarjeta la recogió el perfil <code>revisor</code> y en 38 s devolvió cinco puntos de deuda, de más a menos grave: un XSS latente (inyección de código en la página) por <code>innerHTML</code> sin escapar, la misma condición de carrera que encontró el E2E, la lógica de stock bajo duplicada entre cliente y servidor, un test que se salta en silencio si no hay Node y ficheros <code>.pyc</code> versionados (bytecode que Python genera solo y no debería ir en git). El aviso de fin llegó al mismo chat.</p></div>
 
       <h3>Un ticket por voz, sin comandos <span class="badge ok">≈ 11 min · ≈ 0,11 $</span></h3>
       <p class="prose">Escribir <code>/kanban create …</code> en el móvil no es práctico. La skill <a href="https://github.com/noelserdna/curso-hermes-agent/tree/main/09-equipo-de-agentes/skills/lanzar-pipeline"><code>lanzar-pipeline</code></a> enseña al agente del chat a convertir una petición, también una nota de voz, en un ticket del repo y a lanzarlo al equipo en lugar de programarlo él: comprueba que el repo está limpio, elige el siguiente ID, escribe <code>tickets/&lt;ID&gt;.md</code> con la petición literal y crea las tarjetas encadenadas. <strong>Cada proyecto tiene su tablero</strong> (el nombre de la carpeta del repo), así que las tarjetas de proyectos distintos no se mezclan y el dashboard ofrece un selector.</p>
+      <div class="code"><span class="lbl">instalar la skill</span><pre>cp -R skills/lanzar-pipeline ~/.hermes/skills/software-development/   <span class="c"># skill personal: sirve en todos tus repos</span></pre></div>
+      <ul class="prose">
+        <li><strong>Repo limpio</strong> quiere decir que <code>git status --porcelain</code> no imprime nada: no hay cambios sin commit. Los agentes trabajan sobre esos mismos ficheros; si hubiera cambios tuyos a medias, se mezclarían con los suyos.</li>
+        <li>La skill lanza <code>scripts/lanzar-ticket.sh &lt;repo&gt; &lt;ID&gt; &lt;fichero-del-ticket&gt;</code>, que hace lo mismo que <code>pipeline.sh</code> pero sobre un repo que ya existe. Lo llama con <code>${HERMES_SKILL_DIR}</code>, que Hermes sustituye por la carpeta de la skill.</li>
+        <li><strong>Un tablero por proyecto</strong>: la primera vez, el script crea un tablero cuyo <em>slug</em> (nombre corto en minúsculas y guiones) sale del nombre de la carpeta, con el repo como carpeta de trabajo por defecto. Después crea las tarjetas con <code>hermes kanban --board &lt;slug&gt; create …</code>. Cada tablero tiene su propia base de datos y su dispatcher.</li>
+        <li><strong>El comando de tests</strong> sale de la línea <code>- Tests: `…`</code> del <code>AGENTS.md</code> del repo, el fichero de instrucciones para agentes; si no existe, usa <code>uv run pytest -q</code>. Así el pipeline sirve para cualquier lenguaje. En un proyecto nuevo, la skill prepara el repo (<code>git init</code>, <code>tickets/</code> y ese <code>AGENTS.md</code>).</li>
+        <li><strong>Avisos</strong>: si <code>~/.hermes/.env</code> tiene <code>TELEGRAM_HOME_CHANNEL</code> (lo guarda el comando <code>/sethome</code> del bot), suscribe ese chat a las tres tarjetas con <code>hermes kanban notify-subscribe</code>.</li>
+      </ul>
       <div class="note ok"><span class="t">Probado desde el móvil</span><p>Una nota de voz pidiendo "un botón para añadir productos a la tienda" acabó en el commit <code>TIENDA-13: alta de productos desde la web</code> con 64 tests en verde, tras una ronda de revisión.</p></div>
 
       <h3>Lecciones para montar el tuyo</h3>
       <ol class="prose">
         <li><strong>Céntrate menos en implementar y más en validar.</strong> Si al final tienes que revisar el código a mano, pregúntate qué validación falta: un test, una prueba de rendimiento si toca base de datos, un E2E.</li>
         <li><strong>Decide qué es determinista.</strong> El orden de las fases lo fija un script; dentro de cada fase decide el modelo. Lo que pueda comprobar código, que no lo juzgue el modelo.</li>
-        <li><strong>Dale al agente el entorno completo de un desarrollador:</strong> base de datos propia por worktree, logs, navegador. Sin eso solo puede hacer tests unitarios y "creer" que funciona.</li>
-        <li><strong>Permisos mínimos por rol.</strong> El revisor no necesita navegador; el especificador no necesita escribir. Un agente proactivo atascado se inventa rodeos. Ojo: un perfil <em>no es un sandbox</em>.</li>
-        <li><strong>Tu arnés puede frenar al modelo.</strong> "Prioriza siempre lo más simple" tenía sentido con modelos que sobre-ingenierizaban; con los actuales puede empujarles a la solución peor (un <em>timeout</em> donde tocaba un <em>watcher</em>). Revisa SOUL, AGENTS.md y skills cada vez que cambies de modelo.</li>
+        <li><strong>Dale al agente el entorno completo de un desarrollador:</strong> base de datos propia por worktree (una copia de trabajo extra del repo, en otra carpeta y otra rama), logs, navegador. Sin eso solo puede hacer tests unitarios y "creer" que funciona.</li>
+        <li><strong>Permisos mínimos por rol.</strong> El revisor no necesita navegador; el especificador no necesita escribir. Un agente proactivo atascado se inventa rodeos. Ojo: un perfil <em>no es un sandbox</em>: quitar toolsets limita sus herramientas, pero con la terminal el agente puede hacer lo mismo que tu usuario.</li>
+        <li><strong>Tu arnés puede frenar al modelo.</strong> "Prioriza siempre lo más simple" tenía sentido con modelos que sobre-ingenierizaban; con los actuales puede empujarles a la solución peor (un <em>timeout</em>, esperar un tiempo fijo, donde tocaba un <em>watcher</em>, reaccionar cuando algo cambia). Revisa SOUL, AGENTS.md y skills cada vez que cambies de modelo.</li>
         <li><strong>No sobre-especifiques el cómo.</strong> Fija el qué y los criterios. Con modelos baratos puedes pedir varias variantes y quedarte con la que mejor pase las validaciones.</li>
         <li><strong>Código fácil de revisar</strong>, para humanos y agentes: módulos con interfaces claras y la complejidad dentro (<em>deep modules</em>). Se leen interfaces y solo se baja al detalle donde algo huele mal.</li>
         <li><strong>Construye tu propio flujo.</strong> Este pipeline es un punto de partida: tu producto puede necesitar dos fases o quince. Empieza pequeño y añade la validación que falte.</li>
       </ol>
       <p>Para quitarlo todo: <code>./perfiles/borrar-perfiles.sh</code>, <code>hermes kanban archive …</code> y parar el gateway.</p>
+      <div class="code"><span class="lbl">limpieza</span><pre>./perfiles/borrar-perfiles.sh   <span class="c"># borra los 4 perfiles con su configuración, sesiones y grabaciones</span>
+hermes kanban list              <span class="c"># lista las tarjetas con sus ids</span>
+hermes kanban archive &lt;ids&gt;     <span class="c"># las archiva: salen del tablero, pero no se borran</span>
+<span class="c"># los tableros de lanzar-pipeline (uno por proyecto) se nombran con --board &lt;slug&gt;:</span>
+hermes kanban --board &lt;slug&gt; list
+hermes kanban --board &lt;slug&gt; archive &lt;ids&gt;
+<span class="c"># Ctrl+C en la terminal del gateway</span></pre></div>
       <button class="mark-done" type="button" data-mod="m-equipo" aria-pressed="false">Marcar como completado</button>
     </section>
 
@@ -949,8 +1336,31 @@ hermes kanban create "E2E TIENDA-12" --assignee e2e --parent "$IMPL" --workspace
       <p class="mod-goal">Pasar de tickets a un contrato: requisitos aprobados, decisiones registradas con nombre y commit, y un agente que propone sin poder firmar nunca.</p>
       <p class="prose">En el módulo anterior el equipo de agentes valida contra criterios que escribe el propio especificador. Para un proyecto con cliente falta algo: <strong>qué se pidió, con ejemplos, y quién lo aprobó</strong>. Este módulo monta el método <em>Specification-Driven Development</em> como un arnés de Hermes, <a href="https://github.com/noelserdna/hermes-sdd"><code>hermes-sdd</code></a>, con una regla que lo ordena todo:</p>
       <div class="note"><span class="t">Artículo 13</span><p><strong>El ejecutor nunca firma; el notario nunca decide; el orquestador nunca interpreta.</strong></p></div>
+      <p class="prose"><strong>SDD</strong> (<em>Specification-Driven Development</em>, desarrollo guiado por la especificación) significa que primero se escribe y se aprueba <em>qué</em> debe hacer el software, con ejemplos concretos, y después todo (plan, tareas, código, tests, aceptación) se justifica contra ese texto. Un <strong>arnés</strong> es el conjunto de scripts y piezas que rodea al agente para que trabaje con ese método: le da las etapas, le pone límites y registra lo que pasa. El método tiene una «constitución» de 12 artículos (la especificación manda, trazabilidad, un commit por tarea, tests primero…); <code>hermes-sdd</code> añade el <strong>artículo 13</strong>, que reparte el poder entre tres piezas que verás en la tabla de papeles. Así ninguna puede hacer el trabajo de otra.</p>
 
-      <h3>Cuatro papeles</h3>
+      <h3>Vocabulario del módulo</h3>
+      <p class="prose">Aparecen muchos términos nuevos. Vuelve aquí cuando te pierdas.</p>
+      <div class="tw"><table>
+        <thead><tr><th>Término</th><th>Qué es aquí</th></tr></thead>
+        <tbody>
+          <tr><td>Requisito</td><td>Una cosa que el software debe hacer (<code>REQ-F-001</code>, funcional) o cumplir (<code>REQ-NF</code>, no funcional; <code>REQ-C</code>, restricción), con <strong>criterios de aceptación</strong> numerados (<code>AC1</code>, <code>AC2</code>…) y ejemplos con datos. Viven en <code>requirements/REQUIREMENTS.md</code>; lo que pidió el cliente con sus palabras, en <code>requirements/CUSTOMER-NEEDS.md</code></td></tr>
+          <tr><td>Must</td><td>La prioridad más alta de un requisito. La escala del método es <em>Must have / Should have / Nice to have</em> (inspirada en MoSCoW). Un Must sin cumplir impide la entrega</td></tr>
+          <tr><td>Contrato</td><td>Los requisitos aprobados por una persona. Es lo que se compromete a entregar</td></tr>
+          <tr><td>FASE</td><td>Un incremento del plan: un grupo de requisitos que se implementa y se acepta junto (<code>FASE-0</code>, <code>FASE-1</code>…). Se acepta o se rechaza entera</td></tr>
+          <tr><td>Ruta</td><td>Qué etapas opcionales necesita <em>este</em> proyecto (specs formales, auditoría, plan de tests, seguridad, UX…). La propone el ejecutor a partir de los requisitos y la confirma una persona</td></tr>
+          <tr><td>Puerta</td><td>El punto donde el flujo se detiene hasta que una persona decide (🚪 en el diagrama). Llega como mensaje con botones</td></tr>
+          <tr><td>Ejecutor</td><td>El agente que hace el trabajo de cada etapa. Por defecto, Claude Code en modo no interactivo (<code>claude -p</code>: recibe una instrucción, trabaja y termina, sin conversación) con las skills del método</td></tr>
+          <tr><td>Notario</td><td><code>firmar.sh</code>: un script de bash sin LLM que aplica la decisión de una persona (registro, commit y tag)</td></tr>
+          <tr><td>Orquestador</td><td>El kanban de Hermes más <code>lanzar.sh</code>: crea las tarjetas de cada etapa y las encadena, sin leer ni interpretar su contenido</td></tr>
+          <tr><td>Tablero, tarjeta, tramo</td><td>El kanban del módulo 10: un tablero por proyecto, una tarjeta por etapa. Un <strong>tramo</strong> es la serie de tarjetas que va de una puerta a la siguiente</td></tr>
+          <tr><td>Tag anotado</td><td>Una etiqueta de git (<code>git tag -a</code>) que, además de señalar un commit, guarda un mensaje. El notario escribe en él quién aprobó, con qué rol, por qué canal y sobre qué commit</td></tr>
+          <tr><td>Guardia</td><td>Un <em>hook</em>: un script que se ejecuta antes de cada comando del ejecutor y deniega los prohibidos (firmar, crear tags de aceptación, tocar el kanban, <code>git push</code>…)</td></tr>
+          <tr><td>Demo</td><td>Las capturas y vídeos que el ejecutor deja como evidencia de cada FASE, para que la persona vea el resultado antes de aceptar</td></tr>
+          <tr><td>Cierre y entrega</td><td>El cierre comprueba el proyecto entero (todos los Must de todas las FASEs) con la <strong>puerta de calidad global</strong>; si pasa, se abre la puerta de entrega y su tag <code>entrega-N</code></td></tr>
+          <tr><td>Grabación</td><td>Una ejecución real guardada (historial git y commits de cada etapa) que se puede reproducir sin LLM. El ejecutor que la reproduce se llama <code>replay</code></td></tr>
+        </tbody></table></div>
+
+      <h3>Los papeles</h3>
       <div class="tw"><table>
         <thead><tr><th>Papel</th><th>Quién</th><th>Qué hace</th></tr></thead>
         <tbody>
@@ -958,20 +1368,60 @@ hermes kanban create "E2E TIENDA-12" --assignee e2e --parent "$IMPL" --workspace
           <tr><td>Pregunta</td><td>La puerta: tarjeta bloqueada sin assignee y mensaje con botones</td><td>Enseña primero lo que va mal y después lo que hay que decidir</td></tr>
           <tr><td>Decide</td><td>Una persona autorizada, desde Telegram o desde el panel web de Hermes</td><td>Un toque, con 3 minutos para deshacer</td></tr>
           <tr><td>Firma</td><td>El notario: <code>firmar.sh</code>, un script sin LLM</td><td>Comprueba identidad y commit, registra, etiqueta y lanza lo siguiente</td></tr>
+          <tr><td>Orquesta</td><td>El kanban de Hermes y <code>lanzar.sh</code></td><td>Encadena las tarjetas por tramos, un tablero por proyecto, sin LLM</td></tr>
         </tbody></table></div>
+      <p class="prose">«Tarjeta bloqueada sin assignee» quiere decir que la tarjeta de la puerta no tiene perfil asignado: ningún worker del kanban la recoge, así que se queda parada hasta que una persona decide. «Persona autorizada» es alguien que figura en <code>~/.hermes/hermes-sdd/aprobadores.json</code>, con su nombre, su rol y su identidad en cada canal (su id de Telegram, su usuario del Mac). Los «veredictos» son el resultado por requisito: <code>VERIFIED</code> (cada criterio tiene evidencia válida), <code>FAILING</code> (alguna prueba falla), <code>MISSING</code> (falta evidencia) o <code>WAIVED</code> (exento por decisión humana).</p>
       <div class="code"><span class="lbl">el flujo de un proyecto</span><pre>requisitos ─▶ 🚪 ─▶ ruta ─▶ 🚪 ─▶ plan ─▶ tareas ─▶ 🚪 ─▶ implementar N ─▶ aceptar N ─▶ 🚪 ─▶ … ─▶ cierre ─▶ 🚪 entrega</pre></div>
+      <ul class="prose">
+        <li><strong>requisitos → 🚪</strong>: el ejecutor escribe los requisitos (o usa los que ya tienes) y tú los apruebas. Queda el tag <code>requirements-v1.0</code>.</li>
+        <li><strong>ruta → 🚪</strong>: propone qué etapas opcionales saltar y por qué; tú aceptas, pides el pipeline completo o ajustas.</li>
+        <li><strong>plan → tareas → 🚪</strong>: divide el trabajo en FASEs y cada FASE en tareas (una tarea, un commit). Das conformidad al orden de entrega.</li>
+        <li><strong>implementar N → aceptar N → 🚪</strong>: programa la FASE N con tests, calcula los veredictos y graba la demo. Tú aceptas o rechazas. Si rechazas, vuelve a implementar con tu motivo como prioridad. Se repite por cada FASE.</li>
+        <li><strong>cierre → 🚪 entrega</strong>: comprueba el proyecto entero y te pide la entrega final.</li>
+      </ul>
       <p class="prose">Las decisiones del ejecutor se clasifican: <strong>R</strong>, reversibles (decide con la opción recomendada y lo anota); <strong>C</strong>, las que tocan el contrato (pregunta por escrito con opciones A/B/C y sigue con lo demás; tú contestas en la puerta con un formulario de botones); <strong>H</strong>, humanas por constitución (aceptar, exenciones, editar un test que ya existía): nunca las toma.</p>
+      <p class="prose">Por qué así: el ejecutor corre sin nadie delante (<code>claude -p</code> lanzado desde una tarjeta), así que una pregunta a mitad de etapa no la contestaría nadie. Ejemplos de <strong>R</strong>: el nombre de una función interna o el orden de las tareas. De <strong>C</strong>: un criterio ambiguo o dos requisitos que se contradicen; la pregunta va a <code>.sdd/questions-&lt;etapa&gt;.md</code>. En <strong>H</strong>, una <em>exención</em> (<em>waiver</em>) es aceptar que un requisito quede sin cumplir, con motivo; y un test que ya existía es evidencia del contrato: si el ejecutor pudiera reescribirlo, podría «aprobar» cambiando el examen.</p>
 
       <h3>Práctica 1 · Tu primera puerta, sin coste <span class="badge ok">0 $ · ≈ 10 min</span></h3>
       <p class="prose"><code>practicar.sh</code> monta un proyecto a partir de una <strong>ejecución grabada y anonimizada</strong> (una CLI de tareas): el kanban, las puertas, Telegram y el notario son reales; lo que hace "el agente" es lo que hizo en la grabación, y los tests se ejecutan de verdad.</p>
-      <div class="code"><span class="lbl">terminal</span><pre>git clone https://github.com/noelserdna/hermes-sdd && cd hermes-sdd
-bash instalar.sh && hermes gateway restart
-bash practicar.sh grabaciones/todo-app ~/practica-todo</pre></div>
+      <div class="code"><span class="lbl">terminal</span><pre>git clone https://github.com/noelserdna/hermes-sdd &amp;&amp; cd hermes-sdd
+bash instalar.sh &amp;&amp; hermes gateway restart      <span class="c"># instala el arnés y reinicia el gateway para cargar su plugin</span>
+bash practicar.sh grabaciones/todo-app ~/practica-todo   <span class="c"># &lt;grabación&gt; &lt;carpeta nueva para el proyecto&gt;</span></pre></div>
+      <ul class="prose">
+        <li><code>instalar.sh</code> copia el arnés a <code>~/.hermes/hermes-sdd/&lt;versión&gt;</code> y apunta el enlace <code>~/.hermes/hermes-sdd/actual</code> a esa versión (por eso los comandos posteriores usan <code>actual/</code>). Crea <code>aprobadores.json</code> contigo como aprobador (rol «Cliente», tu id de Telegram si está en la configuración del gateway y tu usuario del Mac), instala el plugin de Telegram y crea el perfil <code>sdd-estacion</code>: un perfil limpio que solo usa la terminal para lanzar etapas, sin copiar tus tokens (solo la clave del modelo), y que no programa ni decide. No cambia tus otros tableros. Se puede repetir para actualizar.</li>
+        <li><code>hermes gateway restart</code> reinicia el gateway (el proceso que habla con Telegram y mueve el kanban, módulos 6 y 10) para que cargue el plugin nuevo.</li>
+        <li><code>practicar.sh</code> recibe dos argumentos: la grabación (<code>grabaciones/todo-app</code>, incluida en el repo) y una carpeta que aún no existe, donde crea el proyecto. Usa el ejecutor <code>replay</code>, que aplica los commits que hizo el agente real en cada etapa (<code>git cherry-pick</code>). «Anonimizada» significa que los ids y usuarios de quien decidió se sustituyeron por marcadores y que no trae tags: las firmas las pones tú.</li>
+      </ul>
       <p class="prose">Decide cada puerta con los botones y, al final, mira lo que quedó registrado: <code>git tag -n8</code>, <code>acceptance/decisions.jsonl</code> y la puerta de calidad global (<code>sdd gate</code>). Prueba también el camino difícil: rechaza una FASE con un motivo o usa <code>/anular</code> sobre una ya aceptada.</p>
+      <div class="code"><span class="lbl">comprobar lo registrado</span><pre>cd ~/practica-todo
+git tag -n8 -l 'requirements-v*' 'fase-*-accepted' 'entrega-*'   <span class="c"># los tags y hasta 8 líneas de su mensaje</span>
+tail -3 acceptance/decisions.jsonl                                <span class="c"># las 3 últimas decisiones humanas</span>
+node ~/.hermes/hermes-sdd/actual/metodo/scripts/sdd.mjs gate     <span class="c"># puerta de calidad global</span></pre></div>
+      <ul class="prose">
+        <li><code>git tag -n8</code> lista los tags con las primeras 8 líneas de su mensaje; <code>-l</code> filtra por patrón (<code>*</code> vale cualquier cosa). Verás <code>Approved-by:</code>, <code>Approver-role:</code>, <code>Channel:</code> y el commit aceptado.</li>
+        <li><code>acceptance/decisions.jsonl</code> es el registro de hechos humanos: aceptaciones de FASE, exenciones, mediciones… En formato <em>JSON Lines</em>: un objeto JSON por línea. Solo crece; nunca se reescribe una línea anterior. <code>tail -3</code> enseña las tres últimas.</li>
+        <li><code>sdd.mjs</code> es la CLI del método (en Node). <code>sdd gate</code> comprueba que todos los Must estén cumplidos y lo dice con su código de salida (<code>echo $?</code> justo después):</li>
+      </ul>
+      <div class="tw"><table>
+        <thead><tr><th>Salida</th><th>Significado</th></tr></thead>
+        <tbody>
+          <tr><td class="num">0</td><td>Objetivo cumplido: todo Must <code>VERIFIED</code> o <code>WAIVED</code></td></tr>
+          <tr><td class="num">1</td><td>No cumplido</td></tr>
+          <tr><td class="num">2</td><td>Evidencia obsoleta: el código cambió después de las pruebas (o error de uso)</td></tr>
+          <tr><td class="num">3</td><td>Cumplido, pero con algún Must exento</td></tr>
+          <tr><td class="num">4</td><td>Hay una objeción abierta sobre un Must en la revisión adversarial (verificadores independientes que buscan fallos en lo que se da por cumplido)</td></tr>
+        </tbody></table></div>
+      <p class="prose">El camino difícil: en una puerta de FASE, <code>❌ Rechazar</code> pide un motivo y el notario lo deja como lo que hay que cambiar en la siguiente implementación. <code>/anular &lt;proyecto&gt; &lt;fase&gt; &lt;motivo&gt;</code> deshace una aceptación ya firmada <em>sin reescribir nada</em>: añade un registro <code>rejected</code> y un tag de revocación.</p>
 
       <h3>Práctica 2 · Un proyecto real con Claude Code <span class="badge ok">≈ 25 $ de Claude · 0,05 $ de Hermes</span></h3>
-      <div class="code"><span class="lbl">terminal</span><pre>bash ~/.hermes/hermes-sdd/actual/lanzar.sh iniciar /ruta/a/tu-repo   # con AGENTS.md y requirements/</pre></div>
+      <div class="code"><span class="lbl">terminal</span><pre>bash ~/.hermes/hermes-sdd/actual/lanzar.sh iniciar /ruta/a/tu-repo   <span class="c"># con AGENTS.md y requirements/</span></pre></div>
+      <p class="prose"><code>lanzar.sh iniciar</code> prepara el repo sin LLM y crea la primera tarjeta (requisitos) en un tablero nuevo con el nombre del proyecto. Necesita el repo sin cambios pendientes. Prepara: añade al <code>.gitignore</code> lo que no se versiona, crea <code>pipeline-state.json</code> (en qué etapa va el proyecto) y <code>.sdd/hermes/hermes-sdd.json</code> (qué ejecutor y modelo usa cada etapa) e instala el hook de git que valida los mensajes de commit. Qué necesita el repo:</p>
+      <ul class="prose">
+        <li><code>AGENTS.md</code> con una sección <code>## SDD Stack Profile</code>: el stack, el comando que ejecuta los tests y dónde están el código y los tests. Hay plantilla en <code>templates/AGENTS.md</code>; si falta, se crea desde ella y te avisa.</li>
+        <li><code>requirements/</code> con <code>CUSTOMER-NEEDS.md</code> y <code>REQUIREMENTS.md</code>, si ya los tienes. Si no, el ejecutor los redacta y te los enseña en la primera puerta.</li>
+      </ul>
       <div class="note ok"><span class="t">Ejecución real</span><p>La CLI de tareas (10 requisitos, 4 FASEs) fue de los requisitos a la entrega con <strong>10 decisiones tomadas con botones</strong>: 16 ejecuciones del ejecutor (46 min de Claude, 25,43 $ equivalentes de la suscripción), 103 tests en verde y los tags <code>requirements-v1.0</code>, <code>fase-0…3-accepted</code> y <code>entrega-1</code>.</p></div>
+      <p class="prose">«Equivalentes de la suscripción»: es el coste que informa <code>claude -p</code> a precio de API. Con una suscripción de Claude no se paga aparte, pero consume tu cuota.</p>
 
       <h3>Práctica 3 · Cambios y proyectos que ya existen <span class="badge ok">probado</span></h3>
       <div class="tw"><table>
@@ -981,11 +1431,22 @@ bash practicar.sh grabaciones/todo-app ~/practica-todo</pre></div>
           <tr><td><code>lanzar.sh adoptar</code> sobre la tienda del módulo 10</td><td>Lee el código, propone 9 requisitos y 3 FASEs retroactivas y pregunta lo que no puede deducir: la búsqueda no mira el SKU ni ignora tildes, "79,90" se rechaza y "1e2" se acepta como 100 €</td><td class="num">9 min · 3,08 $</td></tr>
           <tr><td>La ruta estimada por un agente de Hermes</td><td>Perfil <code>sdd-ejecutor</code> con Sonnet en lugar de Claude Code: misma ruta</td><td class="num">0,075 $ frente a 0,24 $</td></tr>
         </tbody></table></div>
+      <ul class="prose">
+        <li><code>/cambio &lt;proyecto&gt; &lt;petición&gt;</code> se escribe en el chat de Telegram; <code>&lt;proyecto&gt;</code> es el nombre del tablero. Desde la terminal es lo mismo <code>lanzar.sh cambio &lt;repo&gt; "&lt;petición&gt;"</code>. La petición se guarda tal cual en <code>intent/INT-NNN.md</code> (<code>NNN</code> es un número correlativo: <code>INT-001</code>, <code>INT-002</code>…) y se commitea. Así siempre puedes comparar lo que pediste con cómo se tradujo a requisitos. La versión aprobada deja su tag (<code>requirements-v1.1</code>).</li>
+        <li><code>lanzar.sh adoptar &lt;repo&gt;</code> es para un repo que nunca usó el método. Las FASEs <em>retroactivas</em> describen trabajo que ya está hecho. Lo que apruebes es la <strong>línea base</strong>: el contrato desde el que se medirán los cambios futuros.</li>
+        <li>La última fila usa otro ejecutor para una etapa ligera. <code>sdd-ejecutor</code> es un perfil de Hermes que solo tiene ficheros y terminal, con las skills del método y la misma guardia. Se elige por etapa en <code>.sdd/hermes/hermes-sdd.json</code>, por ejemplo <code>"ejecutores": { "ruta": "hermes" }</code>.</li>
+      </ul>
 
       <h3>Práctica 4 · El panel y el mantenimiento <span class="badge ok">0 $ hasta que lances un cambio</span></h3>
       <p class="prose"><strong>Decidir desde el panel:</strong> <code>hermes dashboard</code> → pestaña <strong>Puertas SDD</strong>. Es la misma puerta que llega a Telegram, con la demo en grande, el formulario de preguntas y los botones. Decide en el panel y mira cómo el mensaje de Telegram pasa a «decidida desde dashboard»; deshaz en Telegram y el panel la reabre. El tag guarda el canal: <code>Channel: dashboard:&lt;usuario&gt; modo:local…</code>.</p>
+      <p class="prose"><code>hermes dashboard</code> arranca el panel web de Hermes en tu navegador, por defecto en <code>http://127.0.0.1:9119</code> (solo accesible desde tu máquina). La pestaña <strong>Puertas SDD</strong> la añade el plugin del arnés; si ya tenías el panel abierto, reinícialo después de instalar. <code>modo:local</code> indica que el panel corre sin login: la identidad es el usuario del Mac que lo arrancó, y por eso se anota.</p>
       <p class="prose"><strong>Mantenimiento:</strong> <code>/mantenimiento</code> (o cada día a las 07:00) revisa sin LLM los proyectos entregados: tests, puerta de calidad global, código cambiado fuera del método, vulnerabilidades y versiones mayores nuevas. Si algo cruza su umbral, abre una puerta: <code>🛠 Lanzar cambio</code> lo convierte en un <code>/cambio</code>, que pasa por su puerta de requisitos como cualquier otro, y <code>🔕 Ignorar</code> pide un motivo.</p>
+      <ul class="prose">
+        <li>Lo hace el script <code>vigilar.sh</code>. «Código cambiado fuera del método» son commits de código o tests posteriores a la última entrega que no pasaron por una puerta. Las vulnerabilidades salen de <code>npm audit</code> y las versiones de <code>npm outdated</code>. Una <em>versión mayor</em> es el primer número de la versión (de <code>2.x</code> a <code>3.0</code>), la que puede romper compatibilidad.</li>
+        <li>El <strong>umbral</strong> es cuánto tiene que haber para molestarte. Por defecto: 1 commit fuera del método, 1 vulnerabilidad alta o crítica, 3 dependencias con versión mayor nueva. Se cambian en <code>.sdd/hermes/hermes-sdd.json</code> → <code>mantenimiento</code>; la hora, en <code>~/.hermes/hermes-sdd/atencion.json</code>.</li>
+      </ul>
       <div class="note ok"><span class="t">Ejecución real</span><p>Sobre la CLI de tareas ya entregada, la revisión encontró <code>vitest</code> con una vulnerabilidad crítica y cuatro dependencias con versión mayor nueva. Pulsar «Lanzar cambio» dejó la petición en <code>intent/</code> y una tarjeta de cambio en el tablero. Con el proyecto en pausa (<code>/pausar</code>), la etapa queda aparcada a 0 $ hasta <code>/reanudar</code>: es un buen ensayo.</p></div>
+      <p class="prose"><code>vitest</code> es el framework de tests del proyecto de ejemplo. <code>/pausar &lt;proyecto&gt;</code> impide que arranque cualquier etapa nueva de ese proyecto; las tarjetas esperan sin gastar. <code>/reanudar &lt;proyecto&gt;</code> lo deja seguir.</p>
 
       <h3>Claves de diseño</h3>
       <ol class="prose">
@@ -993,29 +1454,44 @@ bash practicar.sh grabaciones/todo-app ~/practica-todo</pre></div>
         <li><strong>La identidad sale del canal, no de un texto.</strong> Un comentario "DECISIÓN: acepto" puede escribirlo cualquier proceso que corra con tu usuario. El toque en un botón trae el id de quien pulsó; eso se registra, con el id del mensaje como prueba.</li>
         <li><strong>Lo que se firma es lo que se vio.</strong> La puerta guarda el commit que enseñó; si el repo cambia antes de firmar, el notario se niega.</li>
         <li><strong>El kanban tiene fronteras: respétalas.</strong> Los procesos que lanza un worker no pueden modificar el tablero; Hermes lo impide a propósito. Por eso las tarjetas de puerta las crea el gateway, no la etapa.</li>
-        <li><strong>Un modelo pequeño no estima probabilidades.</strong> Con Haiku, los factores de la ruta salieron en la banda de duda y la regla "duda = sí" pidió el pipeline completo para una CLI de una persona; con el modelo por defecto, ruta ligera. El modelo pequeño, para mover tarjetas; los juicios calibrados, a otro.</li>
+        <li><strong>Un modelo pequeño no estima probabilidades.</strong> Con Haiku, los factores de la ruta salieron en la banda de duda y la regla "duda = sí" pidió el pipeline completo para una CLI de una persona; con el modelo por defecto, ruta ligera. El modelo pequeño, para mover tarjetas; los juicios calibrados, a otro. <em>(Cómo funciona: la ruta pregunta siete «factores», como ¿hay datos sensibles? o ¿varios tipos de usuario?, cada uno como una probabilidad de 0 a 1. Desde 0,65 cuenta como sí; hasta 0,35, como no; en medio está la banda de duda, que cuenta como sí.)</em></li>
         <li><strong>No preguntes a mitad de etapa: clasifica.</strong> Así el ejecutor sacó dos contradicciones reales de los requisitos y las dejó como preguntas para la puerta, en lugar de resolverlas a escondidas.</li>
         <li><strong>Las puertas de FASE no ven el proyecto entero.</strong> Las cuatro FASEs se aceptaron y aun así faltaban dos requisitos Must sin FASE asignada: hace falta un <em>cierre</em> con la puerta de calidad global antes de la entrega.</li>
         <li><strong>Una puerta debe obligar a mirar.</strong> Primero las alertas, luego "Ver demo" y solo entonces Aceptar. Se mide cuánto pasó entre ver la demo y decidir: aceptar en 6 s es una señal de aprobación por inercia que el resumen avisa.</li>
-        <li><strong>El canal también necesita vigilancia.</strong> Log, latido, tiempos máximos y autorreparación, y un presupuesto de atención: un mensaje vivo por proyecto, resúmenes y horas de silencio en lugar de un aviso por cada tarjeta.</li>
-        <li><strong>Lo que el ejecutor deja a medias, a la vista y comprobado.</strong> En un cierre, el ejecutor repitió una medición y no hizo commit del registro; el notario se negó a firmar con el árbol sucio. El arnés commitea esos restos con un mensaje que lo dice, pero solo tras comprobar que los registros de decisiones <strong>solo crecieron</strong> y que lo nuevo lo escribió la CLI; si no, la etapa falla y lo ve una persona. Y abre una puerta nueva: nunca se "arregla" una puerta vieja, porque su commit ya no es el que se mostró.</li>
-        <li><strong>La puerta es un dato; el canal, un adaptador.</strong> Telegram y el panel llaman al mismo núcleo, que lo valida todo en el servidor: un botón que la interfaz oculta («Aceptar» antes de ver la demo) también se rechaza si alguien lo llama a mano. Añadir Slack o email es escribir un adaptador, sin tocar el notario.</li>
+        <li><strong>El canal también necesita vigilancia.</strong> Log, latido, tiempos máximos y autorreparación, y un presupuesto de atención: un mensaje vivo por proyecto, resúmenes y horas de silencio en lugar de un aviso por cada tarjeta. <em>(El latido es un fichero que el plugin reescribe en cada vuelta: si deja de actualizarse, el bucle se ha parado. El mensaje vivo es un único mensaje por proyecto que se edita en silencio en lugar de mandar uno nuevo. Por defecto hay resúmenes a las 08:30 y a las 19:00 y silencio de 22 a 8, en <code>atencion.json</code>.)</em></li>
+        <li><strong>Lo que el ejecutor deja a medias, a la vista y comprobado.</strong> En un cierre, el ejecutor repitió una medición y no hizo commit del registro; el notario se negó a firmar con el árbol sucio. El arnés commitea esos restos con un mensaje que lo dice, pero solo tras comprobar que los registros de decisiones <strong>solo crecieron</strong> y que lo nuevo lo escribió la CLI; si no, la etapa falla y lo ve una persona. Y abre una puerta nueva: nunca se "arregla" una puerta vieja, porque su commit ya no es el que se mostró. <em>(«Árbol sucio»: hay cambios en el repo sin commit, así que el commit mostrado no describe todo lo que hay.)</em></li>
+        <li><strong>La puerta es un dato; el canal, un adaptador.</strong> Telegram y el panel llaman al mismo núcleo, que lo valida todo en el servidor: un botón que la interfaz oculta («Aceptar» antes de ver la demo) también se rechaza si alguien lo llama a mano. Añadir Slack o email es escribir un adaptador, sin tocar el notario. <em>(La puerta es un fichero JSON en <code>~/.hermes/hermes-sdd/puertas/</code>; el núcleo es <code>hsdd_nucleo.py</code>, dentro del plugin.)</em></li>
         <li><strong>La identidad tiene fuerza, y se registra.</strong> El id de Telegram no vale lo mismo que «el usuario de este Mac» del panel en modo local. Por eso el canal queda en el tag, y el panel rechaza las peticiones que no vengan de la propia máquina.</li>
         <li><strong>El mantenimiento propone; la persona decide.</strong> La revisión periódica no arregla nada: abre una puerta con lo que encontró. Cada hallazgo tiene una clave que resume <em>qué</em> falla; así, lo ignorado con motivo no vuelve con cada commit.</li>
-        <li><strong>Citar no es firmar.</strong> Una guardia que bloquea cualquier <em>mención</em> de un registro bloquea también leerlo, compararlo, commitear lo que escribió la CLI o citarlo en un informe, y el ejecutor acaba dejando trabajo sin cerrar. La guardia busca invocaciones (fuera de comillas, en el segmento que empieza por el comando) y escrituras; lo que se le escape lo para la comprobación del arnés al cerrar la etapa. Dos capas, cada una con su trabajo.</li>
+        <li><strong>Citar no es firmar.</strong> Una guardia que bloquea cualquier <em>mención</em> de un registro bloquea también leerlo, compararlo, commitear lo que escribió la CLI o citarlo en un informe, y el ejecutor acaba dejando trabajo sin cerrar. La guardia busca invocaciones (fuera de comillas, en el segmento que empieza por el comando) y escrituras; lo que se le escape lo para la comprobación del arnés al cerrar la etapa. Dos capas, cada una con su trabajo. <em>(Ejemplos de las pruebas del arnés: <code>sed -n 2p acceptance/decisions.jsonl</code> lee el registro y se permite; <code>cat &gt;&gt; acceptance/decisions.jsonl</code> escribe en él y se deniega. Un texto entre comillas que dice «sin accept record» solo menciona el comando y se permite; <code>node "$SDD" accept record demo …</code> lo invoca y se deniega.)</em></li>
         <li><strong>Cada incidente se convierte en prueba.</strong> El intento de firma desde el ejecutor es el caso nº 1 de las pruebas del arnés; <code>tests/todo.sh</code> las pasa todas sin LLM antes de cualquier actualización. También la práctica reproducida comprueba que cada decisión registrada sea de quien practica: una grabación trae el trabajo, nunca las firmas.</li>
       </ol>
 
       <h3>Qué garantiza y qué no</h3>
       <p class="prose">Garantiza que nadie firma sin una decisión de una persona autorizada y que lo firmado es el commit mostrado: el canal, el acta del notario y el registro con su tag cuentan la misma historia. <strong>No</strong> garantiza quién sostenía el móvil ni resiste a alguien con tu sesión del sistema: el kanban, los registros y los tags son ficheros tuyos. Las guardias dificultan; solo el ejecutor en contenedor (módulo 9) o una firma con llave física lo impiden.</p>
+      <p class="prose">El <strong>acta</strong> es el fichero que deja el notario por cada puerta (<code>~/.hermes/hermes-sdd/actas/</code>) con los pasos que hizo; si se corta a medias, la siguiente llamada sigue desde ahí. Una <strong>llave física</strong> es un dispositivo USB de seguridad con el que se firman los tags: sin tocarla, ningún proceso puede firmar.</p>
       <p>Operación diaria desde el chat: <code>/puertas</code> · <code>/estado</code> · <code>/mantenimiento</code> · <code>/pausar [proyecto|todo] [ahora]</code> · <code>/reanudar</code> · <code>/anular</code>. Si se agota la cuota de Claude, las etapas se aparcan y se reanudan solas. Las mismas puertas, en la pestaña <strong>Puertas SDD</strong> del panel.</p>
+      <div class="tw"><table>
+        <thead><tr><th>Comando</th><th>Qué hace</th></tr></thead>
+        <tbody>
+          <tr><td><code>/puertas</code></td><td>Te reenvía las puertas abiertas con sus botones</td></tr>
+          <tr><td><code>/estado [proyecto]</code></td><td>En qué etapa va cada proyecto</td></tr>
+          <tr><td><code>/cambio &lt;proyecto&gt; &lt;petición&gt;</code></td><td>Pide un cambio o una funcionalidad nueva (práctica 3)</td></tr>
+          <tr><td><code>/mantenimiento [proyecto]</code></td><td>Lanza ahora la revisión por umbrales</td></tr>
+          <tr><td><code>/pausar [proyecto|todo] [ahora]</code></td><td>No arranca ninguna etapa nueva. Con <code>ahora</code> detiene también la que está en curso (botón de pánico). Sin proyecto, pausa todo</td></tr>
+          <tr><td><code>/reanudar [proyecto|todo]</code></td><td>Quita la pausa</td></tr>
+          <tr><td><code>/anular &lt;proyecto&gt; &lt;fase&gt; &lt;motivo&gt;</code></td><td>Revoca la aceptación de una FASE, dejando registro y tag de revocación</td></tr>
+        </tbody></table></div>
+      <p class="prose">En la notación, <code>&lt;…&gt;</code> es obligatorio, <code>[…]</code> es opcional y <code>|</code> separa alternativas. Solo las personas de <code>aprobadores.json</code> pueden usar estos comandos. Sin Telegram hay un plan B en la terminal: <code>bash ~/.hermes/hermes-sdd/actual/decidir.sh &lt;puerta&gt; acepto</code>, que queda registrado como decisión local.</p>
       <button class="mark-done" type="button" data-mod="m-sdd" aria-pressed="false">Marcar como completado</button>
     </section>
 
     <!-- 12 · comparativa (id m10 se conserva para no romper el progreso guardado) -->
+
     <section class="mod" id="m10" data-title="Comparativa">
       <div class="mod-head"><span class="mod-num">12</span><h2>Comparativa y cuándo usar qué</h2></div>
       <p class="mod-goal">Situar Hermes frente a las alternativas de octubre de 2026 y decidir con criterio.</p>
+      <p class="prose">Cómo leer la tabla. <strong>Dónde corre</strong>: en qué máquina vive el agente; un <em>VPS</em> es un servidor virtual que alquilas por meses y que está siempre encendido. <strong>Modelos</strong>: qué LLM puede usar; OpenRouter es un intermediario que da acceso a muchos modelos con una sola clave (módulo 1). <strong>Tareas programadas</strong>: si puede trabajar solo a una hora fijada, como el cron del módulo 5. <strong>Mensajería</strong>: si puedes hablarle desde Telegram, Slack… (módulo 6). <strong>Licencia</strong>: MIT y Apache-2.0 son licencias open source que permiten usar, modificar y vender; <em>fair-code</em> deja ver y autoalojar el código gratis, con límites para revenderlo como servicio; propietaria es código cerrado.</p>
       <div class="tw"><table class="compare">
         <thead><tr><th>Herramienta</th><th>Qué es</th><th>Dónde corre</th><th>Modelos</th><th>Tareas programadas</th><th>Mensajería</th><th>Licencia</th></tr></thead>
         <tbody>
@@ -1031,32 +1507,43 @@ bash practicar.sh grabaciones/todo-app ~/practica-todo</pre></div>
           <tr><td>LangGraph · CrewAI</td><td>Frameworks para construir agentes</td><td>Tu código</td><td>Cualquiera</td><td>Lo programas tú</td><td>Lo programas tú</td><td>MIT</td></tr>
         </tbody></table></div>
 
+      <h3>Quién es quién</h3>
+      <ul class="prose">
+        <li><strong>OpenClaw</strong>: otro asistente personal open source que vive en tu máquina y te contesta por mensajería; es el competidor más directo de Hermes. Hermes trae <code>hermes claw</code> para migrar desde él.</li>
+        <li><strong>Claude Desktop / Cowork</strong>: la app de escritorio de Claude. Cowork es su modo de trabajo autónomo sobre tus ficheros y conectores. Sus tareas programadas se ejecutan en tu ordenador.</li>
+        <li><strong>Claude Code + rutinas</strong>: Claude Code es el agente de programación de Anthropic en la terminal o el IDE (el editor de código). Las <em>rutinas</em> son tareas de Claude Code que se ejecutan con horario en la nube de Anthropic, sin tu ordenador.</li>
+        <li><strong>Codex CLI</strong> y <strong>Gemini CLI</strong>: los agentes de programación de terminal de OpenAI y de Google. «Vía CI» quiere decir que, para programarlos, los lanzas desde un sistema de integración continua (como GitHub Actions, módulo 9).</li>
+        <li><strong>Cursor</strong>: un editor de código con agente integrado; sus agentes «en segundo plano» trabajan mientras tú sigues en el editor.</li>
+        <li><strong>n8n</strong> y <strong>Zapier</strong>: automatización con flujos de cajas conectadas (nodos), donde cada paso está fijado de antemano: <em>deterministas</em>, hacen siempre lo mismo. Pueden incluir un paso de IA.</li>
+        <li><strong>LangGraph</strong> y <strong>CrewAI</strong>: librerías de Python para programar tu propio agente. No son un producto listo: el cron, la mensajería o la memoria los escribes tú.</li>
+      </ul>
+
       <div class="cols">
         <div class="panel pro"><h4>A favor de Hermes</h4><ul>
           <li>Open source MIT y sin atarte a un proveedor: cambias de modelo con un flag.</li>
           <li>Siempre encendido en un VPS y accesible desde el móvil.</li>
           <li>Memoria y skills que mejoran con el uso, en formato estándar.</li>
-          <li>Cron con entrega a donde quieras y watchdogs sin coste de LLM.</li>
-          <li>7 backends de ejecución, subagentes, MCP en los dos sentidos.</li>
-          <li>Lee tu <code>AGENTS.md</code>/<code>CLAUDE.md</code> e importa tu config de Claude Code.</li>
-          <li>Perfiles, tablero kanban y revisión nativa para montar un equipo de agentes por fases.</li>
-          <li>Barato con modelos eficientes: todas las pruebas de este curso con Hermes, ≈ 0,56 $.</li>
+          <li>Cron con entrega a donde quieras y watchdogs sin coste de LLM (vigilantes que solo ejecutan un script y avisan si hay un problema, módulo 5).</li>
+          <li>7 backends de ejecución (dónde corren sus comandos: tu máquina, Docker, SSH…), subagentes (agentes hijos a los que delega tareas, también en paralelo) y MCP en los dos sentidos: usa servidores MCP y se ofrece como uno con <code>hermes mcp serve</code> (módulos 8 y 9).</li>
+          <li>Lee tu <code>AGENTS.md</code>/<code>CLAUDE.md</code> e importa tu config de Claude Code con <code>hermes import-agent</code> (módulo 7).</li>
+          <li>Perfiles, tablero kanban y revisión nativa para montar un equipo de agentes por fases (módulo 10), y puertas humanas con un método encima (módulo 11).</li>
+          <li>Barato con modelos eficientes: todas las pruebas de este curso con Hermes, ≈ 0,56 $ (sin contar Claude Code como ejecutor en el módulo 11).</li>
         </ul></div>
         <div class="panel con"><h4>En contra</h4><ul>
-          <li>Va muy rápido: cientos de PRs por versión; flags y docs cambian de una semana a otra.</li>
-          <li>Mucha superficie de ataque. La v0.21.6 corrigió fallos en el dashboard, en filtros git de repos no confiables y en el gateway de email.</li>
+          <li>Va muy rápido: cientos de PRs (cambios propuestos al código) por versión; flags y docs cambian de una semana a otra.</li>
+          <li>Mucha superficie de ataque: muchas piezas expuestas (panel web, gateway, integraciones) por donde podría entrar un atacante. La v0.21.6 corrigió fallos en el dashboard, en filtros git de repos no confiables y en el gateway de email.</li>
           <li>La calidad depende del modelo: con modelos pequeños falla más con herramientas y memoria.</li>
           <li>Más técnico que Claude Desktop: el despliegue y la seguridad son tuyos.</li>
-          <li>Las herramientas MCP no pasan por las aprobaciones.</li>
+          <li>Las herramientas MCP no pasan por las aprobaciones: Hermes pide permiso antes de comandos peligrosos en la terminal, pero no antes de usar una herramienta MCP (módulo 8).</li>
           <li>Muy proactivo: si se atasca se inventa rodeos. Necesita límites y permisos acotados.</li>
-          <li>Interfaz del dashboard funcional pero básica.</li>
+          <li>Interfaz del dashboard (el panel web, <code>hermes dashboard</code>) funcional pero básica.</li>
         </ul></div>
       </div>
 
       <h3>Si ya usas Claude Desktop y sus tareas programadas</h3>
       <div class="prose">
         <p>Claude Desktop es más cómodo y no hay nada que mantener, pero sus tareas programadas dependen de que tu ordenador esté encendido con la app abierta y solo usan Claude. Hermes cubre el hueco cuando quieres que el trabajo ocurra <strong>aunque cierres el portátil</strong>, que el resultado te llegue a Telegram o Slack, o que una tarea barata la haga un modelo barato.</p>
-        <p>No es una elección exclusiva. Las skills tienen el mismo formato, un servidor MCP sirve a los dos, y <code>hermes mcp serve</code> te deja usar Hermes desde Claude Desktop.</p>
+        <p>No es una elección exclusiva. Las skills tienen el mismo formato, un servidor MCP sirve a los dos, y <code>hermes mcp serve</code> te deja usar Hermes desde Claude Desktop: Hermes se presenta como un servidor MCP más (módulo 8).</p>
       </div>
       <h3>Local frente a remoto y compartido</h3>
       <div class="prose">
@@ -1070,9 +1557,9 @@ bash practicar.sh grabaciones/todo-app ~/practica-todo</pre></div>
           <tr><td>Tareas personales en tu Mac con Claude, sin infraestructura</td><td><strong>Claude Desktop / Cowork</strong></td></tr>
           <tr><td>Programar en serio dentro de un repo</td><td><strong>Claude Code</strong> o <strong>Codex</strong>, con Hermes alrededor para CI, cron y revisión</td></tr>
           <tr><td>Agentes de código que corren en la nube con horario</td><td><strong>Rutinas de Claude Code</strong> o <strong>Hermes</strong> en un VPS</td></tr>
-          <tr><td>Que todo el equipo lance features y bugs con un flujo común y visible</td><td><strong>Hermes</strong> en un servidor, con perfiles y kanban (módulo 10)</td></tr>
-          <tr><td>Flujos deterministas con cientos de integraciones</td><td><strong>n8n / Zapier</strong>, con Hermes como paso inteligente vía webhook</td></tr>
-          <tr><td>Construir tu propio producto de agentes</td><td><strong>LangGraph</strong>, <strong>CrewAI</strong> o el Claude Agent SDK</td></tr>
+          <tr><td>Que todo el equipo lance features y bugs con un flujo común y visible</td><td><strong>Hermes</strong> en un servidor, con perfiles y kanban (módulo 10); si además hay un cliente que aprueba, con <code>hermes-sdd</code> (módulo 11)</td></tr>
+          <tr><td>Flujos deterministas con cientos de integraciones</td><td><strong>n8n / Zapier</strong>, con Hermes como paso inteligente vía webhook (una URL a la que el flujo envía datos para que Hermes los procese)</td></tr>
+          <tr><td>Construir tu propio producto de agentes</td><td><strong>LangGraph</strong>, <strong>CrewAI</strong> o el Claude Agent SDK (la librería de Anthropic para construir agentes con el mismo motor que Claude Code)</td></tr>
         </tbody></table></div>
       <button class="mark-done" type="button" data-mod="m10" aria-pressed="false">Marcar como completado</button>
     </section>

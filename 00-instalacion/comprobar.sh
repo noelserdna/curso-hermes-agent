@@ -8,4 +8,4 @@ echo "== Modelo";         hermes config get model
 echo "== Diagnóstico";    hermes doctor 2>&1 | tail -15
 echo "== Prueba real (cuesta ~0,002 \$)"
 hermes -z "Responde solo: OK, y el nombre del modelo que eres." --usage-file /tmp/hermes-usage.json \
-  && python3 -c "import json;print('Coste estimado:', json.load(open('/tmp/hermes-usage.json'))['total_including_auxiliary']['estimated_cost_usd'], 'USD')"
+  && python3 -c "import json;print('Coste estimado:', (lambda d: d.get('total_including_auxiliary', d)['estimated_cost_usd'])(json.load(open('/tmp/hermes-usage.json'))), 'USD')"

@@ -1,3 +1,5 @@
+# Metadatos del script (PEP 723): `uv run` lee el bloque siguiente e instala las dependencias
+# en un entorno aislado antes de ejecutar.
 # /// script
 # requires-python = ">=3.10"
 # dependencies = ["mcp>=2.3"]
@@ -6,6 +8,8 @@
 (Hermes, Claude Desktop, Claude Code, Cursor...).
 
 Ejecutar: uv run servidor_tienda.py   (transporte stdio)
+stdio: el cliente (Hermes) arranca este script como proceso hijo y habla con él por su
+entrada y salida estándar. No abre puertos ni usa red.
 """
 import json
 import sqlite3
@@ -13,11 +17,12 @@ from pathlib import Path
 
 from mcp.server.mcpserver import MCPServer  # mcp 2.x (antes: FastMCP)
 
-DB = Path(__file__).with_name("tienda.db")
-mcp = MCPServer("tienda")
+DB = Path(__file__).with_name("tienda.db")  # SQLite: la base de datos es este único fichero
+mcp = MCPServer("tienda")  # nombre con el que el servidor se presenta al cliente
 
 
 def conectar() -> sqlite3.Connection:
+    # La primera vez crea las tablas y cinco productos de ejemplo (SKU = código del producto).
     nueva = not DB.exists()
     con = sqlite3.connect(DB)
     con.row_factory = sqlite3.Row
@@ -35,6 +40,8 @@ def conectar() -> sqlite3.Connection:
     return con
 
 
+# @mcp.tool() publica la función como herramienta MCP: la docstring es la descripción que lee
+# el modelo para decidir cuándo llamarla, y los tipos de la firma definen sus parámetros.
 @mcp.tool()
 def listar_productos() -> str:
     """Devuelve todos los productos con precio (€ sin IVA), stock y stock mínimo."""
@@ -50,6 +57,8 @@ def stock_bajo() -> str:
         return json.dumps([dict(r) for r in filas], ensure_ascii=False)
 
 
+# Única herramienta con efectos (escribe en la base de datos): es la que conviene filtrar
+# (tools.exclude) o proteger (trust: untrusted) en la config del cliente.
 @mcp.tool()
 def registrar_pedido(sku: str, unidades: int) -> str:
     """Registra la venta de `unidades` del producto `sku` y descuenta el stock.
@@ -66,4 +75,4 @@ def registrar_pedido(sku: str, unidades: int) -> str:
 
 
 if __name__ == "__main__":
-    mcp.run()
+    mcp.run()  # por defecto, transporte stdio

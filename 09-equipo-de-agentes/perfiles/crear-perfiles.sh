@@ -13,13 +13,16 @@ crear() {  # crear <perfil> <descripción> [toolsets extra a desactivar...]
   if hermes profile list 2>/dev/null | grep -qw "$perfil"; then
     echo "· $perfil ya existe, lo salto"; return
   fi
+  # --clone: copia config.yaml, .env, SOUL.md y skills del perfil activo · --no-alias: no crea el comando
+  # <perfil> en ~/.local/bin · --description: qué hace el rol (el kanban la usa para repartir tareas)
   hermes profile create "$perfil" --clone --no-alias --description "$descripcion" >/dev/null
   cp "$perfil/SOUL.md" "$HOME/.hermes/profiles/$perfil/SOUL.md"
+  # -p <perfil>: el comando se aplica a ese perfil, sin cambiar el activo
   hermes -p "$perfil" tools disable "${COMUNES[@]}" "$@" >/dev/null
   # Higiene: que el entorno no cambie solo con el uso
-  hermes -p "$perfil" config set auxiliary.background_review.enabled false >/dev/null
-  hermes -p "$perfil" config set curator.enabled false >/dev/null
-  hermes -p "$perfil" config set skills.write_approval true >/dev/null
+  hermes -p "$perfil" config set auxiliary.background_review.enabled false >/dev/null  # sin autoaprendizaje tras cada turno
+  hermes -p "$perfil" config set curator.enabled false >/dev/null                      # sin archivar skills por desuso
+  hermes -p "$perfil" config set skills.write_approval true >/dev/null                 # cambios en skills, con tu aprobación
   echo "✓ $perfil"
 }
 
@@ -30,6 +33,7 @@ crear e2e           "Levanta la app y la prueba en el navegador recorriendo los 
 
 # El E2E graba en vídeo (WebM) cada sesión de navegador. La grabación solo funciona con las
 # herramientas clásicas (browser_navigate...), no con browser_exec, el modo por defecto desde v0.21.
+# backend off NO apaga el navegador: fuerza las herramientas clásicas.
 hermes -p e2e config set browser.backend off >/dev/null
 hermes -p e2e config set browser.record_sessions true >/dev/null
 

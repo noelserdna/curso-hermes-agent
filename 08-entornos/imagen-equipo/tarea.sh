@@ -6,9 +6,13 @@ set -euo pipefail
 REPO=$(cd "$1" && pwd); TAREA=$2
 ENV_FILE=${ENV_FILE:-$HOME/.hermes/.env}
 
+# Construye la imagen con el Dockerfile de esta carpeta y la llama hermes-equipo:local (-t).
+# Si nada cambió, Docker reutiliza lo ya construido.
 docker build -q -t hermes-equipo:local "$(dirname "$0")" >/dev/null
 
 # Solo pasamos la clave del proveedor, no el .env entero (que puede llevar tokens de Telegram, etc.)
+# --rm: borra el contenedor al terminar.  <(...): la salida de grep como fichero temporal.
+# -v: monta el repo en /workspace.  -w: trabaja ahí.  Tras la imagen van los argumentos de hermes.
 docker run --rm \
   --env-file <(grep '^OPENROUTER_API_KEY=' "$ENV_FILE") \
   -v "$REPO:/workspace" -w /workspace \

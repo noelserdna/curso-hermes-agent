@@ -3,16 +3,19 @@
 #   especificar → implementar (con goal y revisión) → E2E en navegador
 # El esqueleto es determinista (este script); cada fase es un agente con contexto limpio.
 # Requisitos: perfiles creados (perfiles/crear-perfiles.sh) y gateway en marcha (hermes gateway run).
-set -euo pipefail
+set -euo pipefail   # para en el primer error (-e), en variables sin definir (-u) y en fallos dentro de un | (pipefail)
 AQUI="$(cd "$(dirname "$0")" && pwd)"
 
 # 1. Entorno fresco: copia de la app en un repo git nuevo
+#    Carpeta: la que pases como primer argumento o, si no, una temporal nueva (mktemp cambia XXXX por letras al azar).
+#    git hace falta para el diff y los commits, y para que Hermes reconozca la carpeta como proyecto.
 WORK="${1:-$(mktemp -d /tmp/tienda-XXXX)}"
 cp -R "$AQUI/app-web/." "$WORK/"
 git -C "$WORK" init -q
 git -C "$WORK" add -A
 git -C "$WORK" -c user.name=pipeline -c user.email=pipeline@local commit -qm "estado inicial"
 for p in especificador implementador revisor e2e; do
+  # -p <perfil>: el comando se aplica a ese perfil. La confianza se guarda por perfil, por eso va en un bucle.
   hermes -p "$p" skills trust "$WORK" >/dev/null   # habilita las skills de proyecto (.hermes/skills)
 done
 echo "Entorno: $WORK"
@@ -20,6 +23,10 @@ echo "Entorno: $WORK"
 TICKET="$(cat "$AQUI/ticket.md")"
 
 # 2. Tarjetas encadenadas: cada una arranca cuando termina su padre
+#    --assignee: perfil que la hace · --workspace dir:<ruta>: trabaja en esa carpeta (no en una temporal vacía)
+#    --max-runtime: tiempo máximo; si lo supera, el dispatcher para al worker y la tarjeta vuelve a la cola
+#    --json | jq -r .id: guarda el id de la tarjeta para encadenar la siguiente con --parent
+#    --goal --goal-max-turns 15: un juez revisa cada turno contra la tarjeta; como mucho 15 turnos
 SPEC=$(hermes kanban create "Especificar TIENDA-12" --assignee especificador \
   --workspace "dir:$WORK" --max-runtime 10m --json \
   --body "$TICKET

@@ -16,12 +16,13 @@ if [ -n "$(git -C "$REPO" status --porcelain)" ]; then
 fi
 
 # Un tablero por proyecto: sus tarjetas, su dispatcher y el repo como carpeta de trabajo por defecto
+# Slug: el nombre de la carpeta en minúsculas, con todo lo que no sea letra o número cambiado por guiones
 BOARD=$(basename "$REPO" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+|-+$//g')
 if ! hermes kanban boards list --json | jq -e --arg b "$BOARD" 'any(.[]; .slug == $b)' >/dev/null; then
   hermes kanban boards create "$BOARD" --name "$(basename "$REPO")" --default-workdir "$REPO" >/dev/null
   echo "Tablero nuevo: $BOARD"
 fi
-KANBAN=(hermes kanban --board "$BOARD")
+KANBAN=(hermes kanban --board "$BOARD")   # prefijo común: todos los comandos de abajo van a este tablero
 
 # El comando de tests sale de la línea "- Tests: `…`" de AGENTS.md (así sirve para cualquier stack)
 TESTS=$(sed -nE 's/^[-*] *Tests: *`([^`]+)`.*/\1/p' "$REPO/AGENTS.md" 2>/dev/null | head -1 || true)

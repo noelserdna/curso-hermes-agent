@@ -1,14 +1,14 @@
 # Copia este fichero a .github/workflows/hermes-review.yml
 # Requiere el secreto OPENROUTER_API_KEY en Settings → Secrets and variables → Actions.
-# ✅ Probado en una PR real del repo del curso: ~2 min por ejecución (la instalación es ~70 s) y ~0,005 $ por revisión.
+# ✅ Probado en una PR real del repo del curso: ~2 min por ejecución (la instalación es ~70 s) y ~0,004 $ por revisión (3 ejecuciones ≈ 0,011 $).
 name: Revisión con Hermes
 
 on:
-  pull_request:
+  pull_request:   # se ejecuta al abrir una PR y en cada push a ella
 
-permissions:
-  contents: read
-  pull-requests: write
+permissions:      # permisos mínimos del token del job
+  contents: read          # leer el código
+  pull-requests: write    # comentar en la PR
 
 jobs:
   review:
@@ -19,13 +19,13 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          fetch-depth: 0
+          fetch-depth: 0   # todo el historial: git diff necesita la rama base
 
       - name: Instalar Hermes Agent (versión fijada)
         run: |
           curl -fsSL https://hermes-agent.nousresearch.com/install.sh \
             | bash -s -- --non-interactive --skip-browser --skip-computer-use --branch v0.21.6
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"   # hermes queda en el PATH de los pasos siguientes
           "$HOME/.local/bin/hermes" --version | head -1   # deja constancia de la versión en el log
 
       - name: Revisar el diff
@@ -34,6 +34,7 @@ jobs:
           # -t file permite leer y también escribir: el revisor solo puede escribir en una carpeta temporal
           HERMES_WRITE_SAFE_ROOT: ${{ runner.temp }}/hermes
         run: |
+          # Tres puntos: solo los cambios de la PR desde que su rama se separó de la base
           git diff origin/${{ github.base_ref }}...HEAD > pr.diff
           # El diff va en un fichero que el agente lee con su herramienta de ficheros (-t file),
           # no dentro del prompt: así no choca con el límite de tamaño de un argumento en PR grandes.
@@ -45,5 +46,5 @@ jobs:
 
       - name: Comentar en la PR
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ github.token }}   # token temporal que GitHub crea para este job
         run: gh pr comment ${{ github.event.pull_request.number }} --body-file review.md

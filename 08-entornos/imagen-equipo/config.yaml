@@ -4,7 +4,7 @@ model:
   provider: "openrouter"
 
 agent:
-  max_turns: 20
+  max_turns: 20   # tope de iteraciones con herramientas por petición
 
 # Nada de memoria ni autoaprendizaje: cada tarea parte del mismo estado
 memory:
