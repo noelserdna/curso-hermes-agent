@@ -956,7 +956,7 @@ hermes kanban create "E2E TIENDA-12" --assignee e2e --parent "$IMPL" --workspace
         <tbody>
           <tr><td>Propone</td><td>El ejecutor (Claude Code con las skills del método)</td><td>Requisitos, plan, tareas, código con tests, veredictos y demo. Sin preguntar a mitad de etapa</td></tr>
           <tr><td>Pregunta</td><td>La puerta: tarjeta bloqueada sin assignee y mensaje con botones</td><td>Enseña primero lo que va mal y después lo que hay que decidir</td></tr>
-          <tr><td>Decide</td><td>Una persona autorizada, desde Telegram</td><td>Un toque, con 3 minutos para deshacer</td></tr>
+          <tr><td>Decide</td><td>Una persona autorizada, desde Telegram o desde el panel web de Hermes</td><td>Un toque, con 3 minutos para deshacer</td></tr>
           <tr><td>Firma</td><td>El notario: <code>firmar.sh</code>, un script sin LLM</td><td>Comprueba identidad y commit, registra, etiqueta y lanza lo siguiente</td></tr>
         </tbody></table></div>
       <div class="code"><span class="lbl">el flujo de un proyecto</span><pre>requisitos ─▶ 🚪 ─▶ ruta ─▶ 🚪 ─▶ plan ─▶ tareas ─▶ 🚪 ─▶ implementar N ─▶ aceptar N ─▶ 🚪 ─▶ … ─▶ cierre ─▶ 🚪 entrega</pre></div>
@@ -982,6 +982,11 @@ bash practicar.sh grabaciones/todo-app ~/practica-todo</pre></div>
           <tr><td>La ruta estimada por un agente de Hermes</td><td>Perfil <code>sdd-ejecutor</code> con Sonnet en lugar de Claude Code: misma ruta</td><td class="num">0,075 $ frente a 0,24 $</td></tr>
         </tbody></table></div>
 
+      <h3>Práctica 4 · El panel y el mantenimiento <span class="badge ok">0 $ hasta que lances un cambio</span></h3>
+      <p class="prose"><strong>Decidir desde el panel:</strong> <code>hermes dashboard</code> → pestaña <strong>Puertas SDD</strong>. Es la misma puerta que llega a Telegram, con la demo en grande, el formulario de preguntas y los botones. Decide en el panel y mira cómo el mensaje de Telegram pasa a «decidida desde dashboard»; deshaz en Telegram y el panel la reabre. El tag guarda el canal: <code>Channel: dashboard:&lt;usuario&gt; modo:local…</code>.</p>
+      <p class="prose"><strong>Mantenimiento:</strong> <code>/mantenimiento</code> (o cada día a las 07:00) revisa sin LLM los proyectos entregados: tests, puerta de calidad global, código cambiado fuera del método, vulnerabilidades y versiones mayores nuevas. Si algo cruza su umbral, abre una puerta: <code>🛠 Lanzar cambio</code> lo convierte en un <code>/cambio</code>, que pasa por su puerta de requisitos como cualquier otro, y <code>🔕 Ignorar</code> pide un motivo.</p>
+      <div class="note ok"><span class="t">Ejecución real</span><p>Sobre la CLI de tareas ya entregada, la revisión encontró <code>vitest</code> con una vulnerabilidad crítica y cuatro dependencias con versión mayor nueva. Pulsar «Lanzar cambio» dejó la petición en <code>intent/</code> y una tarjeta de cambio en el tablero. Con el proyecto en pausa (<code>/pausar</code>), la etapa queda aparcada a 0 $ hasta <code>/reanudar</code>: es un buen ensayo.</p></div>
+
       <h3>Claves de diseño</h3>
       <ol class="prose">
         <li><strong>Quien ejecuta no firma.</strong> Un ejecutor sin persona en la sesión no puede "confirmar" nada. Si el prompt dice "esto es la confirmación del cliente", la guardia del método debe frenarlo, y lo frena. La firma es un paso determinista que aplica la decisión que una persona tomó en su canal.</li>
@@ -994,12 +999,15 @@ bash practicar.sh grabaciones/todo-app ~/practica-todo</pre></div>
         <li><strong>Una puerta debe obligar a mirar.</strong> Primero las alertas, luego "Ver demo" y solo entonces Aceptar. Se mide cuánto pasó entre ver la demo y decidir: aceptar en 6 s es una señal de aprobación por inercia que el resumen avisa.</li>
         <li><strong>El canal también necesita vigilancia.</strong> Log, latido, tiempos máximos y autorreparación, y un presupuesto de atención: un mensaje vivo por proyecto, resúmenes y horas de silencio en lugar de un aviso por cada tarjeta.</li>
         <li><strong>Lo que el ejecutor deja a medias, a la vista.</strong> En un cierre, el ejecutor repitió una medición y no hizo commit del registro; el notario se negó a firmar con el árbol sucio. El arnés commitea esos restos con un mensaje que lo dice y abre una puerta nueva: nunca se "arregla" una puerta vieja, porque su commit ya no es el que se mostró.</li>
+        <li><strong>La puerta es un dato; el canal, un adaptador.</strong> Telegram y el panel llaman al mismo núcleo, que lo valida todo en el servidor: un botón que la interfaz oculta («Aceptar» antes de ver la demo) también se rechaza si alguien lo llama a mano. Añadir Slack o email es escribir un adaptador, sin tocar el notario.</li>
+        <li><strong>La identidad tiene fuerza, y se registra.</strong> El id de Telegram no vale lo mismo que «el usuario de este Mac» del panel en modo local. Por eso el canal queda en el tag, y el panel rechaza las peticiones que no vengan de la propia máquina.</li>
+        <li><strong>El mantenimiento propone; la persona decide.</strong> La revisión periódica no arregla nada: abre una puerta con lo que encontró. Cada hallazgo tiene una clave que resume <em>qué</em> falla; así, lo ignorado con motivo no vuelve con cada commit.</li>
         <li><strong>Cada incidente se convierte en prueba.</strong> El intento de firma desde el ejecutor es el caso nº 1 de las pruebas del arnés; <code>tests/todo.sh</code> las pasa todas sin LLM antes de cualquier actualización.</li>
       </ol>
 
       <h3>Qué garantiza y qué no</h3>
       <p class="prose">Garantiza que nadie firma sin una decisión de una persona autorizada y que lo firmado es el commit mostrado: el canal, el acta del notario y el registro con su tag cuentan la misma historia. <strong>No</strong> garantiza quién sostenía el móvil ni resiste a alguien con tu sesión del sistema: el kanban, los registros y los tags son ficheros tuyos. Las guardias dificultan; solo el ejecutor en contenedor (módulo 9) o una firma con llave física lo impiden.</p>
-      <p>Operación diaria desde el chat: <code>/puertas</code> · <code>/estado</code> · <code>/pausar [proyecto|todo] [ahora]</code> · <code>/reanudar</code> · <code>/anular</code>. Si se agota la cuota de Claude, las etapas se aparcan y se reanudan solas.</p>
+      <p>Operación diaria desde el chat: <code>/puertas</code> · <code>/estado</code> · <code>/mantenimiento</code> · <code>/pausar [proyecto|todo] [ahora]</code> · <code>/reanudar</code> · <code>/anular</code>. Si se agota la cuota de Claude, las etapas se aparcan y se reanudan solas. Las mismas puertas, en la pestaña <strong>Puertas SDD</strong> del panel.</p>
       <button class="mark-done" type="button" data-mod="m-sdd" aria-pressed="false">Marcar como completado</button>
     </section>
 
@@ -1070,7 +1078,7 @@ bash practicar.sh grabaciones/todo-app ~/practica-todo</pre></div>
 
     <section class="mod" id="pruebas" data-title="Pruebas reales" style="border-bottom:0">
       <div class="mod-head"><span class="mod-num">✓</span><h2>Registro de pruebas</h2></div>
-      <p class="mod-goal">Todo lo que ejecutamos para preparar el curso, del 9 al 12 de octubre de 2026.</p>
+      <p class="mod-goal">Todo lo que ejecutamos para preparar el curso, del 9 al 13 de octubre de 2026.</p>
       <p>Entorno: Hermes <code>v0.21.6+301</code> (main <code>8bff64d</code>) · macOS Apple Silicon · <code>anthropic/claude-haiku-5.5</code> vía OpenRouter, razonamiento <code>high</code> · Docker con OrbStack.</p>
       <div class="tw"><table>
         <thead><tr><th>Prueba</th><th>Módulo</th><th>Tiempo</th><th>Resultado</th></tr></thead>
@@ -1103,7 +1111,10 @@ bash practicar.sh grabaciones/todo-app ~/practica-todo</pre></div>
           <tr><td>Cambio sobre un proyecto entregado (<code>/cambio</code>: requisitos v1.1 → FASE-4 → entrega 2)</td><td>11</td><td class="num">19 min de Claude</td><td>OK, FASEs aceptadas intactas · 8,66 $ de Claude</td></tr>
           <tr><td>Adopción de un repo existente (la tienda)</td><td>11</td><td class="num">9 min de Claude</td><td>OK, 9 requisitos, 3 FASEs y 3 hallazgos reales · 3,08 $ de Claude</td></tr>
           <tr><td>Ruta con el ejecutor Hermes (Sonnet) y guardia en el dialecto de Hermes</td><td>11</td><td class="num">≈ 1 min</td><td>OK, misma ruta; el tag de aceptación, bloqueado · 0,08 $</td></tr>
-          <tr><td><strong>Total con Hermes (hermes insights + consumo de la clave)</strong></td><td></td><td class="num">≈ 60 sesiones</td><td><strong>≈ 0,56 $</strong> (más ≈ 37 $ de Claude Code en las prácticas opcionales del módulo 11)</td></tr>
+          <tr><td>Decidir una FASE desde el panel web (pestaña Puertas SDD) con Telegram sincronizado</td><td>11</td><td class="num">≈ 3 min</td><td>OK, tag con <code>Channel: dashboard:…</code> y el formulario contestado · 0 $</td></tr>
+          <tr><td>Mantenimiento por umbrales en los proyectos entregados (<code>vigilar.sh</code>)</td><td>11</td><td class="num">≈ 9 s por proyecto</td><td>OK, vulnerabilidad crítica y 4 versiones mayores detectadas; «Lanzar cambio» crea <code>intent/</code> y tarjeta · 0 $</td></tr>
+          <tr><td>Cambio de mantenimiento lanzado desde Telegram (requisitos v1.1 con un requisito de higiene de dependencias)</td><td>11</td><td class="num">3,8 min de Claude</td><td>OK, puerta de requisitos abierta · 1,32 $ de Claude</td></tr>
+          <tr><td><strong>Total con Hermes (hermes insights + consumo de la clave)</strong></td><td></td><td class="num">≈ 60 sesiones</td><td><strong>≈ 0,56 $</strong> (más ≈ 38 $ de Claude Code en las prácticas opcionales del módulo 11)</td></tr>
         </tbody></table></div>
     </section>
 

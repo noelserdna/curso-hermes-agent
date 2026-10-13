@@ -14,7 +14,7 @@ aprobó) y **decisiones registradas** (quién aceptó qué, sobre qué commit). 
 |---|---|---|
 | Propone | el ejecutor (Claude Code con las skills del método) | requisitos, plan, tareas, código con tests, veredictos y demo |
 | Pregunta | la puerta: tarjeta bloqueada sin assignee + mensaje con botones | enseña lo que hay que decidir, empezando por lo que va mal |
-| Decide | una persona autorizada, desde Telegram | un toque; 3 minutos para deshacer |
+| Decide | una persona autorizada, desde Telegram o desde el panel web de Hermes | un toque; 3 minutos para deshacer |
 | Firma | el notario (`firmar.sh`, un script sin LLM) | comprueba identidad y commit, registra, etiqueta y lanza lo siguiente |
 | Orquesta | el kanban de Hermes + `lanzar.sh` | encadena las tarjetas por tramos, un tablero por proyecto |
 
@@ -72,6 +72,21 @@ botones, 103 tests en verde y los tags `requirements-v1.0`, `fase-0…3-accepted
 - **Etapas ligeras con Hermes:** la ruta del proyecto la estima un agente de Hermes con Sonnet (0,075 $) en vez de
   Claude Code (0,24 $), con la misma ruta resultante.
 
+## Práctica 4 · El panel y el mantenimiento ✅ (0 $ hasta que lances un cambio)
+
+- **Decidir desde el panel:** `hermes dashboard` → pestaña **Puertas SDD**. La misma puerta que llega a Telegram,
+  con la demo en grande (capturas y vídeo), el formulario de preguntas y los botones. Decide en el panel y mira cómo
+  el mensaje de Telegram cambia a «decidida desde dashboard»; deshaz en Telegram y mira cómo el panel la reabre.
+  El tag registra el canal: `Channel: dashboard:<usuario> modo:local…`.
+- **Mantenimiento:** `/mantenimiento` (o cada día a las 07:00) revisa los proyectos entregados sin LLM: tests,
+  puerta de calidad global, código cambiado fuera del método, vulnerabilidades y versiones mayores. Medido sobre la
+  CLI de tareas entregada: encontró `vitest` con una vulnerabilidad crítica y cuatro dependencias con versión mayor
+  nueva, y abrió una puerta. Lanzado el cambio desde Telegram, el ejecutor propuso en 3,8 min (1,32 $) la versión 1.1
+  de los requisitos, con un requisito nuevo de higiene de dependencias, y pidió aprobarla. `🛠 Lanzar cambio` lo convierte en un `/cambio` (con su puerta de requisitos, como
+  siempre); `🔕 Ignorar` pide un motivo y no vuelve a preguntar mientras el hallazgo no cambie.
+- **Ensayo sin gasto:** `/pausar <proyecto>` antes de lanzar el cambio. Verás la cadena entera (firma, `intent/`,
+  tarjeta) y la etapa quedará aparcada hasta `/reanudar`.
+
 ## Claves de diseño
 
 1. **Quien ejecuta no firma.** Un ejecutor sin persona en la sesión no puede "confirmar" nada: si el prompt dice
@@ -101,7 +116,16 @@ botones, 103 tests en verde y los tags `requirements-v1.0`, `fase-0…3-accepted
     commit del registro; el notario se negó a firmar con el árbol sucio (bien hecho). El arnés ahora commitea esos
     restos con un mensaje que lo dice, y la puerta se vuelve a abrir sobre el commit nuevo: nunca se "arregla" una
     puerta vieja, porque su commit ya no es el que se mostró.
-11. **Cada incidente se convierte en prueba.** El intento de firma desde el ejecutor es el caso nº 1 de las pruebas del
+11. **La puerta es un dato; el canal, un adaptador.** Telegram y el panel llaman al mismo núcleo, que valida todo en
+    el servidor: un botón que la interfaz oculta («Aceptar» antes de ver la demo) también se rechaza si alguien lo
+    llama a mano. Añadir Slack o email es escribir un adaptador, no tocar el notario.
+12. **La identidad tiene fuerza, y se registra.** El `from.id` de Telegram no vale lo mismo que «el usuario de este
+    Mac» del panel en modo local; por eso el canal va en el tag y el panel rechaza peticiones que no vengan de la propia
+    máquina.
+13. **El mantenimiento propone; la persona decide.** La revisión periódica no arregla nada: abre una puerta con lo que
+    encontró. Cada hallazgo tiene una clave que resume *qué* falla, así lo ignorado con motivo no vuelve en cada
+    commit.
+14. **Cada incidente se convierte en prueba.** El intento de firma desde el ejecutor es el caso nº 1 de las pruebas del
     arnés; `tests/todo.sh` los pasa todos sin LLM antes de cualquier actualización.
 
 ## Qué garantiza y qué no
@@ -113,5 +137,6 @@ lo impiden.
 
 ## Operación diaria
 
-`/puertas` · `/estado` · `/pausar [proyecto|todo] [ahora]` · `/reanudar` · `/anular <proyecto> <fase> <motivo>`.
+`/puertas` · `/estado` · `/mantenimiento [proyecto]` · `/pausar [proyecto|todo] [ahora]` · `/reanudar` ·
+`/anular <proyecto> <fase> <motivo>`. Las mismas puertas, en la pestaña **Puertas SDD** del panel.
 Si se agota la cuota de Claude, las etapas se aparcan y se reanudan solas cuando se reinicia.
