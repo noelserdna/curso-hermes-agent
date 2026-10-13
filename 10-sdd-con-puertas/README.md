@@ -112,10 +112,12 @@ botones, 103 tests en verde y los tags `requirements-v1.0`, `fase-0…3-accepted
 9. **El canal también necesita vigilancia.** Un bucle que se para sin dejar rastro deja decisiones sin firmar: log,
    latido, tiempos máximos y autorreparación. Y un presupuesto de atención: un mensaje vivo por proyecto, resúmenes y
    horas de silencio en lugar de un aviso por cada tarjeta.
-10. **Lo que el ejecutor deja a medias, a la vista.** En un cierre, el ejecutor repitió una medición y no hizo
-    commit del registro; el notario se negó a firmar con el árbol sucio (bien hecho). El arnés ahora commitea esos
-    restos con un mensaje que lo dice, y la puerta se vuelve a abrir sobre el commit nuevo: nunca se "arregla" una
-    puerta vieja, porque su commit ya no es el que se mostró.
+10. **Lo que el ejecutor deja a medias, a la vista y comprobado.** En un cierre, el ejecutor repitió una medición y
+    no hizo commit del registro; el notario se negó a firmar con el árbol sucio (bien hecho). El arnés commitea esos
+    restos con un mensaje que lo dice, pero solo después de comprobar que los registros de decisiones **solo crecieron**
+    y que lo nuevo lo escribió la CLI (mediciones de un comando); si no, la etapa falla y lo ve una persona. La puerta se
+    vuelve a abrir sobre el commit nuevo: nunca se "arregla" una puerta vieja, porque su commit ya no es el que se
+    mostró.
 11. **La puerta es un dato; el canal, un adaptador.** Telegram y el panel llaman al mismo núcleo, que valida todo en
     el servidor: un botón que la interfaz oculta («Aceptar» antes de ver la demo) también se rechaza si alguien lo
     llama a mano. Añadir Slack o email es escribir un adaptador, no tocar el notario.
@@ -125,8 +127,13 @@ botones, 103 tests en verde y los tags `requirements-v1.0`, `fase-0…3-accepted
 13. **El mantenimiento propone; la persona decide.** La revisión periódica no arregla nada: abre una puerta con lo que
     encontró. Cada hallazgo tiene una clave que resume *qué* falla, así lo ignorado con motivo no vuelve en cada
     commit.
-14. **Cada incidente se convierte en prueba.** El intento de firma desde el ejecutor es el caso nº 1 de las pruebas del
-    arnés; `tests/todo.sh` los pasa todos sin LLM antes de cualquier actualización.
+14. **Citar no es firmar.** Una guardia que bloquea cualquier *mención* de un registro bloquea también leerlo,
+    compararlo, commitear lo que escribió la CLI o citarlo en un informe, y el ejecutor acaba dejando trabajo sin
+    cerrar. La guardia busca invocaciones (fuera de comillas, en el segmento que empieza por el comando) y escrituras;
+    lo que se le escape lo para la comprobación del arnés al cerrar la etapa. Dos capas, cada una con su trabajo.
+15. **Cada incidente se convierte en prueba.** El intento de firma desde el ejecutor es el caso nº 1 de las pruebas del
+    arnés; `tests/todo.sh` los pasa todos sin LLM antes de cualquier actualización. También la práctica reproducida
+    comprueba que cada decisión registrada sea de quien practica: una grabación trae el trabajo, nunca las firmas.
 
 ## Qué garantiza y qué no
 
